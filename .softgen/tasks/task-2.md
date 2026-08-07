@@ -21,19 +21,20 @@ Add dashboard and lesson system to Speak Spanish Like I Did platform.
 - Components: LessonCard, VocabularyPopover, DashboardStats
 
 ## Checklist
-- [ ] Install missing packages (next-auth, prisma client, bcryptjs, react-hot-toast)
-- [ ] Update Prisma schema with Difficulty, Lesson, UserLessonProgress models
-- [ ] Create seed script with 5 sample lessons
-- [ ] Create API routes: /api/lessons, /api/lessons/[id]/progress
-- [ ] Create DashboardLayout component with sidebar/bottom nav
-- [ ] Create DashboardStats component with animated counters
-- [ ] Create LessonCard component
-- [ ] Create VocabularyPopover component
-- [ ] Create dashboard index page (stats, streak, recent activity)
-- [ ] Create lessons index page (browser with filters)
-- [ ] Create individual lesson page (viewer with content, vocabulary, grammar)
+- [x] Install missing packages (next-auth, prisma client, bcryptjs, react-hot-toast)
+- [x] Update Prisma schema with Difficulty, Lesson, UserLessonProgress models
+- [x] Create seed script with 5 sample lessons
+- [x] Create API routes: /api/lessons, /api/lessons/[id]/progress
+- [x] Create DashboardStats component with animated counters
+- [x] Create LessonCard component
+- [x] Create VocabularyPopover component
+- [x] Create dashboard index page (stats, streak, recent activity)
+- [x] Create lessons index page (browser with filters)
+- [x] Create individual lesson page (viewer with content, vocabulary, grammar)
+- [ ] Push database schema to Supabase
+- [ ] Seed the database with sample lessons
+- [ ] Run check_for_errors and fix issues
 - [ ] Update _app.tsx for dashboard layout support
-- [ ] Run check_for_errors
 
 ## Acceptance
 - Dashboard shows user stats, streak, and recent activity
