@@ -1,6 +1,6 @@
 ---
 title: Dashboard and Lesson System
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [dashboard, lessons, prisma, api]
@@ -31,10 +31,10 @@ Add dashboard and lesson system to Speak Spanish Like I Did platform.
 - [x] Create dashboard index page (stats, streak, recent activity)
 - [x] Create lessons index page (browser with filters)
 - [x] Create individual lesson page (viewer with content, vocabulary, grammar)
-- [ ] Push database schema to Supabase
-- [ ] Seed the database with sample lessons
-- [ ] Run check_for_errors and fix issues
-- [ ] Update _app.tsx for dashboard layout support
+- [x] Push database schema to Supabase (via SQL)
+- [x] Seed the database with sample lessons (via SQL)
+- [x] Run check_for_errors and fix issues
+- [x] Update _app.tsx for dashboard layout support
 
 ## Acceptance
 - Dashboard shows user stats, streak, and recent activity
