@@ -55,22 +55,71 @@ enum UserRole {
   ADMIN
 }
 
+enum Difficulty {
+  BEGINNER
+  ELEMENTARY
+  INTERMEDIATE
+  UPPER_INTERMEDIATE
+  ADVANCED
+  MASTERY
+}
+
 model User {
-  id                String       @id @default(cuid())
+  id                String               @id @default(cuid())
   name              String?
-  email             String?      @unique
+  email             String?              @unique
   emailVerified     DateTime?
   password          String?
   image             String?
-  level             SpanishLevel @default(A1)
-  role              UserRole     @default(STUDENT)
-  streak            Int          @default(0)
+  level             SpanishLevel         @default(A1)
+  role              UserRole             @default(STUDENT)
+  streak            Int                  @default(0)
   lastActiveDate    DateTime?
-  totalStudyMinutes Int          @default(0)
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
+  totalStudyMinutes Int                  @default(0)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
   accounts          Account[]
   sessions          Session[]
+  lessons           UserLessonProgress[]
 
   @@map("users")
+}
+
+model Lesson {
+  id              String               @id @default(cuid())
+  title           String
+  slug            String               @unique
+  description     String               @db.Text
+  content         String               @db.Text
+  difficulty      Difficulty
+  level           SpanishLevel
+  order           Int
+  imageUrl        String?
+  vocabularyJson  Json?
+  grammarJson     Json?
+  durationMinutes Int                  @default(15)
+  isPublished     Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  userProgress    UserLessonProgress[]
+
+  @@index([level, order])
+  @@map("lessons")
+}
+
+model UserLessonProgress {
+  id               String    @id @default(cuid())
+  userId           String
+  lessonId         String
+  isCompleted      Boolean   @default(false)
+  completedAt      DateTime?
+  quizScore        Float?
+  timeSpentMinutes Int       @default(0)
+  startedAt        DateTime  @default(now())
+  lastAccessedAt   DateTime  @default(now())
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson           Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("user_lesson_progress")
 }
