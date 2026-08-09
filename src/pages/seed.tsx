@@ -25,7 +25,7 @@ export default function SeedPage() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/seed", { method: "POST" });
+      const res = await fetch("/api/seed?_=" + Date.now(), { method: "POST" });
       const contentType = res.headers.get("content-type") || "";
       const text = await res.text();
 
