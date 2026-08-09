@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -115,6 +116,10 @@ export default function FlashcardsPage() {
 
   return (
     <div className="container py-6 md:py-10 max-w-2xl mx-auto">
+      <Head>
+        <title>Flashcards — Speak Spanish Like I Did</title>
+        <meta name="description" content="Review Spanish vocabulary with spaced repetition flashcards." />
+      </Head>
       {/* Header */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-2">

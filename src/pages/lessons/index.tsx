@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -77,6 +78,10 @@ export default function LessonsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-hero pb-20">
+      <Head>
+        <title>Lessons — Speak Spanish Like I Did</title>
+        <meta name="description" content="Browse Spanish lessons from A1 beginner to C2 mastery." />
+      </Head>
       <div className="container py-8">
         {/* Header */}
         <motion.div

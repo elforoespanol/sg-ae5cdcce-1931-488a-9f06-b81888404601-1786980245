@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -72,6 +73,10 @@ export default function AchievementsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-hero pb-16">
+      <Head>
+        <title>Achievements — Speak Spanish Like I Did</title>
+        <meta name="description" content="Track your Spanish learning achievements and milestones." />
+      </Head>
       <div className="container py-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}

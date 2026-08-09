@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -53,6 +54,10 @@ export default function ChatSessionsPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Head>
+        <title>AI Tutor — Speak Spanish Like I Did</title>
+        <meta name="description" content="Practice Spanish conversations with your AI tutor." />
+      </Head>
       <div className="container py-8 md:py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

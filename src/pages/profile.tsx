@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -63,6 +64,10 @@ export default function ProfilePage() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-8">
+      <Head>
+        <title>Profile — Speak Spanish Like I Did</title>
+        <meta name="description" content="View your Spanish learning profile and public stats." />
+      </Head>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4">
         <div className="h-24 w-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-4xl">
           {user.image ? (

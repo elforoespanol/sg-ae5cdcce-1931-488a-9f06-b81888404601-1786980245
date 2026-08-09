@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -95,6 +96,10 @@ export default function SettingsPage() {
 
   return (
     <div className="container max-w-4xl py-8 space-y-8">
+      <Head>
+        <title>Settings — Speak Spanish Like I Did</title>
+        <meta name="description" content="Manage your profile, learning goals, and account settings." />
+      </Head>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-serif font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your profile, learning preferences, and account</p>
