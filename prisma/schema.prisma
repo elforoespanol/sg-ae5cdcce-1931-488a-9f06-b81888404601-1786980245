@@ -85,12 +85,14 @@ model User {
   createdAt         DateTime     @default(now()) @map("created_at")
   updatedAt         DateTime     @updatedAt @map("updated_at")
 
-  accounts     Account[]
-  sessions     Session[]
-  lessons      UserLessonProgress[]
-  chatSessions ChatSession[]
-  flashcards   Flashcard[]
-  reviewLogs   FlashcardReviewLog[]
+  accounts         Account[]
+  sessions         Session[]
+  lessons          UserLessonProgress[]
+  chatSessions     ChatSession[]
+  flashcards       Flashcard[]
+  reviewLogs       FlashcardReviewLog[]
+  achievements     UserAchievement[]
+  vocabularyLists  VocabularyList[]
 
   @@map("users")
 }
@@ -212,4 +214,61 @@ model FlashcardReviewLog {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("flashcard_review_logs")
+}
+
+model Achievement {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  iconName        String   @map("icon_name")
+  category        String
+  requirementJson Json     @map("requirement_json")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  achievementId String   @map("achievement_id")
+  unlockedAt    DateTime @default(now()) @map("unlocked_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model VocabularyList {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  name        String
+  description String?
+  isPublic    Boolean  @default(false) @map("is_public")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  words VocabularyWord[]
+
+  @@map("vocabulary_lists")
+}
+
+model VocabularyWord {
+  id              String   @id @default(cuid())
+  listId          String   @map("list_id")
+  spanishText     String   @map("spanish_text")
+  englishText     String   @map("english_text")
+  exampleSentence String?  @map("example_sentence")
+  notes           String?
+  order           Int      @default(0)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  list VocabularyList @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@map("vocabulary_words")
 }
