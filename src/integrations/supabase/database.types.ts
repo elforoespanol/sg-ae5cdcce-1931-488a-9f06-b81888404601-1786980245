@@ -68,6 +68,36 @@ export type Database = {
           },
         ]
       }
+      achievements: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          icon_name: string
+          id: string
+          name: string
+          requirement_json: Json
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          icon_name: string
+          id?: string
+          name: string
+          requirement_json?: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon_name?: string
+          id?: string
+          name?: string
+          requirement_json?: Json
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -387,6 +417,42 @@ export type Database = {
           },
         ]
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_lesson_progress: {
         Row: {
           completedAt: string | null
@@ -503,6 +569,85 @@ export type Database = {
           token?: string
         }
         Relationships: []
+      }
+      vocabulary_lists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vocabulary_lists_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vocabulary_words: {
+        Row: {
+          created_at: string
+          english_text: string
+          example_sentence: string | null
+          id: string
+          list_id: string
+          notes: string | null
+          order: number
+          spanish_text: string
+        }
+        Insert: {
+          created_at?: string
+          english_text: string
+          example_sentence?: string | null
+          id?: string
+          list_id: string
+          notes?: string | null
+          order?: number
+          spanish_text: string
+        }
+        Update: {
+          created_at?: string
+          english_text?: string
+          example_sentence?: string | null
+          id?: string
+          list_id?: string
+          notes?: string | null
+          order?: number
+          spanish_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vocabulary_words_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "vocabulary_lists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
