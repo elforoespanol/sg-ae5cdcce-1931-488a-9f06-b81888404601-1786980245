@@ -31,13 +31,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         role: "ADMIN",
         level: "A1",
         streak: 0,
-        total_study_minutes: 0,
-        daily_goal: 20,
-        preferred_accent: "Spain",
-        email_reminders: true,
-        streak_warnings: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        totalStudyMinutes: 0,
+        dailyGoal: 20,
+        preferredAccent: "Spain",
+        emailReminders: true,
+        streakWarnings: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
       { onConflict: "email" }
     );
@@ -75,27 +75,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let createdCount = 0;
     for (const lesson of lessons) {
       const { error } = await adminClient.from("lessons").upsert(
-        { ...lesson, is_published: true, duration_minutes: 15, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+        { ...lesson, isPublished: true, durationMinutes: 15, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
         { onConflict: "slug" }
       );
       if (!error) createdCount++;
     }
 
     const achievements = [
-      { name: "First Steps", description: "Complete your first lesson", icon_name: "Footprints", category: "lessons", requirement_json: { type: "lessons_completed", count: 1 } },
-      { name: "Streak Starter", description: "Maintain a 3-day study streak", icon_name: "Flame", category: "streak", requirement_json: { type: "streak_days", count: 3 } },
-      { name: "Chat Beginner", description: "Send 10 messages to the AI tutor", icon_name: "MessageCircle", category: "chat", requirement_json: { type: "messages_sent", count: 10 } },
-      { name: "Flashcard Apprentice", description: "Review 50 flashcards", icon_name: "Brain", category: "flashcards", requirement_json: { type: "flashcards_reviewed", count: 50 } },
-      { name: "Level Up", description: "Complete all A1 lessons", icon_name: "TrendingUp", category: "lessons", requirement_json: { type: "level_completed", level: "A1" } },
-      { name: "Polyglot in Training", description: "Complete 10 lessons", icon_name: "BookOpen", category: "lessons", requirement_json: { type: "lessons_completed", count: 10 } },
-      { name: "Dedicated Learner", description: "Maintain a 7-day study streak", icon_name: "Calendar", category: "streak", requirement_json: { type: "streak_days", count: 7 } },
-      { name: "Vocabulary Master", description: "Learn 100 words in flashcards", icon_name: "Library", category: "flashcards", requirement_json: { type: "flashcards_mastered", count: 100 } },
+      { name: "First Steps", description: "Complete your first lesson", iconName: "Footprints", category: "lessons", requirementJson: { type: "lessons_completed", count: 1 } },
+      { name: "Streak Starter", description: "Maintain a 3-day study streak", iconName: "Flame", category: "streak", requirementJson: { type: "streak_days", count: 3 } },
+      { name: "Chat Beginner", description: "Send 10 messages to the AI tutor", iconName: "MessageCircle", category: "chat", requirementJson: { type: "messages_sent", count: 10 } },
+      { name: "Flashcard Apprentice", description: "Review 50 flashcards", iconName: "Brain", category: "flashcards", requirementJson: { type: "flashcards_reviewed", count: 50 } },
+      { name: "Level Up", description: "Complete all A1 lessons", iconName: "TrendingUp", category: "lessons", requirementJson: { type: "level_completed", level: "A1" } },
+      { name: "Polyglot in Training", description: "Complete 10 lessons", iconName: "BookOpen", category: "lessons", requirementJson: { type: "lessons_completed", count: 10 } },
+      { name: "Dedicated Learner", description: "Maintain a 7-day study streak", iconName: "Calendar", category: "streak", requirementJson: { type: "streak_days", count: 7 } },
+      { name: "Vocabulary Master", description: "Learn 100 words in flashcards", iconName: "Library", category: "flashcards", requirementJson: { type: "flashcards_mastered", count: 100 } },
     ];
 
     let achCount = 0;
     for (const ach of achievements) {
       const { error } = await adminClient.from("achievements").upsert(
-        { ...ach, created_at: new Date().toISOString() },
+        { ...ach, createdAt: new Date().toISOString() },
         { onConflict: "name" }
       );
       if (!error) achCount++;
