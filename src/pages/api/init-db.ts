@@ -49,7 +49,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         role: "ADMIN",
         level: "A1",
         streak: 0,
-        totalStudyMinutes: 0,
       },
       { onConflict: "email" }
     );
