@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, UserRole, SpanishLevel } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -8,7 +8,7 @@ const lessons = [
   {
     title: "Greetings and Introductions",
     description: "Learn how to greet people and introduce yourself in Spanish",
-    level: "A1",
+    level: SpanishLevel.A1,
     order: 1,
     estimatedMinutes: 15,
     vocabularyJson: [
@@ -52,7 +52,7 @@ Greet three people using different times of day.`,
   {
     title: "Numbers 1-100",
     description: "Master counting in Spanish from one to one hundred",
-    level: "A1",
+    level: SpanishLevel.A1,
     order: 2,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -84,7 +84,7 @@ veinte, treinta, cuarenta, cincuenta, sesenta, setenta, ochenta, noventa, cien
   {
     title: "Colors and Descriptions",
     description: "Describe the world around you with colors and adjectives",
-    level: "A1",
+    level: SpanishLevel.A1,
     order: 3,
     estimatedMinutes: 15,
     vocabularyJson: [
@@ -125,7 +125,7 @@ The big house is red.
   {
     title: "Family Members",
     description: "Talk about your family in Spanish",
-    level: "A1",
+    level: SpanishLevel.A1,
     order: 4,
     estimatedMinutes: 15,
     vocabularyJson: [
@@ -164,7 +164,7 @@ My family is big. I have two brothers and one sister.
   {
     title: "Daily Routines",
     description: "Describe your daily activities in Spanish",
-    level: "A1",
+    level: SpanishLevel.A1,
     order: 5,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -200,7 +200,7 @@ My family is big. I have two brothers and one sister.
   {
     title: "Food and Restaurants",
     description: "Order food and talk about meals in Spanish",
-    level: "A2",
+    level: SpanishLevel.A2,
     order: 6,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -235,7 +235,7 @@ Cliente: Una cerveza, por favor.
   {
     title: "Directions and Places",
     description: "Ask for and give directions in Spanish",
-    level: "A2",
+    level: SpanishLevel.A2,
     order: 7,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -269,7 +269,7 @@ El banco está a la izquierda.
   {
     title: "Shopping and Clothes",
     description: "Navigate shopping and describe clothing",
-    level: "A2",
+    level: SpanishLevel.A2,
     order: 8,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -305,7 +305,7 @@ Vendedor: Cuesta veinticinco euros.
   {
     title: "Weather and Seasons",
     description: "Talk about weather and seasons in Spanish",
-    level: "A2",
+    level: SpanishLevel.A2,
     order: 9,
     estimatedMinutes: 15,
     vocabularyJson: [
@@ -343,7 +343,7 @@ Vendedor: Cuesta veinticinco euros.
   {
     title: "Hobbies and Free Time",
     description: "Talk about what you do in your free time",
-    level: "A2",
+    level: SpanishLevel.A2,
     order: 10,
     estimatedMinutes: 15,
     vocabularyJson: [
@@ -378,7 +378,7 @@ Vendedor: Cuesta veinticinco euros.
   {
     title: "Past Tense (Preterite)",
     description: "Talk about completed past actions using the preterite tense",
-    level: "B1",
+    level: SpanishLevel.B1,
     order: 11,
     estimatedMinutes: 25,
     vocabularyJson: [
@@ -415,7 +415,7 @@ Fue una cena deliciosa.
   {
     title: "Past Tense (Imperfect)",
     description: "Describe ongoing past situations and habits",
-    level: "B1",
+    level: SpanishLevel.B1,
     order: 12,
     estimatedMinutes: 25,
     vocabularyJson: [
@@ -452,7 +452,7 @@ Mi abuela siempre nos preparaba paella.
   {
     title: "Future Plans",
     description: "Talk about future events and intentions",
-    level: "B1",
+    level: SpanishLevel.B1,
     order: 13,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -482,7 +482,7 @@ Mi abuela siempre nos preparaba paella.
   {
     title: "Giving Opinions",
     description: "Express opinions and preferences in Spanish",
-    level: "B1",
+    level: SpanishLevel.B1,
     order: 14,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -520,7 +520,7 @@ Prefiero la comida italiana a la comida rápida.
   {
     title: "Making Comparisons",
     description: "Compare people, places, and things in Spanish",
-    level: "B1",
+    level: SpanishLevel.B1,
     order: 15,
     estimatedMinutes: 20,
     vocabularyJson: [
@@ -560,7 +560,7 @@ Juan es tan alto como Pedro.
   {
     title: "Subjunctive Mood Introduction",
     description: "Express wishes, doubts, and possibilities",
-    level: "B2",
+    level: SpanishLevel.B2,
     order: 16,
     estimatedMinutes: 30,
     vocabularyJson: [
@@ -602,7 +602,7 @@ Dudo que él sepa la respuesta.
   {
     title: "Conditional Tense",
     description: "Talk about hypothetical situations",
-    level: "B2",
+    level: SpanishLevel.B2,
     order: 17,
     estimatedMinutes: 25,
     vocabularyJson: [
@@ -639,7 +639,7 @@ Si fuera rico, compraría una isla.
   {
     title: "Complex Sentence Structures",
     description: "Build complex and compound sentences",
-    level: "B2",
+    level: SpanishLevel.B2,
     order: 18,
     estimatedMinutes: 25,
     vocabularyJson: [
@@ -673,7 +673,7 @@ Si fuera rico, compraría una isla.
   {
     title: "Business Spanish",
     description: "Professional communication in Spanish",
-    level: "B2",
+    level: SpanishLevel.B2,
     order: 19,
     estimatedMinutes: 25,
     vocabularyJson: [
@@ -711,7 +711,7 @@ Si fuera rico, compraría una isla.
   {
     title: "Cultural Topics: Spain",
     description: "Explore Spanish culture, history, and traditions",
-    level: "B2",
+    level: SpanishLevel.B2,
     order: 20,
     estimatedMinutes: 25,
     vocabularyJson: [
@@ -750,7 +750,7 @@ Si fuera rico, compraría una isla.
   {
     title: "Advanced Subjunctive",
     description: "Master complex subjunctive constructions",
-    level: "C1",
+    level: SpanishLevel.C1,
     order: 21,
     estimatedMinutes: 30,
     vocabularyJson: [
@@ -784,7 +784,7 @@ Lo haré sin que nadie me lo pida.
   {
     title: "Literary Analysis Vocabulary",
     description: "Discuss literature with academic vocabulary",
-    level: "C1",
+    level: SpanishLevel.C1,
     order: 22,
     estimatedMinutes: 30,
     vocabularyJson: [
@@ -825,7 +825,7 @@ de Colombia a través de la familia Buendía.
   {
     title: "Debate and Argumentation",
     description: "Participate in formal debates and discussions",
-    level: "C1",
+    level: SpanishLevel.C1,
     order: 23,
     estimatedMinutes: 30,
     vocabularyJson: [
@@ -862,7 +862,7 @@ de Colombia a través de la familia Buendía.
   {
     title: "Professional Writing",
     description: "Write formal reports, essays, and correspondence",
-    level: "C1",
+    level: SpanishLevel.C1,
     order: 24,
     estimatedMinutes: 30,
     vocabularyJson: [
@@ -902,7 +902,7 @@ las tendencias actuales del mercado español...
   {
     title: "Cultural Topics: Latin America",
     description: "Explore the diversity of Latin American cultures",
-    level: "C1",
+    level: SpanishLevel.C1,
     order: 25,
     estimatedMinutes: 30,
     vocabularyJson: [
@@ -939,7 +939,7 @@ Este mestizaje cultural es su mayor riqueza.
   {
     title: "Nuanced Expression",
     description: "Express subtle meanings and shades of opinion",
-    level: "C2",
+    level: SpanishLevel.C2,
     order: 26,
     estimatedMinutes: 35,
     vocabularyJson: [
@@ -970,7 +970,7 @@ Este mestizaje cultural es su mayor riqueza.
   {
     title: "Academic Spanish",
     description: "Write and present at university level",
-    level: "C2",
+    level: SpanishLevel.C2,
     order: 27,
     estimatedMinutes: 35,
     vocabularyJson: [
@@ -1002,7 +1002,7 @@ Este mestizaje cultural es su mayor riqueza.
   {
     title: "Poetry and Literature",
     description: "Analyze and appreciate Spanish poetry",
-    level: "C2",
+    level: SpanishLevel.C2,
     order: 28,
     estimatedMinutes: 35,
     vocabularyJson: [
@@ -1043,7 +1043,7 @@ crean un mundo poético único.
   {
     title: "Historical Texts",
     description: "Read and analyze historical documents",
-    level: "C2",
+    level: SpanishLevel.C2,
     order: 29,
     estimatedMinutes: 35,
     vocabularyJson: [
@@ -1083,7 +1083,7 @@ propias de la épica castellana.
   {
     title: "Regional Dialects and Variations",
     description: "Understand Spanish dialectal diversity",
-    level: "C2",
+    level: SpanishLevel.C2,
     order: 30,
     estimatedMinutes: 35,
     vocabularyJson: [
@@ -1134,8 +1134,8 @@ async function main() {
       email: "test@example.com",
       name: "Test User",
       password: hashedPassword,
-      level: "A1",
-      role: "USER",
+      level: SpanishLevel.A1,
+      role: UserRole.USER,
       xp: 1500,
       streakDays: 5,
       totalStudyMinutes: 480,
