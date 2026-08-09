@@ -82,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     // Get lesson context if linked
-    let lessonContext = {
+    const lessonContext = {
       topic: "General Spanish Conversation",
       vocabularyFocus: [] as string[],
       grammarFocus: [] as string[],

@@ -1,6 +1,6 @@
 ---
 title: AI Tutor Chat System
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [ai, chat, tutor, openai, streaming]
@@ -20,20 +20,21 @@ Implement AI-powered Spanish tutor chat with Sofía persona.
 - Custom hook for managing chat state and streaming
 
 ## Checklist
-- [ ] Update Prisma schema with ChatSession and ChatMessage
-- [ ] Generate Prisma client with new models
-- [ ] Create lib/ai/tutor-prompt.ts
-- [ ] Create lib/ai/parse-correction.ts
-- [ ] Create API route: /api/tutor/chat (POST with streaming)
-- [ ] Create chat session list page
-- [ ] Create individual chat page with streaming
-- [ ] Create new chat from lesson page
-- [ ] Create ChatBubble component
-- [ ] Create CorrectionDisplay component
-- [ ] Create ChatInput component
-- [ ] Create useAITutor hook
-- [ ] Add chat nav link to Navbar
-- [ ] Validate build passes
+- [x] Update Prisma schema with ChatSession and ChatMessage
+- [x] Generate Prisma client with new models
+- [x] Create lib/ai/tutor-prompt.ts
+- [x] Create lib/ai/parse-correction.ts
+- [x] Create API route: /api/tutor/chat (POST with streaming)
+- [x] Create chat session list page
+- [x] Create individual chat page with streaming
+- [x] Create new chat from lesson page
+- [x] Create ChatBubble component
+- [x] Create CorrectionDisplay component
+- [x] Create ChatInput component
+- [x] Create useAITutor hook
+- [x] Add chat nav link to Navbar
+- [x] Push database schema to Supabase
+- [x] Validate build passes
 
 ## Acceptance
 - User can start new chat sessions
