@@ -507,7 +507,9 @@ export type Database = {
       users: {
         Row: {
           createdAt: string | null
+          daily_goal: number
           email: string | null
+          email_reminders: boolean
           emailVerified: string | null
           id: string
           image: string | null
@@ -515,14 +517,18 @@ export type Database = {
           level: string | null
           name: string | null
           password: string | null
+          preferred_accent: string
           role: string | null
           streak: number | null
+          streak_warnings: boolean
           totalStudyMinutes: number | null
           updatedAt: string | null
         }
         Insert: {
           createdAt?: string | null
+          daily_goal?: number
           email?: string | null
+          email_reminders?: boolean
           emailVerified?: string | null
           id?: string
           image?: string | null
@@ -530,14 +536,18 @@ export type Database = {
           level?: string | null
           name?: string | null
           password?: string | null
+          preferred_accent?: string
           role?: string | null
           streak?: number | null
+          streak_warnings?: boolean
           totalStudyMinutes?: number | null
           updatedAt?: string | null
         }
         Update: {
           createdAt?: string | null
+          daily_goal?: number
           email?: string | null
+          email_reminders?: boolean
           emailVerified?: string | null
           id?: string
           image?: string | null
@@ -545,8 +555,10 @@ export type Database = {
           level?: string | null
           name?: string | null
           password?: string | null
+          preferred_accent?: string
           role?: string | null
           streak?: number | null
+          streak_warnings?: boolean
           totalStudyMinutes?: number | null
           updatedAt?: string | null
         }
