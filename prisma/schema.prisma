@@ -1,4 +1,83 @@
-... existing content before Lesson model ...
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SpanishLevel {
+  A1 A2 B1 B2 C1 C2
+}
+
+enum UserRole {
+  STUDENT TEACHER ADMIN
+}
+
+enum Difficulty {
+  BEGINNER ELEMENTARY INTERMEDIATE UPPER_INTERMEDIATE ADVANCED MASTERY
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id                String       @id @default(cuid())
+  name              String?
+  email             String?      @unique
+  emailVerified     DateTime?    @map("email_verified")
+  password          String?
+  image             String?
+  level             SpanishLevel @default(A1)
+  role              UserRole     @default(STUDENT)
+  streak            Int          @default(0)
+  lastActiveDate    DateTime?    @map("last_active_date")
+  totalStudyMinutes Int          @default(0) @map("total_study_minutes")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  accounts         Account[]
+  sessions         Session[]
+  lessons          UserLessonProgress[]
+  chatSessions     ChatSession[]
+  flashcards       Flashcard[]
+  reviewLogs       FlashcardReviewLog[]
+
+  @@map("users")
+}
 
 model Lesson {
   id              String     @id @default(cuid())
@@ -41,6 +120,40 @@ model UserLessonProgress {
 
   @@unique([userId, lessonId])
   @@map("user_lesson_progress")
+}
+
+model ChatSession {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  lessonId  String?  @map("lesson_id")
+  title     String?
+  summary   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson   Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  messages ChatMessage[]
+
+  @@index([userId, createdAt])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id            String   @id @default(cuid())
+  sessionId     String   @map("session_id")
+  role          String
+  content       String   @db.Text
+  hasCorrection Boolean  @default(false) @map("has_correction")
+  originalText  String?  @db.Text @map("original_text")
+  correctedText String?  @db.Text @map("corrected_text")
+  explanation   String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("chat_messages")
 }
 
 model Flashcard {
