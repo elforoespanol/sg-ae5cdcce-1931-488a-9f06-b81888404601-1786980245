@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,12 +11,20 @@ import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { status } = useSession();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    }
+  }, [status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,20 +38,17 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        toast.error("Invalid email or password");
-        setIsLoading(false);
+        toast.error(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
         return;
       }
 
       toast.success("Welcome back!");
-      setIsLoading(false);
-      
-      // Small delay to ensure session cookie is written before navigation
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 300);
-    } catch {
-      toast.error("Something went wrong");
+      // Hard redirect to ensure session is picked up fresh
+      window.location.href = "/dashboard";
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+      console.error("Login error:", err);
+    } finally {
       setIsLoading(false);
     }
   };
