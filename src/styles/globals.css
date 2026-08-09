@@ -61,6 +61,37 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
   }
+
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+}
+
+@layer base {
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  button, a, input, select, textarea {
+    @apply transition-colors duration-150;
+  }
 }
 
 @layer utilities {
@@ -95,10 +126,51 @@
   .bg-gradient-card {
     background: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(40 30% 96%) 100%);
   }
+
+  .animate-skeleton {
+    animation: skeleton-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .animate-page-in {
+    animation: page-in 0.3s ease-out;
+  }
+
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }
 
 @layer components {
   .container {
     @apply mx-auto px-4 md:px-6 lg:px-8 max-w-7xl w-full;
+  }
+
+  .skeleton {
+    @apply bg-muted rounded-md animate-skeleton;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .print-only {
+    display: block !important;
   }
 }

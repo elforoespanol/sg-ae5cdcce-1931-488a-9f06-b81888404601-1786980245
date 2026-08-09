@@ -82,6 +82,10 @@ model User {
   streak            Int          @default(0)
   lastActiveDate    DateTime?    @map("last_active_date")
   totalStudyMinutes Int          @default(0) @map("total_study_minutes")
+  dailyGoal         Int          @default(20) @map("daily_goal")
+  preferredAccent   String       @default("Spain") @map("preferred_accent")
+  emailReminders    Boolean      @default(true) @map("email_reminders")
+  streakWarnings    Boolean      @default(true) @map("streak_warnings")
   createdAt         DateTime     @default(now()) @map("created_at")
   updatedAt         DateTime     @updatedAt @map("updated_at")
 
