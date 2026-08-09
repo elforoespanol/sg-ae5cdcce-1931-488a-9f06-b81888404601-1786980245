@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient, UserRole, SpanishLevel } from "@prisma/client";
+import { PrismaClient, UserRole, SpanishLevel, Difficulty } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -10,7 +10,7 @@ const lessons = [
     description: "Learn how to greet people and introduce yourself in Spanish",
     level: SpanishLevel.A1,
     slug: "greetings-and-introductions",
-    difficulty: "beginner",
+    difficulty: Difficulty.BEGINNER,
     order: 1,
     vocabularyJson: [
       { spanish: "hola", english: "hello", partOfSpeech: "interjection" },
@@ -36,7 +36,7 @@ const lessons = [
     description: "Master counting in Spanish from one to one hundred",
     level: SpanishLevel.A1,
     slug: "numbers-1-100",
-    difficulty: "beginner",
+    difficulty: Difficulty.Beginner,
     order: 2,
     vocabularyJson: [
       { spanish: "uno", english: "one", partOfSpeech: "number" },
@@ -59,7 +59,7 @@ const lessons = [
     description: "Describe the world around you with colors and adjectives",
     level: SpanishLevel.A1,
     slug: "colors-and-descriptions",
-    difficulty: "beginner",
+    difficulty: Difficulty.Beginner,
     order: 3,
     vocabularyJson: [
       { spanish: "rojo", english: "red", partOfSpeech: "adjective" },
@@ -83,7 +83,7 @@ const lessons = [
     description: "Talk about your family in Spanish",
     level: SpanishLevel.A1,
     slug: "family-members",
-    difficulty: "beginner",
+    difficulty: Difficulty.Beginner,
     order: 4,
     vocabularyJson: [
       { spanish: "madre", english: "mother", partOfSpeech: "noun" },
@@ -107,7 +107,7 @@ const lessons = [
     description: "Describe your daily activities in Spanish",
     level: SpanishLevel.A1,
     slug: "daily-routines",
-    difficulty: "beginner",
+    difficulty: Difficulty.Beginner,
     order: 5,
     vocabularyJson: [
       { spanish: "despertar", english: "to wake up", partOfSpeech: "verb" },
@@ -130,7 +130,7 @@ const lessons = [
     description: "Order food and talk about meals in Spanish",
     level: SpanishLevel.A2,
     slug: "food-and-restaurants",
-    difficulty: "beginner",
+    difficulty: Difficulty.BEGINNER,
     order: 6,
     vocabularyJson: [
       { spanish: "restaurante", english: "restaurant", partOfSpeech: "noun" },
@@ -153,7 +153,7 @@ const lessons = [
     description: "Ask for and give directions in Spanish",
     level: SpanishLevel.A2,
     slug: "directions-and-places",
-    difficulty: "elementary",
+    difficulty: Difficulty.ELEMENTARY,
     order: 7,
     vocabularyJson: [
       { spanish: "izquierda", english: "left", partOfSpeech: "noun" },
@@ -176,7 +176,7 @@ const lessons = [
     description: "Navigate shopping and describe clothing",
     level: SpanishLevel.A2,
     slug: "shopping-and-clothes",
-    difficulty: "elementary",
+    difficulty: Difficulty.ELEMENTARY,
     order: 8,
     vocabularyJson: [
       { spanish: "tienda", english: "store", partOfSpeech: "noun" },
@@ -199,7 +199,7 @@ const lessons = [
     description: "Talk about weather and seasons in Spanish",
     level: SpanishLevel.A2,
     slug: "weather-and-seasons",
-    difficulty: "elementary",
+    difficulty: Difficulty.ELEMENTARY,
     order: 9,
     vocabularyJson: [
       { spanish: "sol", english: "sun", partOfSpeech: "noun" },
@@ -222,7 +222,7 @@ const lessons = [
     description: "Talk about what you do in your free time",
     level: SpanishLevel.A2,
     slug: "hobbies-and-free-time",
-    difficulty: "elementary",
+    difficulty: Difficulty.ELEMENTARY,
     order: 10,
     vocabularyJson: [
       { spanish: "hobby", english: "hobby", partOfSpeech: "noun" },
@@ -245,7 +245,7 @@ const lessons = [
     description: "Talk about completed past actions using the preterite tense",
     level: SpanishLevel.B1,
     slug: "past-tense-preterite",
-    difficulty: "intermediate",
+    difficulty: Difficulty.INTERMEDIATE,
     order: 11,
     vocabularyJson: [
       { spanish: "ayer", english: "yesterday", partOfSpeech: "adverb" },
@@ -267,7 +267,7 @@ const lessons = [
     description: "Describe ongoing past situations and habits",
     level: SpanishLevel.B1,
     slug: "past-tense-imperfect",
-    difficulty: "intermediate",
+    difficulty: Difficulty.INTERMEDIATE,
     order: 12,
     vocabularyJson: [
       { spanish: "siempre", english: "always", partOfSpeech: "adverb" },
@@ -289,7 +289,7 @@ const lessons = [
     description: "Talk about future events and intentions",
     level: SpanishLevel.B1,
     slug: "future-plans",
-    difficulty: "intermediate",
+    difficulty: Difficulty.INTERMEDIATE,
     order: 13,
     vocabularyJson: [
       { spanish: "mañana", english: "tomorrow", partOfSpeech: "adverb" },
@@ -311,7 +311,7 @@ const lessons = [
     description: "Express opinions and preferences in Spanish",
     level: SpanishLevel.B1,
     slug: "giving-opinions",
-    difficulty: "intermediate",
+    difficulty: Difficulty.INTERMEDIATE,
     order: 14,
     vocabularyJson: [
       { spanish: "opinión", english: "opinion", partOfSpeech: "noun" },
@@ -334,7 +334,7 @@ const lessons = [
     description: "Compare people, places, and things in Spanish",
     level: SpanishLevel.B1,
     slug: "making-comparisons",
-    difficulty: "intermediate",
+    difficulty: Difficulty.INTERMEDIATE,
     order: 15,
     vocabularyJson: [
       { spanish: "más", english: "more", partOfSpeech: "adverb" },
@@ -357,7 +357,7 @@ const lessons = [
     description: "Express wishes, doubts, and possibilities",
     level: SpanishLevel.B2,
     slug: "subjunctive-mood-introduction",
-    difficulty: "upper-intermediate",
+    difficulty: Difficulty.UPPER_INTERMEDIATE,
     order: 16,
     vocabularyJson: [
       { spanish: "ojalá", english: "hopefully", partOfSpeech: "adverb" },
@@ -380,7 +380,7 @@ const lessons = [
     description: "Talk about hypothetical situations",
     level: SpanishLevel.B2,
     slug: "conditional-tense",
-    difficulty: "upper-intermediate",
+    difficulty: Difficulty.UPPER_INTERMEDIATE,
     order: 17,
     vocabularyJson: [
       { spanish: "si", english: "if", partOfSpeech: "conjunction" },
@@ -402,7 +402,7 @@ const lessons = [
     description: "Build complex and compound sentences",
     level: SpanishLevel.B2,
     slug: "complex-sentence-structures",
-    difficulty: "upper-intermediate",
+    difficulty: Difficulty.UPPER_INTERMEDIATE,
     order: 18,
     vocabularyJson: [
       { spanish: "aunque", english: "although", partOfSpeech: "conjunction" },
@@ -425,7 +425,7 @@ const lessons = [
     description: "Professional communication in Spanish",
     level: SpanishLevel.B2,
     slug: "business-spanish",
-    difficulty: "upper-intermediate",
+    difficulty: Difficulty.UPPER_INTERMEDIATE,
     order: 19,
     vocabularyJson: [
       { spanish: "reunión", english: "meeting", partOfSpeech: "noun" },
@@ -448,7 +448,7 @@ const lessons = [
     description: "Explore Spanish culture, history, and traditions",
     level: SpanishLevel.B2,
     slug: "cultural-topics-spain",
-    difficulty: "upper-intermediate",
+    difficulty: Difficulty.UPPER_INTERMEDIATE,
     order: 20,
     vocabularyJson: [
       { spanish: "fiesta", english: "festival/party", partOfSpeech: "noun" },
@@ -471,7 +471,7 @@ const lessons = [
     description: "Master complex subjunctive constructions",
     level: SpanishLevel.C1,
     slug: "advanced-subjunctive",
-    difficulty: "advanced",
+    difficulty: Difficulty.ADVANCED,
     order: 21,
     vocabularyJson: [
       { spanish: "aun cuando", english: "even when", partOfSpeech: "phrase" },
@@ -493,7 +493,7 @@ const lessons = [
     description: "Discuss literature with academic vocabulary",
     level: SpanishLevel.C1,
     slug: "literary-analysis-vocabulary",
-    difficulty: "advanced",
+    difficulty: Difficulty.Advanced,
     order: 22,
     vocabularyJson: [
       { spanish: "metáfora", english: "metaphor", partOfSpeech: "noun" },
@@ -516,7 +516,7 @@ const lessons = [
     description: "Participate in formal debates and discussions",
     level: SpanishLevel.C1,
     slug: "debate-and-argumentation",
-    difficulty: "advanced",
+    difficulty: Difficulty.Advanced,
     order: 23,
     vocabularyJson: [
       { spanish: "argumento", english: "argument", partOfSpeech: "noun" },
@@ -539,7 +539,7 @@ const lessons = [
     description: "Write formal reports, essays, and correspondence",
     level: SpanishLevel.C1,
     slug: "professional-writing",
-    difficulty: "advanced",
+    difficulty: Difficulty.Advanced,
     order: 24,
     vocabularyJson: [
       { spanish: "informe", english: "report", partOfSpeech: "noun" },
@@ -562,7 +562,7 @@ const lessons = [
     description: "Explore the diversity of Latin American cultures",
     level: SpanishLevel.C1,
     slug: "cultural-topics-latin-america",
-    difficulty: "advanced",
+    difficulty: Difficulty.Advanced,
     order: 25,
     vocabularyJson: [
       { spanish: "diversidad", english: "diversity", partOfSpeech: "noun" },
@@ -585,7 +585,7 @@ const lessons = [
     description: "Express subtle meanings and shades of opinion",
     level: SpanishLevel.C2,
     slug: "nuanced-expression",
-    difficulty: "mastery",
+    difficulty: Difficulty.MASTERY,
     order: 26,
     vocabularyJson: [
       { spanish: "matiz", english: "nuance", partOfSpeech: "noun" },
@@ -607,7 +607,7 @@ const lessons = [
     description: "Write and present at university level",
     level: SpanishLevel.C2,
     slug: "academic-spanish",
-    difficulty: "mastery",
+    difficulty: Difficulty.MASTERY,
     order: 27,
     vocabularyJson: [
       { spanish: "hipótesis", english: "hypothesis", partOfSpeech: "noun" },
@@ -630,7 +630,7 @@ const lessons = [
     description: "Analyze and appreciate Spanish poetry",
     level: SpanishLevel.C2,
     slug: "poetry-and-literature",
-    difficulty: "mastery",
+    difficulty: Difficulty.MASTERY,
     order: 28,
     vocabularyJson: [
       { spanish: "verso", english: "verse", partOfSpeech: "noun" },
@@ -653,7 +653,7 @@ const lessons = [
     description: "Read and analyze historical documents",
     level: SpanishLevel.C2,
     slug: "historical-texts",
-    difficulty: "mastery",
+    difficulty: Difficulty.MASTERY,
     order: 29,
     vocabularyJson: [
       { spanish: "crónica", english: "chronicle", partOfSpeech: "noun" },
@@ -676,7 +676,7 @@ const lessons = [
     description: "Understand Spanish dialectal diversity",
     level: SpanishLevel.C2,
     slug: "regional-dialects-and-variations",
-    difficulty: "mastery",
+    difficulty: Difficulty.MASTERY,
     order: 30,
     vocabularyJson: [
       { spanish: "dialecto", english: "dialect", partOfSpeech: "noun" },
