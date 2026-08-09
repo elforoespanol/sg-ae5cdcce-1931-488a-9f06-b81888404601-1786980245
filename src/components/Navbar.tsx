@@ -2,7 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
-import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy } from "lucide-react";
+import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy, Settings, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -69,19 +69,29 @@ export function Navbar() {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-card shadow-lg py-1">
+                <div className="absolute right-0 mt-2 w-52 rounded-lg border border-border bg-card shadow-lg py-1">
                   <div className="px-4 py-2 border-b border-border">
                     <p className="text-sm font-medium text-foreground">{session.user.name}</p>
                     <p className="text-xs text-muted-foreground">{session.user.email}</p>
                     <p className="text-xs text-primary font-medium mt-0.5">Level: {session.user.level}</p>
                   </div>
-                  <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Sign out
-                  </button>
+                  <Link href="/profile" className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                    <User className="h-4 w-4" />
+                    Profile
+                  </Link>
+                  <Link href="/settings" className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
+                  <div className="border-t border-border mt-1 pt-1">
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -132,7 +142,7 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-2 border-t border-border mt-2">
+            <div className="pt-2 border-t border-border mt-2 space-y-1">
               {session?.user ? (
                 <>
                   <div className="flex items-center gap-3 px-4 py-3">
