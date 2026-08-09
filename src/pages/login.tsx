@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,8 +46,10 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back!");
-      // Hard redirect to ensure session is picked up fresh
-      window.location.replace("/dashboard");
+
+      // Force session refresh and then navigate
+      await getSession({ event: "storage" });
+      router.push("/dashboard");
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
       console.error("Login error:", err);
