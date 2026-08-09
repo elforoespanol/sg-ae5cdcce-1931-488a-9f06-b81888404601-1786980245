@@ -31,11 +31,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      console.log("[LOGIN] Attempting sign in with:", formData.email);
       const result = await signIn("credentials", {
         email: formData.email,
         password: formData.password,
         redirect: false,
       });
+
+      console.log("[LOGIN] signIn result:", result);
 
       if (result?.error) {
         toast.error(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
@@ -44,7 +47,7 @@ export default function LoginPage() {
 
       toast.success("Welcome back!");
       // Hard redirect to ensure session is picked up fresh
-      window.location.href = "/dashboard";
+      window.location.replace("/dashboard");
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
       console.error("Login error:", err);

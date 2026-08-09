@@ -6,6 +6,9 @@ import bcrypt from "bcryptjs";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+console.log("[AUTH INIT] Supabase URL present:", !!supabaseUrl);
+console.log("[AUTH INIT] Service role key present:", !!serviceRoleKey);
+
 const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
@@ -19,7 +22,10 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("[AUTHORIZE] called with email:", credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log("[AUTHORIZE] missing credentials");
           return null;
         }
 
@@ -29,7 +35,10 @@ export const authOptions: NextAuthOptions = {
           .eq("email", credentials.email)
           .single();
 
+        console.log("[AUTHORIZE] user found:", !!user, "error:", error?.message);
+
         if (error || !user || !user.password) {
+          console.log("[AUTHORIZE] no user or password");
           return null;
         }
 
@@ -37,6 +46,8 @@ export const authOptions: NextAuthOptions = {
           credentials.password,
           user.password
         );
+
+        console.log("[AUTHORIZE] password valid:", isPasswordValid);
 
         if (!isPasswordValid) {
           return null;
@@ -55,8 +66,8 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
   cookies: {
     sessionToken: {
@@ -65,7 +76,25 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production",
+        secure: false,
+      },
+    },
+    callbackUrl: {
+      name: `next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: false,
+      },
+    },
+    csrfToken: {
+      name: `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: false,
       },
     },
   },
@@ -73,8 +102,8 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
-      console.log("[NEXTAUTH JWT] user:", user?.id, "account:", account?.provider);
+    async jwt({ token, user }) {
+      console.log("[JWT CALLBACK] user:", user?.id);
       if (user) {
         token.level = user.level;
         token.role = user.role;
@@ -82,7 +111,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      console.log("[NEXTAUTH SESSION] token sub:", token.sub);
+      console.log("[SESSION CALLBACK] token sub:", token.sub);
       if (token && session.user) {
         session.user.id = token.sub as string;
         session.user.level = token.level as string;
