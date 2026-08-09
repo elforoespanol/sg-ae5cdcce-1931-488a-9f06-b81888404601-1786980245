@@ -10,7 +10,6 @@ const lessons = [
     description: "Learn how to greet people and introduce yourself in Spanish",
     level: SpanishLevel.A1,
     order: 1,
-    estimatedMinutes: 15,
     vocabularyJson: [
       { spanish: "hola", english: "hello", partOfSpeech: "interjection" },
       { spanish: "buenos días", english: "good morning", partOfSpeech: "phrase" },
@@ -54,7 +53,6 @@ Greet three people using different times of day.`,
     description: "Master counting in Spanish from one to one hundred",
     level: SpanishLevel.A1,
     order: 2,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "uno", english: "one", partOfSpeech: "number" },
       { spanish: "dos", english: "two", partOfSpeech: "number" },
@@ -86,7 +84,6 @@ veinte, treinta, cuarenta, cincuenta, sesenta, setenta, ochenta, noventa, cien
     description: "Describe the world around you with colors and adjectives",
     level: SpanishLevel.A1,
     order: 3,
-    estimatedMinutes: 15,
     vocabularyJson: [
       { spanish: "rojo", english: "red", partOfSpeech: "adjective" },
       { spanish: "azul", english: "blue", partOfSpeech: "adjective" },
@@ -127,7 +124,6 @@ The big house is red.
     description: "Talk about your family in Spanish",
     level: SpanishLevel.A1,
     order: 4,
-    estimatedMinutes: 15,
     vocabularyJson: [
       { spanish: "madre", english: "mother", partOfSpeech: "noun" },
       { spanish: "padre", english: "father", partOfSpeech: "noun" },
@@ -166,7 +162,6 @@ My family is big. I have two brothers and one sister.
     description: "Describe your daily activities in Spanish",
     level: SpanishLevel.A1,
     order: 5,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "despertar", english: "to wake up", partOfSpeech: "verb" },
       { spanish: "desayunar", english: "to have breakfast", partOfSpeech: "verb" },
@@ -202,7 +197,6 @@ My family is big. I have two brothers and one sister.
     description: "Order food and talk about meals in Spanish",
     level: SpanishLevel.A2,
     order: 6,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "restaurante", english: "restaurant", partOfSpeech: "noun" },
       { spanish: "camarero", english: "waiter", partOfSpeech: "noun" },
@@ -237,7 +231,6 @@ Cliente: Una cerveza, por favor.
     description: "Ask for and give directions in Spanish",
     level: SpanishLevel.A2,
     order: 7,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "izquierda", english: "left", partOfSpeech: "noun" },
       { spanish: "derecha", english: "right", partOfSpeech: "noun" },
@@ -271,7 +264,6 @@ El banco está a la izquierda.
     description: "Navigate shopping and describe clothing",
     level: SpanishLevel.A2,
     order: 8,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "tienda", english: "store", partOfSpeech: "noun" },
       { spanish: "camisa", english: "shirt", partOfSpeech: "noun" },
@@ -307,7 +299,6 @@ Vendedor: Cuesta veinticinco euros.
     description: "Talk about weather and seasons in Spanish",
     level: SpanishLevel.A2,
     order: 9,
-    estimatedMinutes: 15,
     vocabularyJson: [
       { spanish: "sol", english: "sun", partOfSpeech: "noun" },
       { spanish: "lluvia", english: "rain", partOfSpeech: "noun" },
@@ -345,7 +336,6 @@ Vendedor: Cuesta veinticinco euros.
     description: "Talk about what you do in your free time",
     level: SpanishLevel.A2,
     order: 10,
-    estimatedMinutes: 15,
     vocabularyJson: [
       { spanish: "hobby", english: "hobby", partOfSpeech: "noun" },
       { spanish: "música", english: "music", partOfSpeech: "noun" },
@@ -380,7 +370,6 @@ Vendedor: Cuesta veinticinco euros.
     description: "Talk about completed past actions using the preterite tense",
     level: SpanishLevel.B1,
     order: 11,
-    estimatedMinutes: 25,
     vocabularyJson: [
       { spanish: "ayer", english: "yesterday", partOfSpeech: "adverb" },
       { spanish: "anteayer", english: "day before yesterday", partOfSpeech: "adverb" },
@@ -417,7 +406,6 @@ Fue una cena deliciosa.
     description: "Describe ongoing past situations and habits",
     level: SpanishLevel.B1,
     order: 12,
-    estimatedMinutes: 25,
     vocabularyJson: [
       { spanish: "siempre", english: "always", partOfSpeech: "adverb" },
       { spanish: "nunca", english: "never", partOfSpeech: "adverb" },
@@ -454,7 +442,6 @@ Mi abuela siempre nos preparaba paella.
     description: "Talk about future events and intentions",
     level: SpanishLevel.B1,
     order: 13,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "mañana", english: "tomorrow", partOfSpeech: "adverb" },
       { spanish: "pronto", english: "soon", partOfSpeech: "adverb" },
@@ -484,7 +471,6 @@ Mi abuela siempre nos preparaba paella.
     description: "Express opinions and preferences in Spanish",
     level: SpanishLevel.B1,
     order: 14,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "opinión", english: "opinion", partOfSpeech: "noun" },
       { spanish: "creer", english: "to believe", partOfSpeech: "verb" },
@@ -522,7 +508,6 @@ Prefiero la comida italiana a la comida rápida.
     description: "Compare people, places, and things in Spanish",
     level: SpanishLevel.B1,
     order: 15,
-    estimatedMinutes: 20,
     vocabularyJson: [
       { spanish: "más", english: "more", partOfSpeech: "adverb" },
       { spanish: "menos", english: "less", partOfSpeech: "adverb" },
@@ -562,7 +547,6 @@ Juan es tan alto como Pedro.
     description: "Express wishes, doubts, and possibilities",
     level: SpanishLevel.B2,
     order: 16,
-    estimatedMinutes: 30,
     vocabularyJson: [
       { spanish: "ojalá", english: "hopefully", partOfSpeech: "adverb" },
       { spanish: "quizás", english: "perhaps", partOfSpeech: "adverb" },
@@ -604,7 +588,6 @@ Dudo que él sepa la respuesta.
     description: "Talk about hypothetical situations",
     level: SpanishLevel.B2,
     order: 17,
-    estimatedMinutes: 25,
     vocabularyJson: [
       { spanish: "si", english: "if", partOfSpeech: "conjunction" },
       { spanish: "haría", english: "I would do", partOfSpeech: "verb" },
@@ -641,7 +624,6 @@ Si fuera rico, compraría una isla.
     description: "Build complex and compound sentences",
     level: SpanishLevel.B2,
     order: 18,
-    estimatedMinutes: 25,
     vocabularyJson: [
       { spanish: "aunque", english: "although", partOfSpeech: "conjunction" },
       { spanish: "sin embargo", english: "however", partOfSpeech: "phrase" },
@@ -675,7 +657,6 @@ Si fuera rico, compraría una isla.
     description: "Professional communication in Spanish",
     level: SpanishLevel.B2,
     order: 19,
-    estimatedMinutes: 25,
     vocabularyJson: [
       { spanish: "reunión", english: "meeting", partOfSpeech: "noun" },
       { spanish: "negocio", english: "business", partOfSpeech: "noun" },
@@ -713,7 +694,6 @@ Si fuera rico, compraría una isla.
     description: "Explore Spanish culture, history, and traditions",
     level: SpanishLevel.B2,
     order: 20,
-    estimatedMinutes: 25,
     vocabularyJson: [
       { spanish: "fiesta", english: "festival/party", partOfSpeech: "noun" },
       { spanish: "tradición", english: "tradition", partOfSpeech: "noun" },
@@ -752,7 +732,6 @@ Si fuera rico, compraría una isla.
     description: "Master complex subjunctive constructions",
     level: SpanishLevel.C1,
     order: 21,
-    estimatedMinutes: 30,
     vocabularyJson: [
       { spanish: "aun cuando", english: "even when", partOfSpeech: "phrase" },
       { spanish: "con tal de que", english: "provided that", partOfSpeech: "phrase" },
@@ -786,7 +765,6 @@ Lo haré sin que nadie me lo pida.
     description: "Discuss literature with academic vocabulary",
     level: SpanishLevel.C1,
     order: 22,
-    estimatedMinutes: 30,
     vocabularyJson: [
       { spanish: "metáfora", english: "metaphor", partOfSpeech: "noun" },
       { spanish: "símbolo", english: "symbol", partOfSpeech: "noun" },
@@ -827,7 +805,6 @@ de Colombia a través de la familia Buendía.
     description: "Participate in formal debates and discussions",
     level: SpanishLevel.C1,
     order: 23,
-    estimatedMinutes: 30,
     vocabularyJson: [
       { spanish: "argumento", english: "argument", partOfSpeech: "noun" },
       { spanish: "evidencia", english: "evidence", partOfSpeech: "noun" },
@@ -864,7 +841,6 @@ de Colombia a través de la familia Buendía.
     description: "Write formal reports, essays, and correspondence",
     level: SpanishLevel.C1,
     order: 24,
-    estimatedMinutes: 30,
     vocabularyJson: [
       { spanish: "informe", english: "report", partOfSpeech: "noun" },
       { spanish: "redacción", english: "writing", partOfSpeech: "noun" },
@@ -904,7 +880,6 @@ las tendencias actuales del mercado español...
     description: "Explore the diversity of Latin American cultures",
     level: SpanishLevel.C1,
     order: 25,
-    estimatedMinutes: 30,
     vocabularyJson: [
       { spanish: "diversidad", english: "diversity", partOfSpeech: "noun" },
       { spanish: "identidad", english: "identity", partOfSpeech: "noun" },
@@ -941,7 +916,6 @@ Este mestizaje cultural es su mayor riqueza.
     description: "Express subtle meanings and shades of opinion",
     level: SpanishLevel.C2,
     order: 26,
-    estimatedMinutes: 35,
     vocabularyJson: [
       { spanish: "matiz", english: "nuance", partOfSpeech: "noun" },
       { spanish: "sutil", english: "subtle", partOfSpeech: "adjective" },
@@ -972,7 +946,6 @@ Este mestizaje cultural es su mayor riqueza.
     description: "Write and present at university level",
     level: SpanishLevel.C2,
     order: 27,
-    estimatedMinutes: 35,
     vocabularyJson: [
       { spanish: "hipótesis", english: "hypothesis", partOfSpeech: "noun" },
       { spanish: "metodología", english: "methodology", partOfSpeech: "noun" },
@@ -1004,7 +977,6 @@ Este mestizaje cultural es su mayor riqueza.
     description: "Analyze and appreciate Spanish poetry",
     level: SpanishLevel.C2,
     order: 28,
-    estimatedMinutes: 35,
     vocabularyJson: [
       { spanish: "verso", english: "verse", partOfSpeech: "noun" },
       { spanish: "estrofa", english: "stanza", partOfSpeech: "noun" },
@@ -1045,7 +1017,6 @@ crean un mundo poético único.
     description: "Read and analyze historical documents",
     level: SpanishLevel.C2,
     order: 29,
-    estimatedMinutes: 35,
     vocabularyJson: [
       { spanish: "crónica", english: "chronicle", partOfSpeech: "noun" },
       { spanish: "manuscrito", english: "manuscript", partOfSpeech: "noun" },
@@ -1085,7 +1056,6 @@ propias de la épica castellana.
     description: "Understand Spanish dialectal diversity",
     level: SpanishLevel.C2,
     order: 30,
-    estimatedMinutes: 35,
     vocabularyJson: [
       { spanish: "dialecto", english: "dialect", partOfSpeech: "noun" },
       { spanish: "acento", english: "accent", partOfSpeech: "noun" },
@@ -1135,8 +1105,7 @@ async function main() {
       name: "Test User",
       password: hashedPassword,
       level: SpanishLevel.A1,
-      role: UserRole.USER,
-      xp: 1500,
+      role: UserRole.STUDENT,
       streakDays: 5,
       totalStudyMinutes: 480,
       dailyGoal: 20,
@@ -1179,7 +1148,6 @@ async function main() {
           description: lesson.description,
           level: lesson.level,
           order: lesson.order,
-          estimatedMinutes: lesson.estimatedMinutes,
           vocabularyJson: lesson.vocabularyJson,
           grammarJson: lesson.grammarJson,
           content: lesson.content,
