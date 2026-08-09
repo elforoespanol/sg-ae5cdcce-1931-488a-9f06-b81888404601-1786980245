@@ -1,7 +1,14 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "./prisma";
+import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,13 +23,13 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
+        const { data: user, error } = await supabaseAdmin
+          .from("users")
+          .select("*")
+          .eq("email", credentials.email)
+          .single();
 
-        if (!user || !user.password) {
+        if (error || !user || !user.password) {
           return null;
         }
 
