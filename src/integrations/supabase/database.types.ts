@@ -157,6 +157,126 @@ export type Database = {
           },
         ]
       }
+      flashcard_review_logs: {
+        Row: {
+          flashcard_id: string
+          id: string
+          rating: number
+          response_time_ms: number | null
+          reviewed_at: string
+          user_id: string
+        }
+        Insert: {
+          flashcard_id: string
+          id?: string
+          rating: number
+          response_time_ms?: number | null
+          reviewed_at?: string
+          user_id: string
+        }
+        Update: {
+          flashcard_id?: string
+          id?: string
+          rating?: number
+          response_time_ms?: number | null
+          reviewed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcard_review_logs_flashcard_id_fkey"
+            columns: ["flashcard_id"]
+            isOneToOne: false
+            referencedRelation: "flashcards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flashcard_review_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flashcards: {
+        Row: {
+          created_at: string
+          ease_factor: number
+          english_text: string
+          example_sentence: string | null
+          id: string
+          image_url: string | null
+          interval: number
+          is_mastered: boolean
+          last_rating: number | null
+          last_review_date: string | null
+          lesson_id: string | null
+          next_review_date: string
+          repetitions: number
+          spanish_text: string
+          total_correct: number
+          total_reviews: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ease_factor?: number
+          english_text: string
+          example_sentence?: string | null
+          id?: string
+          image_url?: string | null
+          interval?: number
+          is_mastered?: boolean
+          last_rating?: number | null
+          last_review_date?: string | null
+          lesson_id?: string | null
+          next_review_date?: string
+          repetitions?: number
+          spanish_text: string
+          total_correct?: number
+          total_reviews?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ease_factor?: number
+          english_text?: string
+          example_sentence?: string | null
+          id?: string
+          image_url?: string | null
+          interval?: number
+          is_mastered?: boolean
+          last_rating?: number | null
+          last_review_date?: string | null
+          lesson_id?: string | null
+          next_review_date?: string
+          repetitions?: number
+          spanish_text?: string
+          total_correct?: number
+          total_reviews?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flashcards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
           content: string
