@@ -2,7 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
-import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy, Settings, Bell } from "lucide-react";
+import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy, Settings, Bell, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -17,6 +17,7 @@ export function Navbar() {
     { href: "/chat", label: "AI Tutor", icon: MessageSquare, shortcut: "T" },
     { href: "/flashcards", label: "Flashcards", icon: Library, shortcut: "F" },
     { href: "/achievements", label: "Achievements", icon: Trophy, shortcut: "A" },
+    ...(session?.user?.role === "ADMIN" ? [{ href: "/admin", label: "Admin", icon: Shield, shortcut: "M" }] : []),
   ];
 
   const isActive = (href: string) => router.pathname === href || router.pathname.startsWith(href + "/");
