@@ -2,7 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
-import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare } from "lucide-react";
+import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -16,6 +16,7 @@ export function Navbar() {
     { href: "/lessons", label: "Lessons", icon: BookOpen },
     { href: "/chat", label: "AI Tutor", icon: MessageSquare },
     { href: "/flashcards", label: "Flashcards", icon: Library },
+    { href: "/achievements", label: "Achievements", icon: Trophy },
   ];
 
   const isActive = (href: string) => router.pathname === href || router.pathname.startsWith(href + "/");
