@@ -123,3 +123,15 @@ export function getLevelInfo(totalXp: number): { level: number; title: string; x
     progress,
   };
 }
+
+export function getLevelColor(level: string): string {
+  const colors: Record<string, string> = {
+    A1: "bg-emerald-500",
+    A2: "bg-blue-500",
+    B1: "bg-amber-500",
+    B2: "bg-orange-500",
+    C1: "bg-rose-500",
+    C2: "bg-violet-500",
+  };
+  return colors[level] || "bg-gray-500";
+}
