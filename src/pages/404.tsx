@@ -1,10 +1,21 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Home, Search, Compass } from "lucide-react";
+import { Home, Search, Compass, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
+  const [query, setQuery] = useState("");
+  const [searching, setSearching] = useState(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    setSearching(true);
+    window.location.href = `/lessons?search=${encodeURIComponent(query)}`;
+  };
+
   return (
     <>
       <Head>
@@ -44,6 +55,24 @@ export default function NotFound() {
               Looks like you took a wrong turn on your Spanish learning journey. No worries — let's get you back on track!
             </p>
           </div>
+
+          <form onSubmit={handleSearch} className="relative max-w-sm mx-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search lessons..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full pl-10 pr-12 py-2.5 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+            />
+            <button
+              type="submit"
+              disabled={searching || !query.trim()}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/dashboard">
