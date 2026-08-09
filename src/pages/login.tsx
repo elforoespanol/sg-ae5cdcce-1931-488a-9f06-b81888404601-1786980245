@@ -36,10 +36,14 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back!");
-      window.location.href = "/dashboard";
+      setIsLoading(false);
+      
+      // Small delay to ensure session cookie is written before navigation
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 300);
     } catch {
       toast.error("Something went wrong");
-    } finally {
       setIsLoading(false);
     }
   };
