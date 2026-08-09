@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Head from "next/head";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -10,6 +11,7 @@ export default function SeedPage() {
   const [result, setResult] = useState<{
     success: boolean;
     message: string;
+    raw?: string;
     data?: {
       admin: string;
       lessonsCreated: number;
@@ -24,7 +26,21 @@ export default function SeedPage() {
 
     try {
       const res = await fetch("/api/seed", { method: "POST" });
-      const data = await res.json();
+      const contentType = res.headers.get("content-type") || "";
+      const text = await res.text();
+
+      // If response is HTML (error page), show raw text
+      if (!contentType.includes("application/json")) {
+        setResult({
+          success: false,
+          message: "Server returned HTML instead of JSON. The API route may not exist or the server needs restarting.",
+          raw: text.substring(0, 500),
+        });
+        setLoading(false);
+        return;
+      }
+
+      const data = JSON.parse(text);
 
       if (res.ok) {
         setResult({
@@ -41,6 +57,7 @@ export default function SeedPage() {
         setResult({
           success: false,
           message: data.message || data.error || "Unknown error occurred",
+          raw: data.details ? JSON.stringify(data.details, null, 2) : undefined,
         });
       }
     } catch (error) {
@@ -106,7 +123,10 @@ export default function SeedPage() {
           </Button>
 
           {result && (
-            <Alert variant={result.success ? "default" : "destructive"} className={result.success ? "border-green-500/50 bg-green-50" : ""}>
+            <Alert
+              variant={result.success ? "default" : "destructive"}
+              className={result.success ? "border-green-500/50 bg-green-50" : ""}
+            >
               {result.success ? (
                 <CheckCircle className="h-4 w-4 text-green-600" />
               ) : (
@@ -122,15 +142,20 @@ export default function SeedPage() {
                     <p>Total achievements: {result.data.totalAchievements}</p>
                   </div>
                 )}
+                {result.raw && (
+                  <pre className="text-xs bg-black/5 p-2 rounded overflow-auto max-h-40">
+                    {result.raw}
+                  </pre>
+                )}
               </AlertDescription>
             </Alert>
           )}
 
           <div className="text-center text-xs text-muted-foreground pt-2">
             After seeding, go to{" "}
-            <a href="/login" className="text-primary hover:underline font-medium">
+            <Link href="/login" className="text-primary hover:underline font-medium">
               /login
-            </a>{" "}
+            </Link>{" "}
             to sign in
           </div>
         </CardContent>
