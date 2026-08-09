@@ -12,20 +12,20 @@ export function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const navLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/lessons", label: "Lessons", icon: BookOpen },
-    { href: "/chat", label: "AI Tutor", icon: MessageSquare },
-    { href: "/flashcards", label: "Flashcards", icon: Library },
-    { href: "/achievements", label: "Achievements", icon: Trophy },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, shortcut: "D" },
+    { href: "/lessons", label: "Lessons", icon: BookOpen, shortcut: "L" },
+    { href: "/chat", label: "AI Tutor", icon: MessageSquare, shortcut: "T" },
+    { href: "/flashcards", label: "Flashcards", icon: Library, shortcut: "F" },
+    { href: "/achievements", label: "Achievements", icon: Trophy, shortcut: "A" },
   ];
 
   const isActive = (href: string) => router.pathname === href || router.pathname.startsWith(href + "/");
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md" role="navigation" aria-label="Main navigation">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/" className="flex items-center gap-2.5 group" aria-label="Speak Spanish Like I Did - Home">
           <span className="text-2xl">🇪🇸</span>
           <span className="font-serif text-xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors">
             Speak Spanish Like I Did
@@ -39,13 +39,15 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                 isActive(link.href)
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               )}
+              aria-label={link.label}
+              title={`${link.label} (Ctrl+${link.shortcut})`}
             >
-              <link.icon className="h-4 w-4" />
+              <link.icon className="h-4 w-4" aria-hidden="true" />
               {link.label}
             </Link>
           ))}
@@ -57,7 +59,10 @@ export function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                aria-label="User menu"
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
               >
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
                   {session.user.name?.charAt(0).toUpperCase() || "U"}
@@ -65,30 +70,31 @@ export function Navbar() {
                 <span className="text-sm font-medium text-foreground">
                   {session.user.name || "User"}
                 </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-52 rounded-lg border border-border bg-card shadow-lg py-1">
+                <div className="absolute right-0 mt-2 w-52 rounded-lg border border-border bg-card shadow-lg py-1" role="menu">
                   <div className="px-4 py-2 border-b border-border">
                     <p className="text-sm font-medium text-foreground">{session.user.name}</p>
                     <p className="text-xs text-muted-foreground">{session.user.email}</p>
                     <p className="text-xs text-primary font-medium mt-0.5">Level: {session.user.level}</p>
                   </div>
-                  <Link href="/profile" className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
-                    <User className="h-4 w-4" />
+                  <Link href="/profile" className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:bg-muted" role="menuitem">
+                    <User className="h-4 w-4" aria-hidden="true" />
                     Profile
                   </Link>
-                  <Link href="/settings" className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
-                    <Settings className="h-4 w-4" />
+                  <Link href="/settings" className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:bg-muted" role="menuitem">
+                    <Settings className="h-4 w-4" aria-hidden="true" />
                     Settings
                   </Link>
                   <div className="border-t border-border mt-1 pt-1">
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
-                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted transition-colors"
+                      className="flex w-full items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted transition-colors focus-visible:outline-none focus-visible:bg-muted"
+                      role="menuitem"
                     >
-                      <LogOut className="h-4 w-4" />
+                      <LogOut className="h-4 w-4" aria-hidden="true" />
                       Sign out
                     </button>
                   </div>
@@ -99,13 +105,13 @@ export function Navbar() {
             <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
                 Sign in
               </Link>
               <Link
                 href="/register"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
                 Get Started
               </Link>
@@ -116,7 +122,9 @@ export function Navbar() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+          className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -124,7 +132,7 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="md:hidden border-t border-border bg-background" role="menu">
           <div className="container py-4 space-y-1">
             {navLinks.map((link) => (
               <Link
@@ -132,13 +140,14 @@ export function Navbar() {
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                   isActive(link.href)
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 )}
+                role="menuitem"
               >
-                <link.icon className="h-4 w-4" />
+                <link.icon className="h-4 w-4" aria-hidden="true" />
                 {link.label}
               </Link>
             ))}
@@ -154,11 +163,30 @@ export function Navbar() {
                       <p className="text-xs text-primary">Level: {session.user.level}</p>
                     </div>
                   </div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    role="menuitem"
+                  >
+                    <User className="h-4 w-4" aria-hidden="true" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    role="menuitem"
+                  >
+                    <Settings className="h-4 w-4" aria-hidden="true" />
+                    Settings
+                  </Link>
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-destructive hover:bg-muted rounded-lg transition-colors"
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-muted rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    role="menuitem"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <LogOut className="h-4 w-4" aria-hidden="true" />
                     Sign out
                   </button>
                 </>
@@ -167,15 +195,15 @@ export function Navbar() {
                   <Link
                     href="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
-                    <User className="h-4 w-4" />
+                    <User className="h-4 w-4" aria-hidden="true" />
                     Sign in
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     Get Started
                   </Link>
