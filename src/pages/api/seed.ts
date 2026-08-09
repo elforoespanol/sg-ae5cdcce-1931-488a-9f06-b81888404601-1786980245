@@ -36,7 +36,7 @@ const lessons = [
     description: "Master counting in Spanish from one to one hundred",
     level: SpanishLevel.A1,
     slug: "numbers-1-100",
-    difficulty: Difficulty.Beginner,
+    difficulty: Difficulty.BEGINNER,
     order: 2,
     vocabularyJson: [
       { spanish: "uno", english: "one", partOfSpeech: "number" },
@@ -59,7 +59,7 @@ const lessons = [
     description: "Describe the world around you with colors and adjectives",
     level: SpanishLevel.A1,
     slug: "colors-and-descriptions",
-    difficulty: Difficulty.Beginner,
+    difficulty: Difficulty.BEGINNER,
     order: 3,
     vocabularyJson: [
       { spanish: "rojo", english: "red", partOfSpeech: "adjective" },
@@ -83,7 +83,7 @@ const lessons = [
     description: "Talk about your family in Spanish",
     level: SpanishLevel.A1,
     slug: "family-members",
-    difficulty: Difficulty.Beginner,
+    difficulty: Difficulty.BEGINNER,
     order: 4,
     vocabularyJson: [
       { spanish: "madre", english: "mother", partOfSpeech: "noun" },
@@ -107,7 +107,7 @@ const lessons = [
     description: "Describe your daily activities in Spanish",
     level: SpanishLevel.A1,
     slug: "daily-routines",
-    difficulty: Difficulty.Beginner,
+    difficulty: Difficulty.BEGINNER,
     order: 5,
     vocabularyJson: [
       { spanish: "despertar", english: "to wake up", partOfSpeech: "verb" },
@@ -493,7 +493,7 @@ const lessons = [
     description: "Discuss literature with academic vocabulary",
     level: SpanishLevel.C1,
     slug: "literary-analysis-vocabulary",
-    difficulty: Difficulty.Advanced,
+    difficulty: Difficulty.ADVANCED,
     order: 22,
     vocabularyJson: [
       { spanish: "metáfora", english: "metaphor", partOfSpeech: "noun" },
@@ -516,7 +516,7 @@ const lessons = [
     description: "Participate in formal debates and discussions",
     level: SpanishLevel.C1,
     slug: "debate-and-argumentation",
-    difficulty: Difficulty.Advanced,
+    difficulty: Difficulty.ADVANCED,
     order: 23,
     vocabularyJson: [
       { spanish: "argumento", english: "argument", partOfSpeech: "noun" },
@@ -539,7 +539,7 @@ const lessons = [
     description: "Write formal reports, essays, and correspondence",
     level: SpanishLevel.C1,
     slug: "professional-writing",
-    difficulty: Difficulty.Advanced,
+    difficulty: Difficulty.ADVANCED,
     order: 24,
     vocabularyJson: [
       { spanish: "informe", english: "report", partOfSpeech: "noun" },
@@ -562,7 +562,7 @@ const lessons = [
     description: "Explore the diversity of Latin American cultures",
     level: SpanishLevel.C1,
     slug: "cultural-topics-latin-america",
-    difficulty: Difficulty.Advanced,
+    difficulty: Difficulty.ADVANCED,
     order: 25,
     vocabularyJson: [
       { spanish: "diversidad", english: "diversity", partOfSpeech: "noun" },

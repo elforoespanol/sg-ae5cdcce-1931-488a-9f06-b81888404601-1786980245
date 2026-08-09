@@ -10,7 +10,7 @@ const lessons = [
     description: "Learn how to greet people and introduce yourself in Spanish",
     level: SpanishLevel.A1,
     slug: "greetings-and-introductions",
-    difficulty: Difficulty.Beginner,
+    difficulty: Difficulty.BEGINNER,
     order: 1,
     vocabularyJson: [
       { spanish: "hola", english: "hello", partOfSpeech: "interjection" },
