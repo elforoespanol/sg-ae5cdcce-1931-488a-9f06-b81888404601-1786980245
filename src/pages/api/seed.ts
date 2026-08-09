@@ -2,28 +2,47 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
   try {
+    // Validate environment variables
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return res.status(500).json({
+        message: "Missing Supabase environment variables",
+        details: {
+          hasUrl: !!supabaseUrl,
+          hasServiceKey: !!serviceRoleKey,
+        },
+      });
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    // Check if we can connect to Supabase
+    const { error: healthError } = await supabaseAdmin.from("users").select("count", { count: "exact", head: true });
+    if (healthError && healthError.code === "42P01") {
+      return res.status(500).json({
+        message: "Database tables not found. Please run 'npx prisma db push' first.",
+        error: healthError.message,
+      });
+    }
+
     // Create admin user
     const hashedPassword = await bcrypt.hash("Admin123!", 12);
 
-    const { data: existingAdmin, error: findError } = await supabaseAdmin
+    const { data: existingAdmin } = await supabaseAdmin
       .from("users")
       .select("id")
       .eq("email", "admin@sslid.com")
       .maybeSingle();
-
-    if (findError) throw findError;
 
     let adminId = existingAdmin?.id;
 
@@ -44,7 +63,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select("id")
         .single();
 
-      if (createError) throw createError;
+      if (createError) {
+        return res.status(500).json({
+          message: "Failed to create admin user",
+          error: createError.message,
+          details: createError,
+        });
+      }
       adminId = newAdmin!.id;
     }
 
@@ -65,8 +90,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .select("*", { count: "exact", head: true });
 
     if (!achCount || achCount === 0) {
-      for (const a of achievements) {
-        await supabaseAdmin.from("achievements").insert(a);
+      const { error: achError } = await supabaseAdmin.from("achievements").insert(achievements);
+      if (achError) {
+        return res.status(500).json({
+          message: "Failed to seed achievements",
+          error: achError.message,
+        });
       }
     }
 
@@ -105,6 +134,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ];
 
     let createdCount = 0;
+    const errors: string[] = [];
+
     for (const lesson of lessons) {
       const { data: existing } = await supabaseAdmin
         .from("lessons")
@@ -115,7 +146,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!existing) {
         const { error } = await supabaseAdmin.from("lessons").insert(lesson);
         if (error) {
-          console.error("Lesson insert error:", error);
+          errors.push(`${lesson.title}: ${error.message}`);
         } else {
           createdCount++;
         }
@@ -137,12 +168,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       lessonsCreated: createdCount,
       totalLessons,
       totalAchievements,
+      errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
     console.error("Seed error:", error);
     res.status(500).json({
       message: "Seed failed",
       error: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
     });
   }
 }
