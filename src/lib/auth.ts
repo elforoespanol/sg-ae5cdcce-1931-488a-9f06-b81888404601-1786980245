@@ -73,7 +73,8 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      console.log("[NEXTAUTH JWT] user:", user?.id, "account:", account?.provider);
       if (user) {
         token.level = user.level;
         token.role = user.role;
@@ -81,6 +82,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      console.log("[NEXTAUTH SESSION] token sub:", token.sub);
       if (token && session.user) {
         session.user.id = token.sub as string;
         session.user.level = token.level as string;

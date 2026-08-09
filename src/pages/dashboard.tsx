@@ -60,10 +60,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("[DASHBOARD] session status:", status, "user:", session?.user?.id);
     if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, [status, router]);
+  }, [status, session, router]);
 
   useEffect(() => {
     if (!session?.user?.id) return;
