@@ -94,6 +94,7 @@ model User {
   accounts         Account[]
   sessions         Session[]
   lessons          UserLessonProgress[]
+  chatSessions     ChatSession[]
 
   @@map("users")
 }
