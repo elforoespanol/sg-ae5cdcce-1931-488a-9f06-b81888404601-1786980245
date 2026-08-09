@@ -1,6 +1,6 @@
 ---
 title: User Settings, Profile, and UI Polish
-status: in_progress
+status: done
 priority: medium
 type: feature
 tags: [settings, profile, ui-polish, error-boundary, loading-states]
@@ -20,21 +20,21 @@ Add user settings, profile pages, and polish the UI with loading states, error h
 - Utility functions for formatting and level calculation
 
 ## Checklist
-- [ ] Update Prisma schema with user settings fields
-- [ ] Create settings page with all sections
-- [ ] Create profile page
-- [ ] Create ProfileForm component
-- [ ] Create PasswordChange component
-- [ ] Create DailyGoalSelector component
-- [ ] Create API routes for profile/password updates
-- [ ] Create ErrorBoundary component
-- [ ] Create LoadingSkeleton components
-- [ ] Update 404 page with Spanish theme
-- [ ] Create error page
-- [ ] Update Navbar with notifications and profile dropdown
-- [ ] Update globals.css with transitions and animations
-- [ ] Update lib/utils.ts with helpers
-- [ ] Validate build passes
+- [x] Update Prisma schema with user settings fields
+- [x] Create settings page with all sections
+- [x] Create profile page
+- [x] Create ProfileForm component
+- [x] Create PasswordChange component
+- [x] Create DailyGoalSelector component
+- [x] Create API routes for profile/password updates
+- [x] Create ErrorBoundary component
+- [x] Create LoadingSkeleton components
+- [x] Update 404 page with Spanish theme
+- [x] Create error page
+- [x] Update Navbar with notifications and profile dropdown
+- [x] Update globals.css with transitions and animations
+- [x] Update lib/utils.ts with helpers
+- [x] Validate build passes
 
 ## Acceptance
 - Settings page allows updating profile, password, and goals
