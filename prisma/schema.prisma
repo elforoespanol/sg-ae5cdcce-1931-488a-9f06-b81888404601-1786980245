@@ -151,6 +151,7 @@ model Lesson {
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
   userProgress UserLessonProgress[]
+  chatSessions ChatSession[]
 
   @@index([level, order])
   @@map("lessons")
