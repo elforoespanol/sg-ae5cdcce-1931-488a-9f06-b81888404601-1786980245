@@ -1,6 +1,13 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 
+export function LoadingSkeleton({ variant = "dashboard" }: { variant?: "dashboard" | "lesson" | "flashcard" | "chat" }) {
+  if (variant === "lesson") return <LessonSkeleton />;
+  if (variant === "flashcard") return <FlashcardSkeleton />;
+  if (variant === "chat") return <ChatSkeleton />;
+  return <DashboardSkeleton />;
+}
+
 export function DashboardSkeleton() {
   return (
     <div className="container py-8 space-y-8">

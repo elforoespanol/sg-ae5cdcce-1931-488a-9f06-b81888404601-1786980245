@@ -61,7 +61,19 @@ export default function PasswordPage() {
             <CardTitle>Password Update</CardTitle>
           </CardHeader>
           <CardContent>
-            <PasswordChange onChange={() => {}} />
+            <PasswordChange
+              onChange={async (data) => {
+                const res = await fetch("/api/user/password", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(data),
+                });
+                if (!res.ok) {
+                  const err = await res.json();
+                  throw new Error(err.message || "Failed to change password");
+                }
+              }}
+            />
           </CardContent>
         </Card>
       </div>

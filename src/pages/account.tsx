@@ -92,7 +92,22 @@ export default function AccountPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ProfileForm onUpdate={() => update()} />
+            <ProfileForm
+              user={{
+                name: session.user.name,
+                email: session.user.email,
+                level: session.user.level || "A1",
+              }}
+              onSave={async (data) => {
+                const res = await fetch("/api/user/profile", {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(data),
+                });
+                if (!res.ok) throw new Error("Failed to update profile");
+                await update();
+              }}
+            />
           </CardContent>
         </Card>
 
