@@ -1,6 +1,6 @@
 ---
 title: Admin Dashboard, Account, and Password Pages
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [admin, account, password, dashboard]
@@ -13,15 +13,14 @@ position: 8
 Create admin dashboard for ADMIN role users, dedicated account management page, and password change page.
 
 ## Checklist
-- [ ] Admin page (/admin) with user stats and management
-- [ ] Account page (/account) for account settings
-- [ ] Password page (/password) for password management
-- [ ] API routes for admin data
-- [ ] Role-based access control
-- [ ] Build validation
+- [x] Admin page (/admin) with user stats and management
+- [x] Account page (/account) for account settings
+- [x] Password page (/password) for password management
+- [x] API routes for admin data
+- [x] Role-based access control
+- [x] Build validation
 
 ## Acceptance
 - Admin page accessible only to ADMIN users
 - Account page shows user settings
 - Password page allows password changes
-</code></file>
