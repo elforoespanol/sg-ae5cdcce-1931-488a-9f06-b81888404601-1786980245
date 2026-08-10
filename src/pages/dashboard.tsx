@@ -58,25 +58,22 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fallbackUser, setFallbackUser] = useState<{email: string; timestamp: number} | null>(null);
-
-  // Read localStorage fallback for iframe preview
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const [fallbackUser, setFallbackUser] = useState<{email: string; timestamp: number} | null>(() => {
+    if (typeof window === "undefined") return null;
     const raw = localStorage.getItem("sslid_auth_fallback");
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
         if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
-          setFallbackUser(parsed);
-        } else {
-          localStorage.removeItem("sslid_auth_fallback");
+          return parsed;
         }
+        localStorage.removeItem("sslid_auth_fallback");
       } catch {
         localStorage.removeItem("sslid_auth_fallback");
       }
     }
-  }, []);
+    return null;
+  });
 
   useEffect(() => {
     console.log("[DASHBOARD] session status:", status, "fallback:", !!fallbackUser);
