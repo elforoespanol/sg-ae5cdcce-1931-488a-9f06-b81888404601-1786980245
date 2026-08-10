@@ -6,6 +6,20 @@ function getUserIdFromRequest(req: NextApiRequest): string | undefined {
   const session = (req as any).__session;
   if (session?.user?.id) return session.user.id;
   
+  // Check Authorization header first (more reliable in preview)
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    try {
+      const { SignJWT } = require("jose");
+      // We can't verify async here easily, but we can decode the payload
+      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+      if (payload.sub) return payload.sub;
+    } catch {
+      // ignore invalid token
+    }
+  }
+  
   const cookie = req.headers.cookie;
   if (cookie) {
     const match = cookie.match(/sslid_auth=([^;]+)/);

@@ -16,10 +16,14 @@ export default function NewChatPage() {
     }
 
     if (status === "authenticated" && authUser?.id) {
+      const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
       // Create a new session via the chat API
       fetch("/api/tutor/sessions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ title: "New Chat", topic: "general" }),
       })
         .then((res) => res.json())

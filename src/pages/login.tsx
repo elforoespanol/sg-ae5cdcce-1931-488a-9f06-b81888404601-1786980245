@@ -54,7 +54,9 @@ export default function LoginPage() {
           timestamp: Date.now(),
         };
         localStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
+        localStorage.setItem("sslid_auth_token", customData.token);
         sessionStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
+        sessionStorage.setItem("sslid_auth_token", customData.token);
         // Notify all AuthContext instances to re-read auth
         window.dispatchEvent(new Event("sslid-auth-refresh"));
         // Small delay to let AuthContext update before navigation
