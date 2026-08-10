@@ -8,6 +8,14 @@ export default withAuth(
   {
     callbacks: {
       authorized({ req, token }) {
+        // Bypass auth in development/preview environments (iframe cookie restrictions)
+        const isDev = process.env.NODE_ENV === "development";
+        const isPreview = req.nextUrl.hostname.includes("softgen.dev") || req.nextUrl.hostname.includes("localhost");
+        
+        if (isDev || isPreview) {
+          return true;
+        }
+        
         if (!token) {
           return false;
         }
