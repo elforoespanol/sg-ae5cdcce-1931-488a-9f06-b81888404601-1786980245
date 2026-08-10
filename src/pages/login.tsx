@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { signIn, useSession, getSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,11 @@ export default function LoginPage() {
     password: "",
   });
 
-  // Redirect if already authenticated
+  // Redirect when session becomes authenticated
   useEffect(() => {
+    console.log("[LOGIN] session status changed:", status);
     if (status === "authenticated") {
+      console.log("[LOGIN] redirecting to dashboard via useEffect");
       router.push("/dashboard");
     }
   }, [status, router]);
@@ -31,14 +33,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      console.log("[LOGIN] Attempting sign in with:", formData.email);
+      console.log("[LOGIN] calling signIn with:", formData.email);
       const result = await signIn("credentials", {
         email: formData.email,
         password: formData.password,
         redirect: false,
       });
 
-      console.log("[LOGIN] signIn result:", result);
+      console.log("[LOGIN] signIn returned:", result);
 
       if (result?.error) {
         toast.error(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
@@ -46,7 +48,8 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back!");
-      window.location.href = "/dashboard";
+      console.log("[LOGIN] toast shown, waiting for session update...");
+      // The useEffect above will handle redirect when status changes
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
       console.error("Login error:", err);

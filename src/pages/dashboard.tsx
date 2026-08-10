@@ -62,9 +62,13 @@ export default function DashboardPage() {
   useEffect(() => {
     console.log("[DASHBOARD] session status:", status, "user:", session?.user?.id);
     if (status === "unauthenticated") {
-      router.push("/login");
+      const timer = setTimeout(() => {
+        console.log("[DASHBOARD] redirecting to login after delay");
+        router.push("/login");
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-  }, [status, session, router]);
+  }, [status, router]);
 
   useEffect(() => {
     if (!session?.user?.id) return;
