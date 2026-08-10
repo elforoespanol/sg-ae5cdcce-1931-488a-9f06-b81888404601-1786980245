@@ -18,6 +18,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
+    // Verify Supabase is configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      console.error("[REGISTER] Missing Supabase URL");
+      return res.status(500).json({ message: "Server configuration error" });
+    }
+
     // Check for existing user
     const { data: existingUser, error: lookupError } = await supabaseAdmin
       .from("users")
