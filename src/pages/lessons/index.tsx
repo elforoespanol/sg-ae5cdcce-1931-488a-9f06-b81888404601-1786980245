@@ -56,9 +56,11 @@ export default function LessonsPage() {
 
         const res = await fetch(`/api/lessons?${params.toString()}`);
         const data = await res.json();
-        setLessons(data);
+        // Defensive: ensure data is an array
+        setLessons(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Failed to fetch lessons:", error);
+        setLessons([]);
       } finally {
         setLoading(false);
       }

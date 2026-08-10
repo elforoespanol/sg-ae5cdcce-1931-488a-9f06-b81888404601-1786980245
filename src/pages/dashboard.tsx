@@ -97,7 +97,7 @@ export default function DashboardPage() {
 
       if (lessonsRes.ok) {
         const lessonsData = await lessonsRes.json();
-        setLessons(lessonsData.lessons?.slice(0, 3) || []);
+        setLessons(Array.isArray(lessonsData) ? lessonsData.slice(0, 3) : []);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
