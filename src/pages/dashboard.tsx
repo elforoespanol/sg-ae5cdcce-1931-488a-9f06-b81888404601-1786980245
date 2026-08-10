@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Head from "next/head";
@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { DashboardStats } from "@/components/DashboardStats";
 import { LessonCard } from "@/components/LessonCard";
@@ -49,39 +48,23 @@ interface Stats {
 }
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fallback auth state — read synchronously on first render to avoid race condition
-  const [fallbackUser, setFallbackUser] = useState<{ email: string; role: string } | null>(() => {
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("sslid_auth_fallback");
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
-            return parsed;
-          }
-          localStorage.removeItem("sslid_auth_fallback");
-        } catch {
-          localStorage.removeItem("sslid_auth_fallback");
-        }
-      }
+  useEffect(() => {
+    if (status !== "loading" && !authUser) {
+      router.push("/login");
     }
-    return null;
-  });
-
-  const isAuthenticated = !!session?.user || !!fallbackUser;
-  const userRole = session?.user?.role || fallbackUser?.role;
+  }, [status, authUser, router]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (authUser) {
       fetchDashboardData();
     }
-  }, [isAuthenticated]);
+  }, [authUser]);
 
   async function fetchDashboardData() {
     try {
@@ -116,7 +99,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!authUser) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-6">
         <Card className="max-w-md w-full text-center p-8">
@@ -166,7 +149,7 @@ export default function DashboardPage() {
           className="space-y-2"
         >
           <h1 className="text-3xl font-serif font-bold">
-            ¡Hola, {session?.user?.name || fallbackUser?.email?.split("@")[0] || "Learner"}!
+            ¡Hola, {authUser?.name || authUser?.email?.split("@")[0] || "Learner"}!
           </h1>
           <p className="text-muted-foreground">Ready to continue your Spanish journey?</p>
         </motion.div>
