@@ -1,9 +1,8 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
-const rawSecret = process.env.NEXTAUTH_SECRET || "";
 const fallbackSecret = "speak-spanish-like-i-did-fallback-secret-key-2024";
-const authSecret = rawSecret.length >= 32 ? rawSecret : fallbackSecret;
+const authSecret = process.env.NEXTAUTH_SECRET || fallbackSecret;
 
 export default withAuth(
   function middleware(req) {
@@ -13,12 +12,12 @@ export default withAuth(
     secret: authSecret,
     callbacks: {
       authorized({ req, token }) {
-        // Allow all requests in development/preview
+        // Always allow in development/preview
         if (process.env.NODE_ENV === "development") {
           return true;
         }
 
-        // In production, require valid token
+        // In production, require a valid token
         if (!token) {
           return false;
         }
