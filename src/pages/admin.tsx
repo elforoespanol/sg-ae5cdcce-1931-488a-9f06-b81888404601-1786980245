@@ -63,6 +63,12 @@ interface StudentDetail {
     completedAt: string | null;
     lessons: { title: string; slug: string; difficulty: string } | null;
   }>;
+  flashcards: Array<{
+    id: string;
+    word: string;
+    is_mastered: boolean;
+    total_reviews: number;
+  }>;
   chatSessions: Array<{
     id: string;
     created_at: string;
