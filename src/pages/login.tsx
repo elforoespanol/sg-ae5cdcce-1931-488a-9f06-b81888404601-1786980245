@@ -55,8 +55,12 @@ export default function LoginPage() {
         };
         localStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
         sessionStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
-        // Force full page reload so AuthContext mounts fresh and reads auth
-        window.location.href = "/dashboard";
+        // Notify all AuthContext instances to re-read auth
+        window.dispatchEvent(new Event("sslid-auth-refresh"));
+        // Small delay to let AuthContext update before navigation
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 50);
         return;
       }
 

@@ -37,11 +37,7 @@ export default function LessonsPage() {
   const [selectedLevel, setSelectedLevel] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
+  // No auto-redirect - let AuthContext handle auth state
 
   useEffect(() => {
     if (status !== "authenticated") return;

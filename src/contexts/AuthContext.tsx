@@ -123,7 +123,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const handleRefresh = () => refresh();
     window.addEventListener("sslid-auth-refresh", handleRefresh);
-    return () => window.removeEventListener("sslid-auth-refresh", handleRefresh);
+    window.addEventListener("storage", handleRefresh);
+    return () => {
+      window.removeEventListener("sslid-auth-refresh", handleRefresh);
+      window.removeEventListener("storage", handleRefresh);
+    };
   }, [refresh]);
 
   return (
