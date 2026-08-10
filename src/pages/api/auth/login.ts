@@ -65,11 +65,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .setExpirationTime("30d")
       .sign(jwtSecret);
 
-    // Set cookie
     const isSecure = process.env.NODE_ENV === "production";
-    const cookieValue = `next-auth.session-token=${token}; Path=/; HttpOnly; ${isSecure ? "Secure; " : ""}SameSite=Lax; Max-Age=${30 * 24 * 60 * 60}`;
+    const maxAge = 30 * 24 * 60 * 60;
 
-    res.setHeader("Set-Cookie", cookieValue);
+    // Set both HttpOnly session token AND readable auth cookie
+    const cookies = [
+      `next-auth.session-token=${token}; Path=/; HttpOnly; ${isSecure ? "Secure; " : ""}SameSite=Lax; Max-Age=${maxAge}`,
+      `sslid_auth=${encodeURIComponent(JSON.stringify({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        level: user.level,
+      }))}; Path=/; ${isSecure ? "Secure; " : ""}SameSite=Lax; Max-Age=${maxAge}`,
+    ];
+
+    res.setHeader("Set-Cookie", cookies);
+
     res.status(200).json({
       user: {
         id: user.id,

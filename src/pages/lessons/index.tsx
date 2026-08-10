@@ -1,9 +1,8 @@
 import Head from "next/head";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, BookOpen } from "lucide-react";
+import { Search, BookOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LessonCard } from "@/components/LessonCard";
@@ -55,8 +54,12 @@ export default function LessonsPage() {
         if (searchQuery) params.append("search", searchQuery);
 
         const res = await fetch(`/api/lessons?${params.toString()}`);
+        if (!res.ok) {
+          console.error("Lessons API error:", res.status);
+          setLessons([]);
+          return;
+        }
         const data = await res.json();
-        // Defensive: ensure data is an array
         setLessons(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Failed to fetch lessons:", error);
