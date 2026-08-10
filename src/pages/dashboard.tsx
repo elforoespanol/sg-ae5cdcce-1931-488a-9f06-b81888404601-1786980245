@@ -55,12 +55,6 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status !== "loading" && !authUser) {
-      router.push("/login");
-    }
-  }, [status, authUser, router]);
-
-  useEffect(() => {
     if (authUser) {
       fetchDashboardData();
     }
