@@ -1,148 +1,152 @@
-import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import { motion } from "framer-motion";
 import {
-  Flame,
-  Clock,
   BookOpen,
   MessageSquare,
   Layers,
-  ArrowRight,
+  Flame,
   Trophy,
+  Clock,
+  ChevronRight,
   Sparkles,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { XPProgress } from "@/components/dashboard/XPProgress";
+import { Progress } from "@/components/ui/progress";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+import { DashboardStats } from "@/components/DashboardStats";
+import { LessonCard } from "@/components/LessonCard";
 import { StreakCalendar } from "@/components/dashboard/StreakCalendar";
-import { ACHIEVEMENTS, getLevelInfo } from "@/lib/achievements";
+import { XPProgress } from "@/components/dashboard/XPProgress";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
-
-interface DashboardStats {
-  totalXp: number;
+interface Stats {
   streak: number;
-  longestStreak: number;
+  lastActiveDate: string | null;
   totalStudyMinutes: number;
+  level: string;
   lessonsCompleted: number;
+  chatMessages: number;
   flashcardsReviewed: number;
   flashcardsMastered: number;
   dueFlashcards: number;
-  chatMessages: number;
+  totalXp: number;
   recentActivity: Array<{
     type: string;
     description: string;
     date: string;
   }>;
+  unlockedAchievements: Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    unlockedAt: string;
+  }>;
 }
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [fallbackUser, setFallbackUser] = useState<{email: string; timestamp: number} | null>(null);
-  const [mounted, setMounted] = useState(false);
+
+  // Fallback auth state for production
+  const [fallbackUser, setFallbackUser] = useState<{ email: string; role: string } | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      setMounted(true);
-      return;
-    }
-    const raw = localStorage.getItem("sslid_auth_fallback");
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
-          setFallbackUser(parsed);
-        } else {
+    if (typeof window !== "undefined") {
+      const raw = localStorage.getItem("sslid_auth_fallback");
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
+            setFallbackUser(parsed);
+          } else {
+            localStorage.removeItem("sslid_auth_fallback");
+          }
+        } catch {
           localStorage.removeItem("sslid_auth_fallback");
         }
-      } catch {
-        localStorage.removeItem("sslid_auth_fallback");
       }
     }
-    setMounted(true);
   }, []);
+
+  const isAuthenticated = !!session?.user || !!fallbackUser;
+  const userRole = session?.user?.role || fallbackUser?.role;
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const res = await fetch("/api/user/stats");
-        if (res.ok) {
-          const data = await res.json();
-          setStats(data);
-        } else {
-          setStats(null);
-        }
-      } catch (e) {
-        console.error("Failed to fetch stats", e);
-        setStats(null);
-      } finally {
-        setLoading(false);
-      }
+    if (status === "loading") return;
+
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
     }
 
-    fetchStats();
-  }, []);
+    fetchDashboardData();
+  }, [status, isAuthenticated, router]);
 
-  if (!mounted || loading) {
+  async function fetchDashboardData() {
+    try {
+      const [statsRes, lessonsRes] = await Promise.all([
+        fetch("/api/user/stats"),
+        fetch("/api/lessons"),
+      ]);
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setStats(statsData);
+      }
+
+      if (lessonsRes.ok) {
+        const lessonsData = await lessonsRes.json();
+        setLessons(lessonsData.lessons?.slice(0, 3) || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen bg-gradient-hero">
+        <div className="container py-8">
+          <LoadingSkeleton variant="dashboard" />
+        </div>
       </div>
     );
   }
 
-  const userStats = stats || {
-    totalXp: 0,
-    streak: 0,
-    longestStreak: 0,
-    totalStudyMinutes: 0,
-    lessonsCompleted: 0,
-    flashcardsReviewed: 0,
-    flashcardsMastered: 0,
-    dueFlashcards: 0,
-    chatMessages: 0,
-    recentActivity: [],
-  };
-
-  const levelInfo = getLevelInfo(userStats.totalXp);
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const quickActions = [
     {
-      title: "Continue Lessons",
+      title: "Continue Learning",
       description: "Pick up where you left off",
       icon: BookOpen,
       href: "/lessons",
-      color: "bg-primary/10 text-primary",
+      color: "bg-blue-50 text-blue-600",
     },
     {
-      title: "AI Conversation",
-      description: "Practice with our AI tutor",
-      icon: MessageSquare,
-      href: "/chat",
-      color: "bg-secondary/10 text-secondary",
-    },
-    {
-      title: "Review Flashcards",
-      description: userStats.dueFlashcards > 0 ? `${userStats.dueFlashcards} cards due now` : "Strengthen your vocabulary",
+      title: "Practice Flashcards",
+      description: `${stats?.dueFlashcards || 0} cards due for review`,
       icon: Layers,
       href: "/flashcards",
-      color: "bg-accent/20 text-amber-600",
+      color: "bg-amber-50 text-amber-600",
+    },
+    {
+      title: "AI Tutor",
+      description: "Practice conversation",
+      icon: MessageSquare,
+      href: "/chat",
+      color: "bg-violet-50 text-violet-600",
     },
   ];
 
@@ -150,215 +154,143 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-hero pb-16">
       <Head>
         <title>Dashboard — Speak Spanish Like I Did</title>
-        <meta name="description" content="Track your Spanish learning progress, streaks, and achievements." />
       </Head>
-      <div className="container py-8">
-        {/* Welcome */}
+
+      <div className="container py-8 space-y-8">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
+          className="space-y-2"
         >
-          <h1 className="font-serif text-3xl md:text-4xl text-foreground mb-2">
-            Hola, {session?.user?.name || fallbackUser?.email?.split("@")[0] || "Learner"}! 👋
+          <h1 className="text-3xl font-serif font-bold">
+            ¡Hola, {session?.user?.name || fallbackUser?.email?.split("@")[0] || "Learner"}!
           </h1>
-          <p className="text-muted-foreground">
-            Ready to continue your Spanish journey?
-          </p>
+          <p className="text-muted-foreground">Ready to continue your Spanish journey?</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* XP Progress */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <XPProgress totalXp={userStats.totalXp} />
-          </motion.div>
+        <DashboardStats
+          streak={stats?.streak || 0}
+          totalStudyMinutes={stats?.totalStudyMinutes || 0}
+          lessonsCompleted={stats?.lessonsCompleted || 0}
+          dueFlashcards={stats?.dueFlashcards || 0}
+        />
 
-          {/* Streak Calendar */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="lg:col-span-2"
-          >
-            <StreakCalendar
-              streak={userStats.streak}
-              longestStreak={userStats.longestStreak}
-            />
-          </motion.div>
-        </div>
-
-        {/* Stats Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-        >
-          {[
-            {
-              title: "Daily Streak",
-              value: userStats.streak,
-              subtitle: "days",
-              icon: Flame,
-              color: "text-orange-500",
-              bg: "bg-orange-50",
-            },
-            {
-              title: "Study Time",
-              value: Math.round(userStats.totalStudyMinutes),
-              subtitle: "minutes",
-              icon: Clock,
-              color: "text-blue-500",
-              bg: "bg-blue-50",
-            },
-            {
-              title: "Lessons",
-              value: userStats.lessonsCompleted,
-              subtitle: "completed",
-              icon: BookOpen,
-              color: "text-emerald-500",
-              bg: "bg-emerald-50",
-            },
-            {
-              title: "Due Flashcards",
-              value: userStats.dueFlashcards,
-              subtitle: userStats.dueFlashcards > 0 ? "to review" : "all caught up",
-              icon: Layers,
-              color: userStats.dueFlashcards > 0 ? "text-amber-500" : "text-muted-foreground",
-              bg: userStats.dueFlashcards > 0 ? "bg-amber-50" : "bg-muted",
-            },
-          ].map((stat) => (
-            <motion.div key={stat.title} variants={itemVariants}>
-              <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                      <stat.icon className={`h-5 w-5 ${stat.color}`} />
+        <div className="grid md:grid-cols-3 gap-6">
+          {quickActions.map((action, index) => (
+            <motion.div
+              key={action.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2">
+                      <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center`}>
+                        <action.icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{action.title}</h3>
+                        <p className="text-sm text-muted-foreground">{action.description}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-2xl font-serif text-foreground">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {stat.subtitle}
+                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-8"
-        >
-          <h2 className="font-serif text-xl text-foreground mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {quickActions.map((action) => (
-              <Link key={action.title} href={action.href}>
-                <Card className="border-0 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer group">
-                  <CardContent className="p-5">
-                    <div className={`w-10 h-10 rounded-lg ${action.color} flex items-center justify-center mb-4`}>
-                      <action.icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="font-medium text-foreground mb-1 group-hover:text-primary transition-colors">
-                      {action.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {action.description}
-                    </p>
-                    <div className="flex items-center text-sm text-primary font-medium">
-                      Start
-                      <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </motion.div>
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Recommended Lessons</h2>
+              <Button variant="ghost" size="sm" onClick={() => router.push("/lessons")}>
+                View All
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
 
-        {/* Achievements & Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Achievements */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Card className="border-0 shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="font-serif text-lg">Achievements</CardTitle>
-                <Link href="/achievements" className="text-sm text-primary hover:underline">
-                  View all
-                </Link>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-2 gap-3">
-                  {ACHIEVEMENTS.slice(0, 4).map((ach) => (
-                    <div key={ach.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                      <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
-                        <Trophy className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium truncate">{ach.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{ach.description}</p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {lessons.map((lesson: any) => (
+                <LessonCard
+                  key={lesson.id}
+                  lesson={lesson}
+                  onClick={() => router.push(`/lessons/${lesson.id}`)}
+                />
+              ))}
+            </div>
+
+            {stats?.recentActivity && stats.recentActivity.length > 0 && (
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-primary" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {stats.recentActivity.map((activity, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{activity.description}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {activity.date ? new Date(activity.date).toLocaleDateString() : "Recently"}
+                        </p>
                       </div>
                     </div>
                   ))}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          <div className="space-y-6">
+            <XPProgress totalXp={stats?.totalXp || 0} />
+
+            <StreakCalendar streak={stats?.streak || 0} lastActiveDate={stats?.lastActiveDate} />
+
+            {stats?.unlockedAchievements && stats.unlockedAchievements.length > 0 && (
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-amber-500" />
+                    Achievements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {stats.unlockedAchievements.slice(0, 3).map((achievement) => (
+                    <div key={achievement.id} className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center">
+                        <Sparkles className="h-5 w-5 text-amber-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{achievement.name}</p>
+                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center">
+                    <Flame className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{stats?.streak || 0}</p>
+                    <p className="text-sm text-muted-foreground">Day Streak</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
-
-          {/* Recent Activity */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            <Card className="border-0 shadow-sm">
-              <CardHeader>
-                <CardTitle className="font-serif text-lg">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                {userStats.recentActivity.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <Sparkles className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-                    <p>No activity yet. Start a lesson to see your progress!</p>
-                    <Link href="/lessons" className="inline-block mt-4">
-                      <Button variant="outline" className="gap-2">
-                        Browse Lessons
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {userStats.recentActivity.slice(0, 5).map((activity, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                        <div className="w-2 h-2 rounded-full bg-primary" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm">{activity.description}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(activity.date).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>
