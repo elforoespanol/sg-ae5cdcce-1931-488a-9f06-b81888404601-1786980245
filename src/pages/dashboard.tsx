@@ -95,24 +95,25 @@ export default function DashboardPage() {
   }, [status, fallbackUser, router]);
 
   useEffect(() => {
-    if (!session?.user?.id && !fallbackUser) return;
-
     async function fetchStats() {
       try {
         const res = await fetch("/api/user/stats");
         if (res.ok) {
           const data = await res.json();
           setStats(data);
+        } else {
+          setStats(null);
         }
       } catch (e) {
         console.error("Failed to fetch stats", e);
+        setStats(null);
       } finally {
         setLoading(false);
       }
     }
 
     fetchStats();
-  }, [session?.user?.id, fallbackUser]);
+  }, []);
 
   if (!mounted || loading) {
     return (
