@@ -3,15 +3,27 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+// Lazy Supabase client — only created when needed, not at module import time
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error("Supabase configuration missing");
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
+// Ensure secret is always valid (min 32 chars for NextAuth JWT)
+const rawSecret = process.env.NEXTAUTH_SECRET || "";
+const fallbackSecret = "speak-spanish-like-i-did-fallback-secret-key-2024";
+const authSecret = rawSecret.length >= 32 ? rawSecret : fallbackSecret;
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET || "speak-spanish-fallback-secret-2024-min-32-chars-long",
+  secret: authSecret,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -22,13 +34,11 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) {
+            console.error("[AUTH] Missing credentials");
             return null;
           }
 
-          if (!supabaseUrl || !serviceRoleKey) {
-            console.error("[AUTH] Missing Supabase configuration");
-            return null;
-          }
+          const supabaseAdmin = getSupabaseAdmin();
 
           const { data: user, error } = await supabaseAdmin
             .from("users")
