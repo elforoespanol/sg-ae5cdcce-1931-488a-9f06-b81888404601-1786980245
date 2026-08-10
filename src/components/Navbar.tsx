@@ -26,6 +26,8 @@ export function Navbar() {
 
   const handleSignOut = () => {
     localStorage.removeItem("sslid_auth_fallback");
+    sessionStorage.removeItem("sslid_auth_fallback");
+    document.cookie = "sslid_auth=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
     signOut({ callbackUrl: "/" });
   };
 

@@ -48,14 +48,15 @@ export default function LoginPage() {
       const customData = await customRes.json();
 
       if (customRes.ok && customData.token) {
-        localStorage.setItem("sslid_auth_fallback", JSON.stringify({
+        const authData = {
           email: customData.user.email,
           role: customData.user.role,
           timestamp: Date.now(),
-        }));
-        // Notify AuthContext to re-read auth state
-        window.dispatchEvent(new Event("sslid-auth-refresh"));
-        router.push("/dashboard");
+        };
+        localStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
+        sessionStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
+        // Force full page reload so AuthContext mounts fresh and reads auth
+        window.location.href = "/dashboard";
         return;
       }
 

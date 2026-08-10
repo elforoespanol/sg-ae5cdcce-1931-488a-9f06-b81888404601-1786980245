@@ -43,12 +43,11 @@ function readAuthFromStorage(): CustomUser | null {
         level: parsed.level,
       };
     } catch {
-      // Invalid cookie, clear it
       document.cookie = "sslid_auth=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
   }
 
-  // Check localStorage fallback
+  // Check localStorage
   if (typeof window !== "undefined") {
     try {
       const raw = localStorage.getItem("sslid_auth_fallback");
@@ -67,6 +66,26 @@ function readAuthFromStorage(): CustomUser | null {
       }
     } catch {
       // localStorage not available
+    }
+
+    // Check sessionStorage as additional fallback
+    try {
+      const raw = sessionStorage.getItem("sslid_auth_fallback");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
+          return {
+            id: parsed.email,
+            name: parsed.name || parsed.email,
+            email: parsed.email,
+            image: null,
+            role: parsed.role,
+          };
+        }
+        sessionStorage.removeItem("sslid_auth_fallback");
+      }
+    } catch {
+      // sessionStorage not available
     }
   }
 

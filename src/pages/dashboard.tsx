@@ -200,7 +200,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {lessons.map((lesson: any) => (
+              {Array.isArray(lessons) && lessons.map((lesson: any) => (
                 <LessonCard
                   key={lesson.id}
                   id={lesson.id}
