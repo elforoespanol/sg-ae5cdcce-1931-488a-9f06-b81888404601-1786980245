@@ -25,7 +25,20 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Use custom login API as primary (more reliable than NextAuth in production)
+      // Try NextAuth first for proper session establishment
+      const result = await signIn("credentials", {
+        email: email.trim(),
+        password,
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
+
+      if (result?.ok) {
+        router.push("/dashboard");
+        return;
+      }
+
+      // Fallback to custom login API
       const customRes = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,30 +48,13 @@ export default function LoginPage() {
       const customData = await customRes.json();
 
       if (customRes.ok && customData.token) {
-        // Store fallback auth data
         localStorage.setItem("sslid_auth_fallback", JSON.stringify({
           email: customData.user.email,
           role: customData.user.role,
           timestamp: Date.now(),
         }));
-        // Use client-side navigation to preserve state and avoid full reload issues
         router.push("/dashboard");
         return;
-      }
-
-      // If custom login fails with 401, try NextAuth as fallback
-      if (customRes.status === 401) {
-        const result = await signIn("credentials", {
-          email: email.trim(),
-          password,
-          redirect: false,
-          callbackUrl: "/dashboard",
-        });
-
-        if (result?.ok) {
-          router.push("/dashboard");
-          return;
-        }
       }
 
       setError(customData.message || "Invalid email or password");
