@@ -6,14 +6,11 @@ import { motion } from "framer-motion";
 import {
   Flame,
   Clock,
-  TrendingUp,
   BookOpen,
   MessageSquare,
   Layers,
   ArrowRight,
-  Zap,
   Trophy,
-  Brain,
   Sparkles,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,8 +51,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const { data: session } = useSession();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [fallbackUser, setFallbackUser] = useState<{email: string; timestamp: number} | null>(null);
@@ -81,18 +77,6 @@ export default function DashboardPage() {
     }
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    console.log("[DASHBOARD] session status:", status, "fallback:", !!fallbackUser);
-    
-    // Only redirect after session has finished loading
-    if (status === "loading") return;
-
-    if (status === "unauthenticated" && !fallbackUser) {
-      console.log("[DASHBOARD] redirecting to login");
-      router.push("/login");
-    }
-  }, [status, fallbackUser, router]);
 
   useEffect(() => {
     async function fetchStats() {
