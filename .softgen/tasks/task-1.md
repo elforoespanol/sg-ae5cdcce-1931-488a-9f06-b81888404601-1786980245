@@ -18,14 +18,14 @@ Adapting App Router specs to Page Router (src/pages/).
 - [x] Set up Prisma schema with User, Account, Session, VerificationToken models
 - [x] Update globals.css with Spanish-inspired color palette and fonts
 - [x] Update tailwind.config.ts with custom fonts and animations
-- [ ] Create lib/prisma.ts client singleton
-- [ ] Create lib/auth.ts NextAuth configuration
-- [ ] Create API route for NextAuth
-- [ ] Create middleware for route protection
-- [ ] Create Navbar component
-- [ ] Build landing page (index.tsx)
-- [ ] Build login page
-- [ ] Build register page
+- [x] Create lib/prisma.ts client singleton
+- [x] Create lib/auth.ts NextAuth configuration
+- [x] Create API route for NextAuth
+- [x] Create middleware for route protection
+- [x] Create Navbar component
+- [x] Build landing page (index.tsx)
+- [x] Build login page
+- [x] Build register page
 
 ## Acceptance
 - App loads without errors
