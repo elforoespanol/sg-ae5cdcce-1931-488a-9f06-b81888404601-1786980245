@@ -11,9 +11,8 @@ function getUserIdFromRequest(req: NextApiRequest): string | undefined {
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
     try {
-      const { SignJWT } = require("jose");
-      // We can't verify async here easily, but we can decode the payload
-      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString());
+      // JWT payload is base64url-encoded JSON
+      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
       if (payload.sub) return payload.sub;
     } catch {
       // ignore invalid token
