@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { useEffect, useState, useMemo } from "react";
 import Head from "next/head";
@@ -87,7 +87,7 @@ interface StudentDetail {
 }
 
 export default function AdminPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
@@ -96,32 +96,39 @@ export default function AdminPage() {
   const [filterSub, setFilterSub] = useState<string>("ALL");
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
-  // Fallback auth state — read synchronously on first render to avoid race condition
-  const [fallbackUser, setFallbackUser] = useState<{email: string; role: string} | null>(() => {
-    if (typeof window !== "undefined") {
-      const raw = localStorage.getItem("sslid_auth_fallback");
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
-            return parsed;
-          }
-          localStorage.removeItem("sslid_auth_fallback");
-        } catch {
-          localStorage.removeItem("sslid_auth_fallback");
-        }
-      }
-    }
-    return null;
-  });
   const [mounted, setMounted] = useState(false);
+
+  // All hooks must be called before any early returns
+  const isAdmin = authUser?.role === "ADMIN";
+  const isAuthenticated = !!authUser;
+
+  const filteredStudents = useMemo(() => {
+    return students.filter((s) => {
+      const matchesSearch =
+        !searchQuery ||
+        (s.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+        s.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSub = filterSub === "ALL" || s.subscription_type === filterSub;
+      return matchesSearch && matchesSub;
+    });
+  }, [students, searchQuery, filterSub]);
+
+  const subscriptionOptions = ["ALL", "FREE", "PRO", "ENTERPRISE"];
+
+  const statCards = [
+    { label: "Total Users", value: stats?.totalUsers ?? 0, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Lessons", value: stats?.totalLessons ?? 0, icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: "Flashcards", value: stats?.totalFlashcards ?? 0, icon: Layers, color: "text-amber-600", bg: "bg-amber-50" },
+    { label: "Chat Sessions", value: stats?.totalChats ?? 0, icon: MessageSquare, color: "text-violet-600", bg: "bg-violet-50" },
+    { label: "Achievements", value: stats?.totalAchievements ?? 0, icon: Trophy, color: "text-rose-600", bg: "bg-rose-50" },
+    { label: "Active Today", value: stats?.activeToday ?? 0, icon: UserCheck, color: "text-teal-600", bg: "bg-teal-50" },
+    { label: "New This Week", value: stats?.newThisWeek ?? 0, icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
+    { label: "Avg Study Time", value: `${stats?.avgStudyTime ?? 0}m`, icon: Clock, color: "text-indigo-600", bg: "bg-indigo-50" },
+  ];
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  const isAdmin = session?.user?.role === "ADMIN" || fallbackUser?.role === "ADMIN";
-  const isAuthenticated = !!session?.user || !!fallbackUser;
 
   useEffect(() => {
     if (isAdmin) {
@@ -130,16 +137,6 @@ export default function AdminPage() {
       setLoading(false);
     }
   }, [isAdmin]);
-
-  if (status === "loading" || (loading && isAdmin)) {
-    return (
-      <div className="min-h-screen bg-gradient-hero">
-        <div className="container py-8">
-          <LoadingSkeleton variant="dashboard" />
-        </div>
-      </div>
-    );
-  }
 
   async function fetchData() {
     try {
@@ -179,30 +176,6 @@ export default function AdminPage() {
     }
   }
 
-  const filteredStudents = useMemo(() => {
-    return students.filter((s) => {
-      const matchesSearch =
-        !searchQuery ||
-        (s.name?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-        s.email.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesSub = filterSub === "ALL" || s.subscription_type === filterSub;
-      return matchesSearch && matchesSub;
-    });
-  }, [students, searchQuery, filterSub]);
-
-  const subscriptionOptions = ["ALL", "FREE", "PRO", "ENTERPRISE"];
-
-  const statCards = [
-    { label: "Total Users", value: stats?.totalUsers ?? 0, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Lessons", value: stats?.totalLessons ?? 0, icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { label: "Flashcards", value: stats?.totalFlashcards ?? 0, icon: Layers, color: "text-amber-600", bg: "bg-amber-50" },
-    { label: "Chat Sessions", value: stats?.totalChats ?? 0, icon: MessageSquare, color: "text-violet-600", bg: "bg-violet-50" },
-    { label: "Achievements", value: stats?.totalAchievements ?? 0, icon: Trophy, color: "text-rose-600", bg: "bg-rose-50" },
-    { label: "Active Today", value: stats?.activeToday ?? 0, icon: UserCheck, color: "text-teal-600", bg: "bg-teal-50" },
-    { label: "New This Week", value: stats?.newThisWeek ?? 0, icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
-    { label: "Avg Study Time", value: `${stats?.avgStudyTime ?? 0}m`, icon: Clock, color: "text-indigo-600", bg: "bg-indigo-50" },
-  ];
-
   if (!mounted || status === "loading") {
     return (
       <div className="min-h-screen bg-gradient-hero">
@@ -235,6 +208,16 @@ export default function AdminPage() {
           <p className="text-muted-foreground mb-6">You do not have permission to access the admin dashboard.</p>
           <Button onClick={() => router.push("/dashboard")}>Go to Dashboard</Button>
         </Card>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero">
+        <div className="container py-8">
+          <LoadingSkeleton variant="dashboard" />
+        </div>
       </div>
     );
   }
