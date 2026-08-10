@@ -7,7 +7,8 @@ import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown,
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
-  const { user: authUser, isAdmin } = useAuth();
+  const { user: authUser } = useAuth();
+  const isAdmin = authUser?.role === "ADMIN";
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
