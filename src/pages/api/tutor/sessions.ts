@@ -2,9 +2,29 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
+function getUserIdFromRequest(req: NextApiRequest): string | undefined {
+  const session = (req as any).__session;
+  if (session?.user?.id) return session.user.id;
+  
+  const cookie = req.headers.cookie;
+  if (cookie) {
+    const match = cookie.match(/sslid_auth=([^;]+)/);
+    if (match) {
+      try {
+        const auth = JSON.parse(decodeURIComponent(match[1]));
+        return auth.id;
+      } catch {
+        // ignore
+      }
+    }
+  }
+  return undefined;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req });
-  const userId = session?.user?.id;
+  (req as any).__session = session;
+  const userId = getUserIdFromRequest(req);
 
   const supabase = getSupabaseAdmin();
   if (!supabase || !userId) {

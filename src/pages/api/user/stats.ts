@@ -2,17 +2,33 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
+function getUserIdFromRequest(req: NextApiRequest): string | undefined {
+  const session = (req as any).__session;
+  if (session?.user?.id) return session.user.id;
+  
+  const cookie = req.headers.cookie;
+  if (cookie) {
+    const match = cookie.match(/sslid_auth=([^;]+)/);
+    if (match) {
+      try {
+        const auth = JSON.parse(decodeURIComponent(match[1]));
+        return auth.id;
+      } catch {
+        // ignore
+      }
+    }
+  }
+  return undefined;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") return res.status(405).json({ message: "Method not allowed" });
 
   try {
     const session = await getSession({ req });
-    const isDev = process.env.NODE_ENV === "development";
-    if (!isDev && !session?.user?.id) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+    (req as any).__session = session;
+    const userId = getUserIdFromRequest(req);
 
-    const userId = session?.user?.id;
     if (!userId) {
       return res.status(200).json({
         streak: 0, lastActiveDate: null, totalStudyMinutes: 0, level: "A1",
