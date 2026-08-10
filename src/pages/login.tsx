@@ -49,7 +49,7 @@ export default function LoginPage() {
 
       // Navigate to dashboard after a brief delay to let session state update
       setTimeout(() => {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }, 100);
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
