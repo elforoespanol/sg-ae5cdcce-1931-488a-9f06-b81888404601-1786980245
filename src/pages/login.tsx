@@ -48,7 +48,7 @@ export default function LoginPage() {
       }
 
       toast.success("Welcome back!");
-      console.log("[LOGIN] toast shown, waiting for session update...");
+      window.location.assign("/dashboard");
       // The useEffect above will handle redirect when status changes
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
