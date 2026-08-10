@@ -54,26 +54,24 @@ export default function DashboardPage() {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fallback auth state for production
-  const [fallbackUser, setFallbackUser] = useState<{ email: string; role: string } | null>(null);
-
-  useEffect(() => {
+  // Fallback auth state — read synchronously on first render to avoid race condition
+  const [fallbackUser, setFallbackUser] = useState<{ email: string; role: string } | null>(() => {
     if (typeof window !== "undefined") {
       const raw = localStorage.getItem("sslid_auth_fallback");
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
           if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
-            setFallbackUser(parsed);
-          } else {
-            localStorage.removeItem("sslid_auth_fallback");
+            return parsed;
           }
+          localStorage.removeItem("sslid_auth_fallback");
         } catch {
           localStorage.removeItem("sslid_auth_fallback");
         }
       }
     }
-  }, []);
+    return null;
+  });
 
   const isAuthenticated = !!session?.user || !!fallbackUser;
   const userRole = session?.user?.role || fallbackUser?.role;

@@ -96,25 +96,27 @@ export default function AdminPage() {
   const [filterSub, setFilterSub] = useState<string>("ALL");
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
-  const [fallbackUser, setFallbackUser] = useState<{email: string; role: string} | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
+  // Fallback auth state — read synchronously on first render to avoid race condition
+  const [fallbackUser, setFallbackUser] = useState<{email: string; role: string} | null>(() => {
     if (typeof window !== "undefined") {
       const raw = localStorage.getItem("sslid_auth_fallback");
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
           if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
-            setFallbackUser(parsed);
-          } else {
-            localStorage.removeItem("sslid_auth_fallback");
+            return parsed;
           }
+          localStorage.removeItem("sslid_auth_fallback");
         } catch {
           localStorage.removeItem("sslid_auth_fallback");
         }
       }
     }
+    return null;
+  });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
     setMounted(true);
   }, []);
 
@@ -122,7 +124,7 @@ export default function AdminPage() {
   const isAuthenticated = !!session?.user || !!fallbackUser;
 
   useEffect(() => {
-    if (!mounted || status === "loading") return;
+    if (status === "loading") return;
 
     if (!isAuthenticated) {
       router.push("/login");
@@ -134,7 +136,7 @@ export default function AdminPage() {
     } else {
       setLoading(false);
     }
-  }, [mounted, status, isAuthenticated, isAdmin, router]);
+  }, [status, isAuthenticated, isAdmin, router]);
 
   async function fetchData() {
     try {
