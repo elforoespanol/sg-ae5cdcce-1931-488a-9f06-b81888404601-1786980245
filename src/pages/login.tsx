@@ -44,13 +44,32 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Use NextAuth built-in redirect — server-side 302 works reliably in iframe previews
-    await signIn("credentials", {
-      email: formData.email,
-      password: formData.password,
-      callbackUrl: "/dashboard",
-      redirect: true,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
+        return;
+      }
+
+      // Store fallback auth for iframe preview (cookies may be blocked)
+      localStorage.setItem("sslid_auth_fallback", JSON.stringify({
+        email: formData.email,
+        timestamp: Date.now(),
+      }));
+
+      toast.success("Welcome back!");
+      window.location.href = "/dashboard";
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+      console.error("Login error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
