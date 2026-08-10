@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
 interface CustomUser {
@@ -13,11 +13,13 @@ interface CustomUser {
 interface AuthContextType {
   user: CustomUser | null;
   status: "loading" | "authenticated" | "unauthenticated";
+  refresh: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   status: "loading",
+  refresh: () => {},
 });
 
 function getCookie(name: string): string | null {
@@ -26,70 +28,87 @@ function getCookie(name: string): string | null {
   return match ? decodeURIComponent(match[2]) : null;
 }
 
+function readAuthFromStorage(): CustomUser | null {
+  // Check cookie first (most reliable across navigations)
+  const cookieAuth = getCookie("sslid_auth");
+  if (cookieAuth) {
+    try {
+      const parsed = JSON.parse(cookieAuth);
+      return {
+        id: parsed.id,
+        name: parsed.name,
+        email: parsed.email,
+        image: null,
+        role: parsed.role,
+        level: parsed.level,
+      };
+    } catch {
+      // Invalid cookie, clear it
+      document.cookie = "sslid_auth=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
+  }
+
+  // Check localStorage fallback
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem("sslid_auth_fallback");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
+          return {
+            id: parsed.email,
+            name: parsed.name || parsed.email,
+            email: parsed.email,
+            image: null,
+            role: parsed.role,
+          };
+        }
+        localStorage.removeItem("sslid_auth_fallback");
+      }
+    } catch {
+      // localStorage not available
+    }
+  }
+
+  return null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: session, status: sessionStatus } = useSession();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
   const [user, setUser] = useState<CustomUser | null>(null);
 
-  useEffect(() => {
-    // NextAuth session takes priority
+  const refresh = useCallback(() => {
     if (session?.user) {
       setUser(session.user);
       setStatus("authenticated");
       return;
     }
 
-    // Check cookie fallback (works across page navigations and in preview iframes)
-    const cookieAuth = getCookie("sslid_auth");
-    if (cookieAuth) {
-      try {
-        const parsed = JSON.parse(cookieAuth);
-        setUser({
-          id: parsed.id,
-          name: parsed.name,
-          email: parsed.email,
-          image: null,
-          role: parsed.role,
-          level: parsed.level,
-        });
-        setStatus("authenticated");
-        return;
-      } catch {
-        // Invalid cookie, clear it
-        document.cookie = "sslid_auth=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      }
+    const storedUser = readAuthFromStorage();
+    if (storedUser) {
+      setUser(storedUser);
+      setStatus("authenticated");
+    } else {
+      setUser(null);
+      setStatus("unauthenticated");
     }
-
-    // Check localStorage fallback
-    if (typeof window !== "undefined") {
-      try {
-        const raw = localStorage.getItem("sslid_auth_fallback");
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Date.now() - parsed.timestamp < 30 * 24 * 60 * 60 * 1000) {
-            setUser({
-              id: parsed.email,
-              name: parsed.name || parsed.email,
-              email: parsed.email,
-              image: null,
-              role: parsed.role,
-            });
-            setStatus("authenticated");
-            return;
-          }
-          localStorage.removeItem("sslid_auth_fallback");
-        }
-      } catch {
-        // localStorage not available
-      }
-    }
-
-    // Not authenticated
-    setStatus("unauthenticated");
   }, [session]);
 
+  // Initial auth check + re-check when session changes
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  // Listen for auth refresh events from login/logout
+  useEffect(() => {
+    const handleRefresh = () => refresh();
+    window.addEventListener("sslid-auth-refresh", handleRefresh);
+    return () => window.removeEventListener("sslid-auth-refresh", handleRefresh);
+  }, [refresh]);
+
   return (
-    <AuthContext.Provider value={{ user, status }}>
+    <AuthContext.Provider value={{ user, status, refresh }}>
       {children}
     </AuthContext.Provider>
   );

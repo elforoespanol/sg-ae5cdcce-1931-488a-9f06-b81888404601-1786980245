@@ -131,6 +131,16 @@ export default function AdminPage() {
     }
   }, [isAdmin]);
 
+  if (status === "loading" || (loading && isAdmin)) {
+    return (
+      <div className="min-h-screen bg-gradient-hero">
+        <div className="container py-8">
+          <LoadingSkeleton variant="dashboard" />
+        </div>
+      </div>
+    );
+  }
+
   async function fetchData() {
     try {
       const [statsRes, studentsRes] = await Promise.all([
@@ -225,16 +235,6 @@ export default function AdminPage() {
           <p className="text-muted-foreground mb-6">You do not have permission to access the admin dashboard.</p>
           <Button onClick={() => router.push("/dashboard")}>Go to Dashboard</Button>
         </Card>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-hero">
-        <div className="container py-8">
-          <LoadingSkeleton variant="dashboard" />
-        </div>
       </div>
     );
   }

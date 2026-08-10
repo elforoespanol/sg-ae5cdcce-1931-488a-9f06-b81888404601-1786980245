@@ -89,7 +89,7 @@ export default function DashboardPage() {
     }
   }
 
-  if (status === "loading" || loading) {
+  if (status === "loading" || (loading && authUser)) {
     return (
       <div className="min-h-screen bg-gradient-hero">
         <div className="container py-8">

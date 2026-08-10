@@ -53,8 +53,9 @@ export default function LoginPage() {
           role: customData.user.role,
           timestamp: Date.now(),
         }));
-        // Force full page reload so AuthContext re-reads localStorage
-        window.location.href = "/dashboard";
+        // Notify AuthContext to re-read auth state
+        window.dispatchEvent(new Event("sslid-auth-refresh"));
+        router.push("/dashboard");
         return;
       }
 
