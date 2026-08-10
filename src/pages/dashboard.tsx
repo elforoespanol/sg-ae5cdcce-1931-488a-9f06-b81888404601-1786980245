@@ -58,22 +58,29 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fallbackUser, setFallbackUser] = useState<{email: string; timestamp: number} | null>(() => {
-    if (typeof window === "undefined") return null;
+  const [fallbackUser, setFallbackUser] = useState<{email: string; timestamp: number} | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      setMounted(true);
+      return;
+    }
     const raw = localStorage.getItem("sslid_auth_fallback");
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
         if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
-          return parsed;
+          setFallbackUser(parsed);
+        } else {
+          localStorage.removeItem("sslid_auth_fallback");
         }
-        localStorage.removeItem("sslid_auth_fallback");
       } catch {
         localStorage.removeItem("sslid_auth_fallback");
       }
     }
-    return null;
-  });
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     console.log("[DASHBOARD] session status:", status, "fallback:", !!fallbackUser);
@@ -107,7 +114,7 @@ export default function DashboardPage() {
     fetchStats();
   }, [session?.user?.id, fallbackUser]);
 
-  if ((status === "loading" && !fallbackUser) || loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
