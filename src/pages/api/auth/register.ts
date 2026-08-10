@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -18,14 +18,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
-    // Verify Supabase is configured
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      console.error("[REGISTER] Missing Supabase URL");
-      return res.status(500).json({ message: "Server configuration error" });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      console.error("[REGISTER] Supabase not configured");
+      return res.status(503).json({ message: "Database not available" });
     }
 
-    // Check for existing user
-    const { data: existingUser, error: lookupError } = await supabaseAdmin
+    const { data: existingUser, error: lookupError } = await supabase
       .from("users")
       .select("id")
       .eq("email", email)
@@ -42,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const { data: user, error: insertError } = await supabaseAdmin
+    const { data: user, error: insertError } = await supabase
       .from("users")
       .insert({
         name,
