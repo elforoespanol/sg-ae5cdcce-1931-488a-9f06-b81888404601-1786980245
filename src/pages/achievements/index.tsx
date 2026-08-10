@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Trophy, Sparkles } from "lucide-react";
 import { AchievementCard } from "@/components/achievements/AchievementCard";
 import { ACHIEVEMENTS } from "@/lib/achievements";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UnlockedAchievement {
   achievementId: string;
@@ -13,7 +14,7 @@ interface UnlockedAchievement {
 }
 
 export default function AchievementsPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const [unlocked, setUnlocked] = useState<UnlockedAchievement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,7 @@ export default function AchievementsPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!authUser?.id) return;
     async function fetchUnlocked() {
       try {
         const res = await fetch("/api/user/stats");
@@ -40,7 +41,7 @@ export default function AchievementsPage() {
       }
     }
     fetchUnlocked();
-  }, [session?.user?.id]);
+  }, [authUser?.id]);
 
   if (status === "loading" || loading) {
     return (
@@ -50,7 +51,7 @@ export default function AchievementsPage() {
     );
   }
 
-  if (!session?.user) return null;
+  if (!authUser) return null;
 
   const unlockedIds = new Set(unlocked.map((u) => u.achievementId));
   const recentlyUnlocked = unlocked

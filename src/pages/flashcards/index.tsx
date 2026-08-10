@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flame, Zap } from "lucide-react";
 import { FlashcardItem } from "@/components/flashcards/FlashcardItem";
@@ -8,6 +8,7 @@ import { ReviewControls } from "@/components/flashcards/ReviewControls";
 import { FlashcardProgress } from "@/components/flashcards/FlashcardProgress";
 import { SessionComplete } from "@/components/flashcards/SessionComplete";
 import { EmptyDeck } from "@/components/flashcards/EmptyDeck";
+import { useRouter } from "next/navigation";
 
 interface Flashcard {
   id: string;
@@ -23,7 +24,8 @@ interface Flashcard {
 }
 
 export default function FlashcardsPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
+  const router = useRouter();
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,6 +59,12 @@ export default function FlashcardsPage() {
     fetchCards();
   }, [fetchCards]);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
   const handleRate = useCallback(async (rating: number) => {
     const currentCard = cards[currentIndex];
     if (!currentCard) return;
@@ -88,7 +96,7 @@ export default function FlashcardsPage() {
 
   const progress = cards.length > 0 ? (currentIndex / cards.length) * 100 : 0;
 
-  if (isLoading) {
+  if (status === "loading" || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Zap className="h-8 w-8 animate-spin text-primary" />

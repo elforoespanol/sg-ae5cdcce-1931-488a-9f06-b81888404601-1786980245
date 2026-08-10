@@ -7,6 +7,7 @@ import { MessageSquare, Plus, Clock, ChevronRight, Loader2, BookOpen } from "luc
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ChatSession {
   id: string;
@@ -19,7 +20,7 @@ interface ChatSession {
 }
 
 export default function ChatSessionsPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +32,7 @@ export default function ChatSessionsPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!authUser?.id) return;
 
     fetch("/api/tutor/sessions")
       .then((res) => res.json())
@@ -42,7 +43,7 @@ export default function ChatSessionsPage() {
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
-  }, [session?.user?.id]);
+  }, [authUser?.id]);
 
   if (status === "loading" || isLoading) {
     return (

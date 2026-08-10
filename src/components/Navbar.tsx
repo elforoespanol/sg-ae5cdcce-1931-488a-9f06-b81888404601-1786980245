@@ -1,12 +1,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { signOut, useSession } from "next-auth/react";
-import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy, Settings, Bell, Shield } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
-  const { data: session } = useSession();
+  const { user: authUser, isAdmin } = useAuth();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -17,10 +18,15 @@ export function Navbar() {
     { href: "/chat", label: "AI Tutor", icon: MessageSquare, shortcut: "T" },
     { href: "/flashcards", label: "Flashcards", icon: Library, shortcut: "F" },
     { href: "/achievements", label: "Achievements", icon: Trophy, shortcut: "A" },
-    ...(session?.user?.role === "ADMIN" ? [{ href: "/admin", label: "Admin", icon: Shield, shortcut: "M" }] : []),
+    ...(isAdmin ? [{ href: "/admin", label: "Admin", icon: Shield, shortcut: "M" }] : []),
   ];
 
   const isActive = (href: string) => router.pathname === href || router.pathname.startsWith(href + "/");
+
+  const handleSignOut = () => {
+    localStorage.removeItem("sslid_auth_fallback");
+    signOut({ callbackUrl: "/" });
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md" role="navigation" aria-label="Main navigation">
@@ -56,7 +62,7 @@ export function Navbar() {
 
         {/* Desktop Auth */}
         <div className="hidden md:flex items-center gap-3">
-          {session?.user ? (
+          {authUser ? (
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -66,10 +72,10 @@ export function Navbar() {
                 aria-haspopup="true"
               >
                 <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                  {session.user.name?.charAt(0).toUpperCase() || "U"}
+                  {authUser.name?.charAt(0).toUpperCase() || "U"}
                 </div>
                 <span className="text-sm font-medium text-foreground">
-                  {session.user.name || "User"}
+                  {authUser.name || "User"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               </button>
@@ -77,9 +83,9 @@ export function Navbar() {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-52 rounded-lg border border-border bg-card shadow-lg py-1" role="menu">
                   <div className="px-4 py-2 border-b border-border">
-                    <p className="text-sm font-medium text-foreground">{session.user.name}</p>
-                    <p className="text-xs text-muted-foreground">{session.user.email}</p>
-                    <p className="text-xs text-primary font-medium mt-0.5">Level: {session.user.level}</p>
+                    <p className="text-sm font-medium text-foreground">{authUser.name}</p>
+                    <p className="text-xs text-muted-foreground">{authUser.email}</p>
+                    <p className="text-xs text-primary font-medium mt-0.5">Level: {authUser.level}</p>
                   </div>
                   <Link href="/profile" className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:bg-muted" role="menuitem">
                     <User className="h-4 w-4" aria-hidden="true" />
@@ -91,7 +97,7 @@ export function Navbar() {
                   </Link>
                   <div className="border-t border-border mt-1 pt-1">
                     <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={handleSignOut}
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted transition-colors focus-visible:outline-none focus-visible:bg-muted"
                       role="menuitem"
                     >
@@ -153,15 +159,15 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-2 border-t border-border mt-2 space-y-1">
-              {session?.user ? (
+              {authUser ? (
                 <>
                   <div className="flex items-center gap-3 px-4 py-3">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                      {session.user.name?.charAt(0).toUpperCase() || "U"}
+                      {authUser.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{session.user.name}</p>
-                      <p className="text-xs text-primary">Level: {session.user.level}</p>
+                      <p className="text-sm font-medium">{authUser.name}</p>
+                      <p className="text-xs text-primary">Level: {authUser.level}</p>
                     </div>
                   </div>
                   <Link
@@ -183,7 +189,7 @@ export function Navbar() {
                     Settings
                   </Link>
                   <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={handleSignOut}
                     className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-destructive hover:bg-muted rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                     role="menuitem"
                   >

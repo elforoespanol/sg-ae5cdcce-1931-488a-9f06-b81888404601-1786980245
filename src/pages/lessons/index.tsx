@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LessonCard } from "@/components/LessonCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 
 const levels = ["ALL", "A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -30,7 +31,7 @@ interface Lesson {
 }
 
 export default function LessonsPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,7 +75,7 @@ export default function LessonsPage() {
     );
   }
 
-  if (!session) return null;
+  if (!authUser) return null;
 
   return (
     <div className="min-h-screen bg-gradient-hero pb-20">
