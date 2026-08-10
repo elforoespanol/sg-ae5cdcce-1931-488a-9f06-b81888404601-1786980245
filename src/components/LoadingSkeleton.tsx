@@ -1,11 +1,22 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 
-export function LoadingSkeleton({ variant = "dashboard" }: { variant?: "dashboard" | "lesson" | "flashcard" | "chat" }) {
+export function LoadingSkeleton({ variant = "dashboard" }: { variant?: "dashboard" | "lesson" | "flashcard" | "chat" | "card" }) {
   if (variant === "lesson") return <LessonSkeleton />;
   if (variant === "flashcard") return <FlashcardSkeleton />;
   if (variant === "chat") return <ChatSkeleton />;
+  if (variant === "card") return <CardSkeleton />;
   return <DashboardSkeleton />;
+}
+
+export function CardSkeleton() {
+  return (
+    <div className="space-y-4 p-4">
+      <div className="h-6 w-3/4 bg-muted rounded animate-pulse" />
+      <div className="h-4 w-full bg-muted rounded animate-pulse" />
+      <div className="h-4 w-5/6 bg-muted rounded animate-pulse" />
+    </div>
+  );
 }
 
 export function DashboardSkeleton() {

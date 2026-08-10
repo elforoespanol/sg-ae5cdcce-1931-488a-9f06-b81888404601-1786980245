@@ -1,14 +1,18 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getSupabaseAdmin } from "./supabase-admin";
-import { compare } from "bcryptjs";
 
-// Use a stable fallback secret for preview and production
-const fallbackSecret = "speak-spanish-like-i-did-fallback-secret-key-2024";
-const authSecret = process.env.NEXTAUTH_SECRET || fallbackSecret;
+// Hardcoded admin credentials — guaranteed to work even without database
+const ADMIN_EMAIL = "admin@sslid.com";
+const ADMIN_PASSWORD = "Admin123!";
+const ADMIN_USER = {
+  id: "admin-hardcoded-id",
+  email: ADMIN_EMAIL,
+  name: "Admin User",
+  level: "C2",
+  role: "ADMIN",
+};
 
 export const authOptions: NextAuthOptions = {
-  secret: authSecret,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -23,67 +27,65 @@ export const authOptions: NextAuthOptions = {
           }
 
           const email = credentials.email.trim().toLowerCase();
-          const password = credentials.password;
 
-          // Try Supabase first
-          const supabase = getSupabaseAdmin();
-          if (supabase) {
-            try {
-              const { data: user, error } = await supabase
+          // Hardcoded admin fallback — always works
+          if (email === ADMIN_EMAIL && credentials.password === ADMIN_PASSWORD) {
+            return ADMIN_USER;
+          }
+
+          // Try Supabase for other users
+          try {
+            const { getSupabaseAdmin } = await import("@/lib/supabase-admin");
+            const supabase = getSupabaseAdmin();
+            if (supabase) {
+              const { data: user } = await supabase
                 .from("users")
                 .select("id, email, name, password, level, role")
                 .eq("email", email)
                 .single();
 
-              if (!error && user && user.password) {
-                const isValid = await compare(password, user.password);
+              if (user?.password) {
+                const { compare } = await import("bcryptjs");
+                const isValid = await compare(credentials.password, user.password);
                 if (isValid) {
                   return {
                     id: user.id,
                     email: user.email,
                     name: user.name,
-                    level: user.level || "A1",
-                    role: user.role || "STUDENT",
+                    level: user.level,
+                    role: user.role,
                   };
                 }
               }
-            } catch (dbErr) {
-              console.error("[AUTH] DB error:", dbErr);
-              // Fall through to fallback
             }
-          }
-
-          // Fallback: hardcoded admin for demo/emergency access
-          if (email === "admin@sslid.com" && password === "Admin123!") {
-            return {
-              id: "admin-fallback-id",
-              email: "admin@sslid.com",
-              name: "Admin User",
-              level: "C2",
-              role: "ADMIN",
-            };
+          } catch (dbErr) {
+            console.error("[Auth] Supabase lookup failed:", dbErr);
           }
 
           return null;
         } catch (err) {
-          console.error("[AUTH] Authorize error:", err);
+          console.error("[Auth] Authorize error:", err);
           return null;
         }
       },
     }),
   ],
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60,
+  },
+  secret: process.env.NEXTAUTH_SECRET || "speak-spanish-fallback-secret-key-2024",
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.sub = user.id;
+        token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.level = user.level;
@@ -92,8 +94,10 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.sub as string;
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
         session.user.level = token.level as string;
         session.user.role = token.role as string;
       }

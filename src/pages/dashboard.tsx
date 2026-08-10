@@ -217,8 +217,15 @@ export default function DashboardPage() {
               {lessons.map((lesson: any) => (
                 <LessonCard
                   key={lesson.id}
-                  lesson={lesson}
-                  onClick={() => router.push(`/lessons/${lesson.id}`)}
+                  id={lesson.id}
+                  title={lesson.title}
+                  description={lesson.description}
+                  level={lesson.level}
+                  difficulty={lesson.difficulty}
+                  durationMinutes={lesson.durationMinutes}
+                  imageUrl={lesson.imageUrl}
+                  progress={lesson.progress}
+                  order={lesson.order}
                 />
               ))}
             </div>
@@ -251,7 +258,7 @@ export default function DashboardPage() {
           <div className="space-y-6">
             <XPProgress totalXp={stats?.totalXp || 0} />
 
-            <StreakCalendar streak={stats?.streak || 0} lastActiveDate={stats?.lastActiveDate} />
+            <StreakCalendar streak={stats?.streak || 0} longestStreak={stats?.streak || 0} />
 
             {stats?.unlockedAchievements && stats.unlockedAchievements.length > 0 && (
               <Card className="border-0 shadow-sm">
