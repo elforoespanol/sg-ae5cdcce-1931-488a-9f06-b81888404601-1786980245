@@ -282,10 +282,7 @@ export default function HomePage() {
           <div className="container">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <span className="text-2xl">🇪🇸</span>
-                <span className="font-serif text-lg font-semibold text-foreground">
-                  Speak Spanish Like I Did
-                </span>
+                <img src="/logo.jpg" alt="Speak Spanish Like I Did" className="h-10 w-auto object-contain" />
               </div>
               <p className="text-sm text-muted-foreground">
                 © 2026 Speak Spanish Like I Did. All rights reserved.

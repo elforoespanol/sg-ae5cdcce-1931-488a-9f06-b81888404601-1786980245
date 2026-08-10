@@ -76,9 +76,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md animate-fade-in-up">
         <Card className="border-0 shadow-2xl bg-card/95 backdrop-blur-sm">
           <CardHeader className="space-y-1 text-center pb-6">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-3">
-              <span className="text-3xl">🇪🇸</span>
-            </div>
+            <img src="/logo.jpg" alt="Speak Spanish Like I Did" className="mx-auto h-20 w-auto object-contain mb-3" />
             <CardTitle className="font-serif text-2xl text-foreground">
               Start your journey
             </CardTitle>

@@ -87,9 +87,7 @@ export default function LoginPage() {
       >
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center pb-6">
-            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-2xl">🇪🇸</span>
-            </div>
+            <img src="/logo.jpg" alt="Speak Spanish Like I Did" className="mx-auto h-20 w-auto object-contain mb-4" />
             <CardTitle className="text-2xl font-serif">Welcome Back</CardTitle>
             <CardDescription>Continue your Spanish learning journey</CardDescription>
           </CardHeader>
