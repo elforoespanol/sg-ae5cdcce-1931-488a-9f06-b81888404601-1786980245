@@ -33,16 +33,22 @@ export default function ChatSessionsPage() {
   useEffect(() => {
     if (!authUser?.id) return;
 
-    fetch("/api/tutor/sessions")
+    // Fetch sessions
+    fetch("/api/tutor/sessions", {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
-        if (data.sessions) {
-          setSessions(data.sessions);
-        }
+        setSessions(data.sessions || []);
+        setIsLoading(false);
       })
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
-  }, [authUser?.id]);
+      .catch((err) => {
+        console.error("Failed to fetch sessions:", err);
+        setIsLoading(false);
+      });
+  }, [authUser?.id, token]);
 
   if (status === "loading" || isLoading) {
     return (
