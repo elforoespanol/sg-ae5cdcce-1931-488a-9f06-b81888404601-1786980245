@@ -61,9 +61,18 @@ export default function DashboardPage() {
 
   useEffect(() => {
     console.log("[DASHBOARD] session status:", status, "user:", session?.user?.id);
-    if (status === "unauthenticated") {
+    
+    // Check localStorage fallback for iframe preview compatibility
+    const fallback = typeof window !== "undefined" 
+      ? localStorage.getItem("sslid_auth_fallback") 
+      : null;
+    const hasFallback = fallback && (Date.now() - JSON.parse(fallback).timestamp) < 5 * 60 * 1000;
+    
+    console.log("[DASHBOARD] fallback present:", !!hasFallback);
+
+    if (status === "unauthenticated" && !hasFallback) {
       const timer = setTimeout(() => {
-        console.log("[DASHBOARD] redirecting to login after delay");
+        console.log("[DASHBOARD] redirecting to login — no session or fallback");
         router.push("/login");
       }, 3000);
       return () => clearTimeout(timer);
