@@ -33,6 +33,7 @@ export default function ChatSessionsPage() {
   useEffect(() => {
     if (!authUser?.id) return;
 
+    const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
     // Fetch sessions
     fetch("/api/tutor/sessions", {
       headers: {
@@ -48,7 +49,7 @@ export default function ChatSessionsPage() {
         console.error("Failed to fetch sessions:", err);
         setIsLoading(false);
       });
-  }, [authUser?.id, token]);
+  }, [authUser?.id]);
 
   if (status === "loading" || isLoading) {
     return (
