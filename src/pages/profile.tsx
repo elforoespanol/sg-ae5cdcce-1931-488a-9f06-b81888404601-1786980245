@@ -1,37 +1,47 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
-import { User, BookOpen, Flame, Clock, Award, Library, Trophy, TrendingUp, GraduationCap } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { User, Mail, Award, Calendar, GraduationCap, Flame, BookOpen, Trophy } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getLevelInfo, getLevelColor } from "@/lib/achievements";
 import { formatDate } from "@/lib/utils";
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<any>(null);
   const [achievements, setAchievements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
   }, [status, router]);
 
   useEffect(() => {
-    if (session?.user?.id) {
-      fetchStats();
-      fetchAchievements();
+    if (authUser) {
+      fetchData();
     }
-  }, [session]);
+  }, [authUser]);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch("/api/user/stats");
-      const data = await res.json();
-      setStats(data);
+      const [statsRes, achRes] = await Promise.all([
+        fetch("/api/user/stats"),
+        fetch("/api/achievements/check", { method: "POST" }),
+      ]);
+      if (statsRes.ok) {
+        const s = await statsRes.json();
+        setStats(s);
+      }
+      if (achRes.ok) {
+        const a = await achRes.json();
+        setAchievements(a.achievements || []);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -39,17 +49,7 @@ export default function ProfilePage() {
     }
   };
 
-  const fetchAchievements = async () => {
-    try {
-      const res = await fetch("/api/achievements/check", { method: "POST" });
-      const data = await res.json();
-      setAchievements(data.achievements || []);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  if (status === "loading" || loading) {
+  if (status === "loading" || (loading && authUser)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -57,121 +57,155 @@ export default function ProfilePage() {
     );
   }
 
-  if (!session?.user) return null;
+  if (!authUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Redirecting to login...</p>
+      </div>
+    );
+  }
 
-  const user = session.user;
-  const levelInfo = getLevelInfo(stats?.user?.xp || 0);
+  const levelInfo = getLevelInfo(stats?.totalXp || 0);
 
   return (
-    <div className="container max-w-4xl py-8 space-y-8">
+    <div className="min-h-screen bg-gradient-hero pb-16">
       <Head>
         <title>Profile — Speak Spanish Like I Did</title>
-        <meta name="description" content="View your Spanish learning profile and public stats." />
       </Head>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4">
-        <div className="h-24 w-24 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-4xl">
-          {user.image ? (
-            <img src={user.image} alt={user.name || ""} className="h-full w-full rounded-full object-cover" />
-          ) : (
-            <span className="text-3xl">👤</span>
-          )}
-        </div>
-        <div>
-          <h1 className="text-2xl font-serif font-bold">{user.name || "Student"}</h1>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <Badge className={`${getLevelColor(user.level as any)} text-white`}>
-              {user.level}
-            </Badge>
-            <span className="text-sm text-muted-foreground">•</span>
-            <span className="text-sm text-muted-foreground">Level {levelInfo.level} {levelInfo.title}</span>
+      <div className="container max-w-3xl py-8 space-y-8">
+        {/* Profile Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
+        >
+          <div className="h-28 w-28 mx-auto rounded-full bg-primary/10 flex items-center justify-center border-4 border-background shadow-lg">
+            {authUser.image ? (
+              <img src={authUser.image} alt={authUser.name || ""} className="h-full w-full rounded-full object-cover" />
+            ) : (
+              <User className="h-14 w-14 text-primary/60" />
+            )}
           </div>
-        </div>
-      </motion.div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: "Lessons", value: stats?.lessonsCompleted || 0, icon: BookOpen },
-          { label: "Streak", value: `${stats?.user?.streak || 0} days`, icon: Flame },
-          { label: "Study Time", value: `${Math.round((stats?.user?.totalStudyMinutes || 0) / 60)}h`, icon: Clock },
-          { label: "Flashcards", value: stats?.dueFlashcards || 0, icon: Library },
-        ].map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <Card className="p-4 text-center space-y-2">
-              <stat.icon className="h-5 w-5 mx-auto text-primary" />
-              <p className="text-2xl font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="md:col-span-2">
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              Study Activity
-            </h2>
-            <div className="h-48 flex items-end justify-between gap-2">
-              {stats?.activity?.map((day: any, i: number) => {
-                const maxMinutes = Math.max(...stats.activity.map((d: any) => d.minutes), 1);
-                const height = day.minutes > 0 ? Math.max((day.minutes / maxMinutes) * 100, 8) : 4;
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: `${height}%` }}
-                      transition={{ delay: i * 0.05, duration: 0.5 }}
-                      className="w-full max-w-[40px] rounded-t bg-primary/20 hover:bg-primary/40 transition-colors"
-                    />
-                    <span className="text-[10px] text-muted-foreground">{day.day}</span>
-                  </div>
-                );
-              }) || <p className="text-sm text-muted-foreground">No activity data yet</p>}
+          <div>
+            <h1 className="text-3xl font-serif font-bold">{authUser.name || "Spanish Learner"}</h1>
+            <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+              <Badge className={`${getLevelColor(authUser.level as any)} text-white`}>
+                {authUser.level || "A1"}
+              </Badge>
+              <span className="text-sm text-muted-foreground">•</span>
+              <span className="text-sm text-muted-foreground">{levelInfo.title}</span>
             </div>
-          </Card>
+          </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-primary" />
-              Achievements
-            </h2>
-            <div className="space-y-3">
-              {achievements.filter((a: any) => a.unlocked).slice(0, 5).map((ach: any) => (
-                <div key={ach.id} className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Award className="h-4 w-4 text-primary" />
+        {/* User Details Card */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card>
+            <CardContent className="p-6 space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Account Details
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Mail className="h-5 w-5 text-primary" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{ach.name}</p>
-                    <p className="text-xs text-muted-foreground">{formatDate(ach.unlockedAt)}</p>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Email</p>
+                    <p className="font-medium">{authUser.email}</p>
                   </div>
                 </div>
-              ))}
-              {achievements.filter((a: any) => a.unlocked).length === 0 && (
-                <p className="text-sm text-muted-foreground">No achievements yet. Keep studying!</p>
-              )}
-            </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <GraduationCap className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Spanish Level</p>
+                    <p className="font-medium">{authUser.level || "A1"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Member Since</p>
+                    <p className="font-medium">{formatDate(new Date().toISOString())}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Flame className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Current Streak</p>
+                    <p className="font-medium">{stats?.streak || 0} days</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Quick Stats */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <h2 className="text-lg font-semibold mb-4">Learning Progress</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "Lessons Done", value: stats?.lessonsCompleted || 0, icon: BookOpen },
+              { label: "Study Hours", value: `${Math.round((stats?.totalStudyMinutes || 0) / 60)}`, icon: Calendar },
+              { label: "Flashcards", value: stats?.flashcardsReviewed || 0, icon: Award },
+              { label: "Total XP", value: stats?.totalXp || 0, icon: Trophy },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.05 }}
+              >
+                <Card className="p-4 text-center space-y-2 hover:shadow-md transition-shadow">
+                  <stat.icon className="h-5 w-5 mx-auto text-primary" />
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Achievements */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card>
+            <CardContent className="p-6">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-primary" />
+                Achievements
+              </h2>
+              <div className="space-y-3">
+                {achievements.filter((a: any) => a.unlocked).length > 0 ? (
+                  achievements.filter((a: any) => a.unlocked).map((ach: any) => (
+                    <div key={ach.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Award className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium">{ach.name}</p>
+                        <p className="text-sm text-muted-foreground">{ach.description}</p>
+                      </div>
+                      <span className="text-xs text-muted-foreground">{formatDate(ach.unlockedAt)}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No achievements yet. Complete lessons and practice flashcards to earn them!
+                  </p>
+                )}
+              </div>
+            </CardContent>
           </Card>
         </motion.div>
       </div>
-
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <GraduationCap className="h-5 w-5 text-primary" />
-            Vocabulary Lists
-          </h2>
-          <p className="text-sm text-muted-foreground">Create vocabulary lists from the flashcards page to see them here.</p>
-        </Card>
-      </motion.div>
     </div>
   );
 }
