@@ -115,10 +115,6 @@ export default function DashboardPage() {
     );
   }
 
-  if (!session?.user && !fallbackUser) {
-    return null;
-  }
-
   const userStats = stats || {
     totalXp: 0,
     streak: 0,
