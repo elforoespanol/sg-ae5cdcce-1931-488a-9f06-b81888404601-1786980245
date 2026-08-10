@@ -19,11 +19,23 @@ export default function LoginPage() {
     password: "",
   });
 
-  // Redirect when session becomes authenticated
+  // Handle NextAuth error from query params
   useEffect(() => {
-    console.log("[LOGIN] session status changed:", status);
+    const { error } = router.query;
+    if (error) {
+      if (error === "CredentialsSignin") {
+        toast.error("Invalid email or password");
+      } else {
+        toast.error("Authentication failed");
+      }
+      // Clear error from URL
+      router.replace("/login", undefined, { shallow: true });
+    }
+  }, [router]);
+
+  // Redirect if already authenticated
+  useEffect(() => {
     if (status === "authenticated") {
-      console.log("[LOGIN] redirecting to dashboard via useEffect");
       router.push("/dashboard");
     }
   }, [status, router]);
@@ -32,30 +44,13 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      console.log("[LOGIN] calling signIn with:", formData.email);
-      const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-
-      console.log("[LOGIN] signIn returned:", result);
-
-      if (result?.error) {
-        toast.error(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
-        return;
-      }
-
-      toast.success("Welcome back!");
-      window.location.assign("/dashboard");
-      // The useEffect above will handle redirect when status changes
-    } catch (err) {
-      toast.error("Something went wrong. Please try again.");
-      console.error("Login error:", err);
-    } finally {
-      setIsLoading(false);
-    }
+    // Use NextAuth built-in redirect — server-side 302 works reliably in iframe previews
+    await signIn("credentials", {
+      email: formData.email,
+      password: formData.password,
+      callbackUrl: "/dashboard",
+      redirect: true,
+    });
   };
 
   return (
