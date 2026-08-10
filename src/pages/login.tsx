@@ -25,6 +25,7 @@ export default function LoginPage() {
     setError("");
 
     try {
+      // Try NextAuth first
       const result = await signIn("credentials", {
         email: email.trim(),
         password,
@@ -32,18 +33,37 @@ export default function LoginPage() {
         callbackUrl: "/dashboard",
       });
 
-      if (result?.error) {
-        setError("Invalid email or password");
-        setIsLoading(false);
+      if (result?.ok) {
+        router.push("/dashboard");
         return;
       }
 
-      if (result?.ok) {
+      // If NextAuth fails, try custom login API
+      console.log("[Login] NextAuth failed, trying custom login...");
+      const customRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+
+      const customData = await customRes.json();
+
+      if (customRes.ok && customData.token) {
+        // Store token in localStorage for fallback
+        localStorage.setItem("sslid_auth_fallback", JSON.stringify({
+          email: customData.user.email,
+          role: customData.user.role,
+          timestamp: Date.now(),
+        }));
         router.push("/dashboard");
+        return;
       }
+
+      setError(customData.message || "Invalid email or password");
     } catch (err) {
       console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };

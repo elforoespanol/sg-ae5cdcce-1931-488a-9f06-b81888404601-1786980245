@@ -1,36 +1,48 @@
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
 const fallbackSecret = "speak-spanish-like-i-did-fallback-secret-key-2024";
-const authSecret = process.env.NEXTAUTH_SECRET || fallbackSecret;
+const jwtSecret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || fallbackSecret);
 
-export default withAuth(
-  function middleware(req) {
+// Paths that require authentication
+const protectedPaths = ["/dashboard", "/lessons", "/chat", "/flashcards", "/admin", "/profile", "/settings"];
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Check if this is a protected path
+  const isProtected = protectedPaths.some(path => pathname.startsWith(path));
+  if (!isProtected) {
     return NextResponse.next();
-  },
-  {
-    secret: authSecret,
-    callbacks: {
-      authorized({ req, token }) {
-        // Always allow in development/preview
-        if (process.env.NODE_ENV === "development") {
-          return true;
-        }
-
-        // In production, require a valid token
-        if (!token) {
-          return false;
-        }
-
-        return true;
-      },
-    },
-    pages: {
-      signIn: "/login",
-    },
   }
-);
+
+  // In development, allow all
+  if (process.env.NODE_ENV === "development") {
+    return NextResponse.next();
+  }
+
+  // Check for session token in cookie
+  const token = request.cookies.get("next-auth.session-token")?.value;
+
+  if (!token) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  try {
+    // Verify the JWT
+    await jwtVerify(token, jwtSecret);
+    return NextResponse.next();
+  } catch {
+    // Invalid token, redirect to login
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+}
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/lessons/:path*", "/chat/:path*", "/flashcards/:path*", "/admin/:path*", "/admin"],
+  matcher: ["/dashboard/:path*", "/lessons/:path*", "/chat/:path*", "/flashcards/:path*", "/admin/:path*", "/admin", "/profile", "/settings"],
 };
