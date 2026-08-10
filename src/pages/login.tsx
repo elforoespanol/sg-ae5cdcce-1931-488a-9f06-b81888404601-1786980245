@@ -41,8 +41,8 @@ export default function LoginPage() {
           role: customData.user.role,
           timestamp: Date.now(),
         }));
-        // Force full navigation to ensure dashboard gets fresh render with localStorage set
-        window.location.href = "/dashboard";
+        // Use client-side navigation to preserve state and avoid full reload issues
+        router.push("/dashboard");
         return;
       }
 
