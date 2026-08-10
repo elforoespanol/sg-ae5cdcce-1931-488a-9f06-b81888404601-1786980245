@@ -36,7 +36,7 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group" aria-label="Speak Spanish Like I Did - Home">
-          <img src="/logo.jpg" alt="Speak Spanish Like I Did" className="h-12 w-auto object-contain" />
+          <img src="/logo.jpg" alt="Speak Spanish Like I Did" className="h-16 w-auto object-contain" />
         </Link>
 
         {/* Desktop Nav */}
