@@ -8,17 +8,16 @@ export default withAuth(
   {
     callbacks: {
       authorized({ req, token }) {
-        // Bypass auth in development/preview environments (iframe cookie restrictions)
-        const isDev = process.env.NODE_ENV === "development";
-        const isPreview = req.nextUrl.hostname.includes("softgen.dev") || req.nextUrl.hostname.includes("localhost");
-        
-        if (isDev || isPreview) {
+        // Allow all requests in development/preview
+        if (process.env.NODE_ENV === "development") {
           return true;
         }
-        
+
+        // In production, require valid token
         if (!token) {
           return false;
         }
+
         return true;
       },
     },
@@ -29,5 +28,6 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/lessons/:path*", "/chat/:path*", "/flashcards/:path*"],
+  matcher: ["/dashboard/:path*", "/lessons/:path*", "/chat/:path*", "/flashcards/:path*", "/admin/:path*", "/admin"],
 };
+</code>

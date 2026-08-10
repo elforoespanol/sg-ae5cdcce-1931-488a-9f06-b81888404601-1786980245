@@ -3,17 +3,15 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-console.log("[AUTH INIT] Supabase URL present:", !!supabaseUrl);
-console.log("[AUTH INIT] Service role key present:", !!serviceRoleKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET || "speak-spanish-fallback-secret-2024-min-32-chars-long",
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -22,45 +20,54 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("[AUTHORIZE] called with email:", credentials?.email);
-        
-        if (!credentials?.email || !credentials?.password) {
-          console.log("[AUTHORIZE] missing credentials");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            return null;
+          }
+
+          if (!supabaseUrl || !serviceRoleKey) {
+            console.error("[AUTH] Missing Supabase configuration");
+            return null;
+          }
+
+          const { data: user, error } = await supabaseAdmin
+            .from("users")
+            .select("*")
+            .eq("email", credentials.email)
+            .single();
+
+          if (error) {
+            console.error("[AUTH] Supabase error:", error.message);
+            return null;
+          }
+
+          if (!user || !user.password) {
+            console.error("[AUTH] User not found or no password");
+            return null;
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            console.error("[AUTH] Password mismatch");
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            level: user.level,
+            role: user.role,
+          };
+        } catch (err) {
+          console.error("[AUTH] Authorize exception:", err);
           return null;
         }
-
-        const { data: user, error } = await supabaseAdmin
-          .from("users")
-          .select("*")
-          .eq("email", credentials.email)
-          .single();
-
-        console.log("[AUTHORIZE] user found:", !!user, "error:", error?.message);
-
-        if (error || !user || !user.password) {
-          console.log("[AUTHORIZE] no user or password");
-          return null;
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        console.log("[AUTHORIZE] password valid:", isPasswordValid);
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          level: user.level,
-          role: user.role,
-        };
       },
     }),
   ],
@@ -74,27 +81,9 @@ export const authOptions: NextAuthOptions = {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: "lax",
         path: "/",
-        secure: true,
-      },
-    },
-    callbackUrl: {
-      name: `next-auth.callback-url`,
-      options: {
-        httpOnly: true,
-        sameSite: "none",
-        path: "/",
-        secure: true,
-      },
-    },
-    csrfToken: {
-      name: `next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "none",
-        path: "/",
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
       },
     },
   },
@@ -103,7 +92,6 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      console.log("[JWT CALLBACK] user:", user?.id);
       if (user) {
         token.level = user.level;
         token.role = user.role;
@@ -111,7 +99,6 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      console.log("[SESSION CALLBACK] token sub:", token.sub);
       if (token && session.user) {
         session.user.id = token.sub as string;
         session.user.level = token.level as string;
