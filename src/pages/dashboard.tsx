@@ -58,28 +58,40 @@ export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fallbackUser, setFallbackUser] = useState<{email: string; timestamp: number} | null>(null);
+
+  // Read localStorage fallback for iframe preview
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = localStorage.getItem("sslid_auth_fallback");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
+          setFallbackUser(parsed);
+        } else {
+          localStorage.removeItem("sslid_auth_fallback");
+        }
+      } catch {
+        localStorage.removeItem("sslid_auth_fallback");
+      }
+    }
+  }, []);
 
   useEffect(() => {
-    console.log("[DASHBOARD] session status:", status);
+    console.log("[DASHBOARD] session status:", status, "fallback:", !!fallbackUser);
     
     // Only redirect after session has finished loading
     if (status === "loading") return;
 
-    const fallback = typeof window !== "undefined" 
-      ? localStorage.getItem("sslid_auth_fallback") 
-      : null;
-    const hasFallback = fallback && (Date.now() - JSON.parse(fallback).timestamp) < 5 * 60 * 1000;
-
-    console.log("[DASHBOARD] has fallback:", hasFallback);
-
-    if (status === "unauthenticated" && !hasFallback) {
+    if (status === "unauthenticated" && !fallbackUser) {
       console.log("[DASHBOARD] redirecting to login");
       router.push("/login");
     }
-  }, [status, router]);
+  }, [status, fallbackUser, router]);
 
   useEffect(() => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id && !fallbackUser) return;
 
     async function fetchStats() {
       try {
@@ -96,9 +108,9 @@ export default function DashboardPage() {
     }
 
     fetchStats();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, fallbackUser]);
 
-  if (status === "loading" || loading) {
+  if ((status === "loading" && !fallbackUser) || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="h-8 w-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -106,7 +118,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!session?.user) {
+  if (!session?.user && !fallbackUser) {
     return null;
   }
 
@@ -164,7 +176,7 @@ export default function DashboardPage() {
           className="mb-8"
         >
           <h1 className="font-serif text-3xl md:text-4xl text-foreground mb-2">
-            Hola, {session.user.name || "Learner"}! 👋
+            Hola, {session?.user?.name || fallbackUser?.email?.split("@")[0] || "Learner"}! 👋
           </h1>
           <p className="text-muted-foreground">
             Ready to continue your Spanish journey?

@@ -63,7 +63,7 @@ export default function LoginPage() {
       }));
 
       toast.success("Welcome back!");
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
       console.error("Login error:", err);
