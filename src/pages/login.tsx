@@ -45,10 +45,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Force session refresh before navigation
-      const session = await getSession();
-      console.log("[LOGIN] session after signIn:", !!session);
-
       toast.success("Welcome back!");
       router.push("/dashboard");
     } catch (err) {
