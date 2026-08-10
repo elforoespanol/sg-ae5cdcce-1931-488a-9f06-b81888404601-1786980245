@@ -12,6 +12,7 @@ import {
   Clock,
   ChevronRight,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,15 +78,10 @@ export default function DashboardPage() {
   const userRole = session?.user?.role || fallbackUser?.role;
 
   useEffect(() => {
-    if (status === "loading") return;
-
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
+    if (isAuthenticated) {
+      fetchDashboardData();
     }
-
-    fetchDashboardData();
-  }, [status, isAuthenticated, router]);
+  }, [isAuthenticated]);
 
   async function fetchDashboardData() {
     try {
@@ -121,7 +117,16 @@ export default function DashboardPage() {
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-6">
+        <Card className="max-w-md w-full text-center p-8">
+          <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h1 className="text-xl font-bold mb-2">Authentication Required</h1>
+          <p className="text-muted-foreground mb-6">Please sign in to access your dashboard.</p>
+          <Button onClick={() => router.push("/login")}>Go to Login</Button>
+        </Card>
+      </div>
+    );
   }
 
   const quickActions = [

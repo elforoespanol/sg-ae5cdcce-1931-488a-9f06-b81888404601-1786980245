@@ -124,19 +124,12 @@ export default function AdminPage() {
   const isAuthenticated = !!session?.user || !!fallbackUser;
 
   useEffect(() => {
-    if (status === "loading") return;
-
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-
     if (isAdmin) {
       fetchData();
     } else {
       setLoading(false);
     }
-  }, [status, isAuthenticated, isAdmin, router]);
+  }, [isAdmin]);
 
   async function fetchData() {
     try {
@@ -211,7 +204,16 @@ export default function AdminPage() {
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-6">
+        <Card className="max-w-md w-full text-center p-8">
+          <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h1 className="text-xl font-bold mb-2">Authentication Required</h1>
+          <p className="text-muted-foreground mb-6">Please sign in to access the admin panel.</p>
+          <Button onClick={() => router.push("/login")}>Go to Login</Button>
+        </Card>
+      </div>
+    );
   }
 
   if (!isAdmin) {
