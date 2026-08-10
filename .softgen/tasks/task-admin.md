@@ -21,6 +21,7 @@ Build a comprehensive admin panel for monitoring students, their progress, and s
 - [x] Add student detail modal/drawer with progress, activity, achievements
 - [x] Add search and filter functionality
 - [x] Add subscription type badges
+- [x] Fix iframe preview redirect loops
 
 ## Acceptance
 - [x] Admin can view all students in a sortable table
