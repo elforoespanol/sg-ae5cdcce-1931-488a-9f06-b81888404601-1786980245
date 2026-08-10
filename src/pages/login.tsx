@@ -47,9 +47,10 @@ export default function LoginPage() {
 
       toast.success("Welcome back!");
 
-      // Force session refresh and then navigate
-      await getSession({ event: "storage" });
-      router.push("/dashboard");
+      // Navigate to dashboard after a brief delay to let session state update
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
       console.error("Login error:", err);
