@@ -1,159 +1,136 @@
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import Head from "next/head";
+import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import toast from "react-hot-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  // Handle NextAuth error from query params
-  useEffect(() => {
-    const { error } = router.query;
-    if (error) {
-      if (error === "CredentialsSignin") {
-        toast.error("Invalid email or password");
-      } else {
-        toast.error("Authentication failed");
-      }
-      // Clear error from URL
-      router.replace("/login", undefined, { shallow: true });
-    }
-  }, [router]);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
     try {
       const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
+        email: email.trim(),
+        password,
         redirect: false,
+        callbackUrl: "/dashboard",
       });
 
       if (result?.error) {
-        toast.error(result.error === "CredentialsSignin" ? "Invalid email or password" : result.error);
+        setError("Invalid email or password");
+        setIsLoading(false);
         return;
       }
 
-      // Store fallback auth for iframe preview (cookies may be blocked)
-      localStorage.setItem("sslid_auth_fallback", JSON.stringify({
-        email: formData.email,
-        timestamp: Date.now(),
-      }));
-
-      toast.success("Welcome back!");
-      window.location.href = "/dashboard";
+      if (result?.ok) {
+        router.push("/dashboard");
+      }
     } catch (err) {
-      toast.error("Something went wrong. Please try again.");
       console.error("Login error:", err);
-    } finally {
+      setError("Something went wrong. Please try again.");
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-hero px-4">
-      <div className="w-full max-w-md animate-fade-in-up">
-        <Card className="border-0 shadow-2xl bg-card/95 backdrop-blur-sm">
-          <CardHeader className="space-y-1 text-center pb-6">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-3">
-              <span className="text-3xl">🇪🇸</span>
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 sm:p-6">
+      <Head>
+        <title>Sign In — Speak Spanish Like I Did</title>
+      </Head>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="border-0 shadow-xl">
+          <CardHeader className="text-center pb-6">
+            <div className="mx-auto w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              <span className="text-2xl">🇪🇸</span>
             </div>
-            <CardTitle className="font-serif text-2xl text-foreground">
-              Welcome back
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Sign in to continue your Spanish journey
-            </CardDescription>
+            <CardTitle className="text-2xl font-serif">Welcome Back</CardTitle>
+            <CardDescription>Continue your Spanish learning journey</CardDescription>
           </CardHeader>
+
           <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email
-                </Label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="hola@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="pl-10 h-11 bg-background border-input focus-visible:ring-primary"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </Label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="pl-10 pr-10 h-11 bg-background border-input focus-visible:ring-primary"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 pr-10"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Signing in...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    Sign in
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
-                )}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign In"}
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
-                <Link href="/register" className="text-primary font-medium hover:underline">
-                  Create one
-                </Link>
-              </p>
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <Link href="/register" className="text-primary hover:underline font-medium">
+                Create one
+              </Link>
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </div>
   );
 }
