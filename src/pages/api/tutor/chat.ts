@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
-import { prisma } from "@/lib/prisma";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { buildTutorSystemPrompt, StudentLevel } from "@/lib/ai/tutor-prompt";
 import { parseCorrectionFromResponse } from "@/lib/ai/parse-correction";
 import OpenAI from "openai";
@@ -21,7 +21,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const session = await getSession({ req });
-  if (!session?.user?.id) {
+  const userId = session?.user?.id;
+
+  const supabase = getSupabaseAdmin();
+  if (!supabase || !userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -33,12 +36,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Get user info
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { name: true, level: true },
-    });
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("name, level")
+      .eq("id", userId)
+      .single();
 
-    if (!user) {
+    if (userError || !user) {
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -46,40 +50,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let chatSessionId = sessionId;
 
     if (!chatSessionId) {
-      const newSession = await prisma.chatSession.create({
-        data: {
-          userId: session.user.id,
+      const { data: newSession, error: createError } = await supabase
+        .from("chat_sessions")
+        .insert({
+          userId,
           lessonId: lessonId || null,
           title: message.slice(0, 50) + (message.length > 50 ? "..." : ""),
-        },
-      });
+        })
+        .select("id")
+        .single();
+
+      if (createError) throw createError;
       chatSessionId = newSession.id;
     } else {
-      // Verify session belongs to user
-      const existingSession = await prisma.chatSession.findFirst({
-        where: { id: chatSessionId, userId: session.user.id },
-      });
+      const { data: existingSession } = await supabase
+        .from("chat_sessions")
+        .select("id")
+        .eq("id", chatSessionId)
+        .eq("userId", userId)
+        .single();
+
       if (!existingSession) {
         return res.status(403).json({ message: "Invalid session" });
       }
     }
 
     // Save user message
-    await prisma.chatMessage.create({
-      data: {
-        sessionId: chatSessionId,
-        role: "user",
-        content: message,
-      },
+    await supabase.from("chat_messages").insert({
+      sessionId: chatSessionId,
+      role: "user",
+      content: message,
     });
 
     // Get conversation history
-    const previousMessages = await prisma.chatMessage.findMany({
-      where: { sessionId: chatSessionId },
-      orderBy: { createdAt: "asc" },
-      take: 20,
-      select: { role: true, content: true },
-    });
+    const { data: previousMessages } = await supabase
+      .from("chat_messages")
+      .select("role, content")
+      .eq("sessionId", chatSessionId)
+      .order("createdAt", { ascending: true })
+      .limit(20);
 
     // Get lesson context if linked
     const lessonContext = {
@@ -89,10 +98,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     if (lessonId) {
-      const lesson = await prisma.lesson.findUnique({
-        where: { id: lessonId },
-        select: { title: true, vocabularyJson: true, grammarJson: true },
-      });
+      const { data: lesson } = await supabase
+        .from("lessons")
+        .select("title, vocabularyJson, grammarJson")
+        .eq("id", lessonId)
+        .single();
+
       if (lesson) {
         lessonContext.topic = lesson.title;
         try {
@@ -119,7 +130,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       studentName: user.name || "Student",
       level: (user.level as StudentLevel) || "A1",
       lesson: lessonContext,
-      conversationHistory: previousMessages.map((m) => ({
+      conversationHistory: (previousMessages || []).map((m) => ({
         role: m.role,
         content: m.content,
       })),
@@ -135,7 +146,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        ...previousMessages.slice(-10).map((m) => ({
+        ...(previousMessages || []).slice(-10).map((m) => ({
           role: m.role as "user" | "assistant",
           content: m.content,
         })),
@@ -161,16 +172,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Parse and save the complete response
     const { displayMessage, correction } = parseCorrectionFromResponse(fullResponse);
 
-    await prisma.chatMessage.create({
-      data: {
-        sessionId: chatSessionId,
-        role: "assistant",
-        content: displayMessage,
-        hasCorrection: !!correction,
-        originalText: correction?.original || null,
-        correctedText: correction?.corrected || null,
-        explanation: correction?.explanation || null,
-      },
+    await supabase.from("chat_messages").insert({
+      sessionId: chatSessionId,
+      role: "assistant",
+      content: displayMessage,
+      hasCorrection: !!correction,
+      originalText: correction?.original || null,
+      correctedText: correction?.corrected || null,
+      explanation: correction?.explanation || null,
     });
 
     // Send correction info if present

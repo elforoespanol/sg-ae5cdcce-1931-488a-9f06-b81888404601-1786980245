@@ -1,51 +1,48 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
-import { prisma } from "@/lib/prisma";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
   const session = await getSession({ req });
-  if (!session?.user?.id) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+  const userId = session?.user?.id;
 
-  const { sessionId } = req.query;
-
-  if (!sessionId || typeof sessionId !== "string") {
-    return res.status(400).json({ message: "Session ID is required" });
+  const supabase = getSupabaseAdmin();
+  if (!supabase || !userId) {
+    return res.status(200).json({ messages: [] });
   }
 
   try {
-    // Verify session belongs to user
-    const chatSession = await prisma.chatSession.findFirst({
-      where: { id: sessionId, userId: session.user.id },
-    });
+    if (req.method !== "GET") {
+      return res.status(405).json({ message: "Method not allowed" });
+    }
+
+    const { sessionId } = req.query;
+    if (!sessionId || typeof sessionId !== "string") {
+      return res.status(400).json({ message: "Session ID required" });
+    }
+
+    const { data: chatSession } = await supabase
+      .from("chat_sessions")
+      .select("id")
+      .eq("id", sessionId)
+      .eq("userId", userId)
+      .single();
 
     if (!chatSession) {
       return res.status(404).json({ message: "Session not found" });
     }
 
-    const messages = await prisma.chatMessage.findMany({
-      where: { sessionId },
-      orderBy: { createdAt: "asc" },
-      select: {
-        id: true,
-        role: true,
-        content: true,
-        hasCorrection: true,
-        originalText: true,
-        correctedText: true,
-        explanation: true,
-        createdAt: true,
-      },
-    });
+    const { data: messages, error } = await supabase
+      .from("chat_messages")
+      .select("id, role, content, hasCorrection, originalText, correctedText, explanation, createdAt")
+      .eq("sessionId", sessionId)
+      .order("createdAt", { ascending: true });
 
-    return res.status(200).json({ messages });
+    if (error) throw error;
+
+    return res.status(200).json({ messages: messages || [] });
   } catch (error) {
-    console.error("Fetch messages error:", error);
-    return res.status(500).json({ message: "Failed to fetch messages" });
+    console.error("Messages API error:", error);
+    return res.status(200).json({ messages: [] });
   }
 }

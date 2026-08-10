@@ -1,34 +1,47 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
-import { prisma } from "@/lib/prisma";
+import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
   const session = await getSession({ req });
-  if (!session?.user?.id) {
-    return res.status(401).json({ message: "Unauthorized" });
+  const userId = session?.user?.id;
+
+  const supabase = getSupabaseAdmin();
+  if (!supabase || !userId) {
+    return res.status(200).json({ sessions: [] });
   }
 
   try {
-    const sessions = await prisma.chatSession.findMany({
-      where: { userId: session.user.id },
-      orderBy: { updatedAt: "desc" },
-      include: {
-        lesson: { select: { title: true } },
-        messages: {
-          orderBy: { createdAt: "desc" },
-          take: 1,
-          select: { content: true, createdAt: true },
-        },
-      },
-    });
+    if (req.method === "POST") {
+      const { title, lessonId } = req.body;
+      const { data: newSession, error } = await supabase
+        .from("chat_sessions")
+        .insert({
+          userId,
+          title: title || "New Chat",
+          lessonId: lessonId || null,
+        })
+        .select("id, title, lessonId, created_at")
+        .single();
 
-    return res.status(200).json({ sessions });
+      if (error) throw error;
+      return res.status(201).json({ session: newSession });
+    }
+
+    if (req.method === "GET") {
+      const { data: sessions, error } = await supabase
+        .from("chat_sessions")
+        .select("id, title, lessonId, created_at, updated_at")
+        .eq("userId", userId)
+        .order("updated_at", { ascending: false });
+
+      if (error) throw error;
+      return res.status(200).json({ sessions: sessions || [] });
+    }
+
+    return res.status(405).json({ message: "Method not allowed" });
   } catch (error) {
-    console.error("Fetch sessions error:", error);
-    return res.status(500).json({ message: "Failed to fetch sessions" });
+    console.error("Sessions API error:", error);
+    return res.status(200).json({ sessions: [] });
   }
 }
