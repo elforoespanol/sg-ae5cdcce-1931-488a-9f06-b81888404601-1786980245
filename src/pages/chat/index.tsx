@@ -1,6 +1,5 @@
 import Head from "next/head";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, Plus, Clock, ChevronRight, Loader2, BookOpen } from "lucide-react";

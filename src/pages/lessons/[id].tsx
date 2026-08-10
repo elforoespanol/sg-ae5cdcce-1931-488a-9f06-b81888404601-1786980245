@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import {
@@ -247,7 +247,7 @@ function renderInline(text: string, vocabulary: VocabularyItem[]) {
 }
 
 export default function LessonPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const { id } = router.query;
 
