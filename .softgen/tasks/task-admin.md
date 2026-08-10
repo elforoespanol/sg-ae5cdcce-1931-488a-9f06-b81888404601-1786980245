@@ -1,6 +1,6 @@
 ---
 title: Admin Panel — Student Management
-status: in_progress
+status: done
 priority: high
 type: feature
 tags: [admin, dashboard, students]
@@ -23,7 +23,7 @@ Build a comprehensive admin panel for monitoring students, their progress, and s
 - [x] Add subscription type badges
 
 ## Acceptance
-- [ ] Admin can view all students in a sortable table
-- [ ] Admin can click a student to see their full progress and activity
-- [ ] Subscription types are visible and filterable
-- [ ] Stats API works without Prisma errors
+- [x] Admin can view all students in a sortable table
+- [x] Admin can click a student to see their full progress and activity
+- [x] Subscription types are visible and filterable
+- [x] Stats API works without Prisma errors
