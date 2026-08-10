@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { compare } from "bcryptjs";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
-import { sign } from "jsonwebtoken";
+import { SignJWT } from "jose";
 
 const fallbackSecret = "speak-spanish-like-i-did-fallback-secret-key-2024";
-const jwtSecret = process.env.NEXTAUTH_SECRET || fallbackSecret;
+const jwtSecret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || fallbackSecret);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -52,19 +52,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Create JWT token
-    const token = sign(
-      {
-        sub: user.id,
-        email: user.email,
-        name: user.name,
-        level: user.level,
-        role: user.role,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
-      },
-      jwtSecret
-    );
+    // Create JWT token with jose
+    const token = await new SignJWT({
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      level: user.level,
+      role: user.role,
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setExpirationTime("30d")
+      .sign(jwtSecret);
 
     // Set cookie
     const isSecure = process.env.NODE_ENV === "production";
