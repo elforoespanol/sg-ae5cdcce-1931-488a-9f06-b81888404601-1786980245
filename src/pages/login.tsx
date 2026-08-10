@@ -53,7 +53,8 @@ export default function LoginPage() {
           role: customData.user.role,
           timestamp: Date.now(),
         }));
-        router.push("/dashboard");
+        // Force full page reload so AuthContext re-reads localStorage
+        window.location.href = "/dashboard";
         return;
       }
 

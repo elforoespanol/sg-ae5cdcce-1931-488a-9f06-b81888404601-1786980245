@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { Loader2, MessageSquare, BookOpen, ArrowLeft } from "lucide-react";
@@ -20,7 +20,7 @@ interface ChatMessageData {
 }
 
 export default function ChatPage() {
-  const { data: session, status } = useSession();
+  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const { sessionId } = router.query;
   const [isLoading, setIsLoading] = useState(true);
