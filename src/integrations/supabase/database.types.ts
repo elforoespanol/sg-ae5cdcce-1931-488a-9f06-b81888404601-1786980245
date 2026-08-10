@@ -521,6 +521,7 @@ export type Database = {
           role: string | null
           streak: number | null
           streak_warnings: boolean
+          subscription_type: string
           totalStudyMinutes: number | null
           updatedAt: string | null
         }
@@ -540,6 +541,7 @@ export type Database = {
           role?: string | null
           streak?: number | null
           streak_warnings?: boolean
+          subscription_type?: string
           totalStudyMinutes?: number | null
           updatedAt?: string | null
         }
@@ -559,6 +561,7 @@ export type Database = {
           role?: string | null
           streak?: number | null
           streak_warnings?: boolean
+          subscription_type?: string
           totalStudyMinutes?: number | null
           updatedAt?: string | null
         }
