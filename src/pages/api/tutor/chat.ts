@@ -51,6 +51,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: "Method not allowed" });
   }
 
+  if (!process.env.OPENAI_API_KEY) {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.write(`data: ${JSON.stringify({ content: "¡Hola! I'm currently unavailable due to a configuration issue. Please contact support to get the AI tutor up and running again. ¡Gracias!" })}\n\n`);
+    res.write("data: [DONE]\n\n");
+    return res.end();
+  }
+
   const session = await getSession({ req });
   (req as any).__session = session;
   let userId = getUserIdFromRequest(req);

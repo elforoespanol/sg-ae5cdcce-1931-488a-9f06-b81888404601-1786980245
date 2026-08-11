@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Send, Mic } from "lucide-react";
+import { Send, Mic, MicOff } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -10,7 +10,10 @@ interface ChatInputProps {
 
 export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
   const [text, setText] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const charCount = text.length;
   const maxChars = 500;
@@ -21,6 +24,48 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [text]);
+
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setSpeechSupported(!!SpeechRecognition);
+  }, []);
+
+  const startListening = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "es-ES";
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognitionRef.current = recognition;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognition.onresult = (event: any) => {
+      let finalTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        setText((prev) => {
+          const combined = prev ? prev + " " + finalTranscript : finalTranscript;
+          return combined.slice(0, maxChars);
+        });
+      }
+    };
+
+    recognition.start();
+  }, []);
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,11 +89,16 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
       <div className="flex items-end gap-3">
         <button
           type="button"
-          disabled
-          className="shrink-0 p-2.5 rounded-xl border border-border text-muted-foreground hover:bg-muted transition-colors disabled:opacity-40"
-          title="Voice input coming soon"
+          onClick={isListening ? stopListening : startListening}
+          disabled={!speechSupported || isLoading || disabled}
+          className={`shrink-0 p-2.5 rounded-xl border transition-colors ${
+            isListening
+              ? "border-destructive text-destructive bg-destructive/10 animate-pulse"
+              : "border-border text-muted-foreground hover:bg-muted"
+          } disabled:opacity-40`}
+          title={speechSupported ? (isListening ? "Stop listening" : "Speak in Spanish") : "Voice input not supported in this browser"}
         >
-          <Mic className="h-5 w-5" />
+          {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
         </button>
 
         <div className="flex-1 relative">
