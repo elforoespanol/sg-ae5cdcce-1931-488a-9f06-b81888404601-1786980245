@@ -1,6 +1,37 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getSession } from "next-auth/react";
 import { LESSONS_DATA } from "@/lib/lessons-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+
+function getUserIdFromRequest(req: NextApiRequest): string | undefined {
+  const session = (req as any).__session;
+  if (session?.user?.id) return session.user.id;
+  
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    try {
+      const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
+      if (payload.sub) return payload.sub;
+    } catch {
+      // ignore
+    }
+  }
+  
+  const cookie = req.headers.cookie;
+  if (cookie) {
+    const match = cookie.match(/sslid_auth=([^;]+)/);
+    if (match) {
+      try {
+        const auth = JSON.parse(decodeURIComponent(match[1]));
+        return auth.id;
+      } catch {
+        // ignore
+      }
+    }
+  }
+  return undefined;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -12,86 +43,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Lesson ID required" });
   }
 
-  const supabase = getSupabaseAdmin();
-
-  // Find real lesson data by slug or ID
-  const realLesson = LESSONS_DATA.find((l) => l.id === id || l.slug === id);
-
-  if (!supabase) {
-    // No Supabase — return from real data or 404
-    if (realLesson) {
-      return res.status(200).json({
-        ...realLesson,
-        userProgress: [],
-      });
-    }
+  // Find lesson in authoritative data source
+  const lesson = LESSONS_DATA.find((l) => l.id === id || l.slug === id);
+  if (!lesson) {
     return res.status(404).json({ message: "Lesson not found" });
   }
 
-  try {
-    const { data: lesson, error } = await supabase
-      .from("lessons")
-      .select("*, userProgress:user_lesson_progress(isCompleted, timeSpentMinutes, lastAccessedAt, quizScore)")
-      .eq("id", id)
-      .single();
+  const session = await getSession({ req });
+  (req as any).__session = session;
+  const userId = getUserIdFromRequest(req);
 
-    if (error || !lesson) {
-      // Try to find by slug if ID lookup failed
-      const { data: lessonBySlug } = await supabase
-        .from("lessons")
-        .select("*, userProgress:user_lesson_progress(isCompleted, timeSpentMinutes, lastAccessedAt, quizScore)")
-        .eq("slug", id)
-        .single();
+  // Fetch user progress from Supabase if authenticated
+  let userProgress: any[] = [];
+  const supabase = getSupabaseAdmin();
+  if (userId && supabase) {
+    try {
+      const { data: progress } = await supabase
+        .from("user_lesson_progress")
+        .select("isCompleted, timeSpentMinutes, lastAccessedAt, quizScore")
+        .eq("userId", userId)
+        .eq("lessonId", lesson.id)
+        .maybeSingle();
 
-      if (lessonBySlug) {
-        // Enrich with real content if database has placeholders
-        const enriched = enrichLesson(lessonBySlug, realLesson);
-        return res.status(200).json(enriched);
+      if (progress) {
+        userProgress = [progress];
       }
-
-      // Return real data if available, else 404
-      if (realLesson) {
-        return res.status(200).json({
-          ...realLesson,
-          userProgress: [],
-        });
-      }
-      return res.status(404).json({ message: "Lesson not found" });
+    } catch (err) {
+      console.error("Error fetching user progress:", err);
     }
-
-    // Enrich with real content if database has placeholders
-    const enriched = enrichLesson(lesson, realLesson);
-    return res.status(200).json(enriched);
-  } catch (error) {
-    console.error("Error fetching lesson:", error);
-    if (realLesson) {
-      return res.status(200).json({
-        ...realLesson,
-        userProgress: [],
-      });
-    }
-    return res.status(500).json({ message: "Failed to fetch lesson" });
   }
-}
 
-function enrichLesson(dbLesson: any, realLesson: any) {
-  if (!realLesson) return dbLesson;
-
-  const isPlaceholder =
-    !dbLesson.content ||
-    dbLesson.content === "Lesson content here..." ||
-    dbLesson.content.length < 50;
-
-  return {
-    ...dbLesson,
-    title: dbLesson.title || realLesson.title,
-    description: dbLesson.description || realLesson.description,
-    content: isPlaceholder ? realLesson.content : dbLesson.content,
-    vocabularyJson: dbLesson.vocabularyJson || realLesson.vocabularyJson,
-    grammarJson: dbLesson.grammarJson || realLesson.grammarJson,
-    exercisesJson: dbLesson.exercisesJson || realLesson.exercisesJson,
-    level: dbLesson.level || realLesson.level,
-    durationMinutes: dbLesson.durationMinutes || realLesson.durationMinutes,
-    isPublished: dbLesson.isPublished ?? true,
-  };
+  return res.status(200).json({
+    ...lesson,
+    userProgress,
+  });
 }
