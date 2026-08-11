@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LessonCard } from "@/components/LessonCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
+import { LESSONS_DATA } from "@/lib/lessons-data";
 
 const levels = ["ALL", "A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -37,36 +38,59 @@ export default function LessonsPage() {
   const [selectedLevel, setSelectedLevel] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // No auto-redirect - let AuthContext handle auth state
-
+  // Build lessons from authoritative source immediately
   useEffect(() => {
-    if (status !== "authenticated") return;
+    setLoading(true);
+    
+    let baseLessons = LESSONS_DATA.map((l) => ({
+      ...l,
+      userProgress: [] as any[],
+    }));
 
-    const fetchLessons = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams();
-        if (selectedLevel !== "ALL") params.append("level", selectedLevel);
-        if (searchQuery) params.append("search", searchQuery);
+    // Filter by level
+    if (selectedLevel !== "ALL") {
+      baseLessons = baseLessons.filter((l) => l.level === selectedLevel);
+    }
 
-        const res = await fetch(`/api/lessons?${params.toString()}`);
-        if (!res.ok) {
-          console.error("Lessons API error:", res.status);
-          setLessons([]);
-          return;
-        }
-        const data = await res.json();
-        setLessons(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch lessons:", error);
-        setLessons([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Filter by search
+    if (searchQuery) {
+      const term = searchQuery.toLowerCase();
+      baseLessons = baseLessons.filter(
+        (l) =>
+          l.title.toLowerCase().includes(term) ||
+          l.description.toLowerCase().includes(term)
+      );
+    }
 
-    fetchLessons();
-  }, [selectedLevel, searchQuery, status]);
+    setLessons(baseLessons);
+    setLoading(false);
+  }, [selectedLevel, searchQuery]);
+
+  // Fetch user progress separately
+  useEffect(() => {
+    if (status !== "authenticated" || !authUser?.id) return;
+
+    const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
+    fetch("/api/lessons", {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!Array.isArray(data)) return;
+        
+        // Merge user progress into existing lessons
+        const progressMap = new Map(data.map((l: any) => [l.id, l.userProgress]));
+        setLessons((prev) =>
+          prev.map((lesson) => ({
+            ...lesson,
+            userProgress: progressMap.get(lesson.id) || [],
+          }))
+        );
+      })
+      .catch((err) => console.error("Failed to fetch progress:", err));
+  }, [status, authUser?.id]);
 
   if (status === "loading") {
     return (
