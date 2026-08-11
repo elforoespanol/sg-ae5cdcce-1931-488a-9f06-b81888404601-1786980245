@@ -1,3 +1,4 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import { LESSONS_DATA } from "@/lib/lessons-data";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
