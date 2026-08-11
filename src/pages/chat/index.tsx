@@ -7,6 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
+import toast from "react-hot-toast";
 
 interface ChatSession {
   id: string;
