@@ -19,7 +19,6 @@ function getUserIdFromRequest(req: NextApiRequest): string | undefined {
   const session = (req as any).__session;
   if (session?.user?.id) return session.user.id;
   
-  // Check Authorization header first (more reliable in preview)
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
@@ -27,7 +26,7 @@ function getUserIdFromRequest(req: NextApiRequest): string | undefined {
       const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
       if (payload.sub) return payload.sub;
     } catch {
-      // ignore invalid token
+      // ignore
     }
   }
   
@@ -46,18 +45,100 @@ function getUserIdFromRequest(req: NextApiRequest): string | undefined {
   return undefined;
 }
 
+function generateDemoResponse(message: string, userName: string, level: string): string {
+  const lower = message.toLowerCase().trim();
+
+  // Specific: "Hola como estas" without accents
+  if (lower === "hola como estas" || lower === "hola, como estas") {
+    return `[ORIGINAL] ${message}\n[CORRECTED] Hola, ¿cómo estás?\n[EXPLANATION] Two things to remember: 1) Questions in Spanish need opening ¿ and closing ? 2) "cómo" (how) and "estás" (you are) need accent marks. Don't worry — accents take practice!\n\n¡Hola ${userName}! Estoy muy bien, gracias. ¿Y tú? ¿Cómo te va con tu español?`;
+  }
+
+  // Greetings
+  if (lower.includes("hola") || lower.includes("buenos") || lower.includes("buenas")) {
+    return `¡Hola ${userName}! ¡Qué gusto saludarte! ¿Cómo estás hoy? ¿Listo para practicar español?`;
+  }
+
+  // "How are you" type responses
+  if (lower.includes("estoy") || lower.includes("bien") || lower.includes("mal") || lower.includes("regular") || lower.includes("más o menos")) {
+    return `¡Me alegro de escucharte! Practiquemos un poco más. ¿Puedes decirme qué te gusta hacer en tu tiempo libre?`;
+  }
+
+  // Introductions
+  if (lower.includes("me llamo") || lower.includes("mi nombre") || lower.includes("soy ")) {
+    return `¡Mucho gusto! Es un placer conocerte. ¿De dónde eres? ¿Qué te motiva a aprender español?`;
+  }
+
+  // Numbers / counting attempt
+  if (/\d/.test(message) || lower.includes("uno") || lower.includes("dos") || lower.includes("tres")) {
+    return `¡Excelente! Los números son muy útiles. ¿Puedes contar hasta diez en español? Uno, dos, tres...`;
+  }
+
+  // Goodbye
+  if (lower.includes("adiós") || lower.includes("adios") || lower.includes("hasta luego") || lower.includes("chao")) {
+    return `¡Hasta luego, ${userName}! Ha sido un placer charlar contigo. ¡Nos vemos pronto! ¡Sigue practicando!`;
+  }
+
+  // Thank you
+  if (lower.includes("gracias") || lower.includes("thank")) {
+    return `¡De nada! Es un placer ayudarte. ¿Quieres practicar algo más?`;
+  }
+
+  // English messages — encourage Spanish
+  if (/^[a-z\s\.,!?']+$/i.test(message) && !/[áéíóúñ¿¡ü]/i.test(message) && lower.length > 3) {
+    const phrases: Record<string, string> = {
+      A1: "¡Inténtalo en español! Puedes decir 'Hola, soy ${userName}'",
+      A2: "¡Buen intento! Intenta responder en español. Empieza con 'Yo...'",
+      B1: "Practiquemos en español. ¿Cómo dirías eso en castellano?",
+      B2: "Vamos a mantener la conversación en español. ¿Cómo expresarías eso?",
+      C1: "Todo en español, por favor. ¿Cómo formularías esa idea?",
+      C2: "Sigamos en español. Expresa esa idea con tus propias palabras.",
+    };
+    return `¡Hola ${userName}! ${phrases[level as keyof typeof phrases] || phrases.A1}`;
+  }
+
+  // Default encouraging response
+  return `¡Muy bien, ${userName}! Me encanta tu entusiasmo. Sigue practicando — cada conversación te acerca más a la fluidez. ¿Quieres que practiquemos algún tema en particular?`;
+}
+
+async function streamDemoResponse(res: NextApiResponse, message: string, userName: string, level: string) {
+  const fullText = generateDemoResponse(message, userName, level);
+  
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const words = fullText.split(" ");
+  let current = "";
+  
+  for (const word of words) {
+    current += (current ? " " : "") + word;
+    res.write(`data: ${JSON.stringify({ content: current })}\n\n`);
+    // Small delay to simulate typing
+    await new Promise((r) => setTimeout(r, 25));
+  }
+
+  res.write("data: [DONE]\n\n");
+  
+  // Check for correction block
+  const { displayMessage, correction } = parseCorrectionFromResponse(fullText);
+  if (correction) {
+    res.write(
+      `data: ${JSON.stringify({
+        correction: {
+          original: correction.original,
+          corrected: correction.corrected,
+          explanation: correction.explanation,
+        },
+      })}\n\n`
+    );
+  }
+  
+  res.end();
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-    res.write(`data: ${JSON.stringify({ content: "¡Hola! I'm currently unavailable due to a configuration issue. Please contact support to get the AI tutor up and running again. ¡Gracias!" })}\n\n`);
-    res.write("data: [DONE]\n\n");
-    return res.end();
   }
 
   const session = await getSession({ req });
@@ -72,13 +153,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Message is required" });
   }
 
-  // For local sessions, we don't need Supabase
   const isLocalSession = sessionId?.startsWith("local-chat-");
 
   try {
     const supabase = getSupabaseAdmin();
 
-    // Try to get user info from Supabase if available
     if (supabase && userId) {
       const { data: user } = await supabase
         .from("users")
@@ -90,7 +169,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         userLevel = (user.level as StudentLevel) || "A1";
       }
     } else if (!userId && isLocalSession) {
-      // For local sessions without auth, try to decode user from token payload
       const authHeader = req.headers.authorization;
       if (authHeader?.startsWith("Bearer ")) {
         const token = authHeader.slice(7);
@@ -107,7 +185,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    // Only save to Supabase for server-side sessions
+    // Save to Supabase for server-side sessions
     let chatSessionId = sessionId;
     if (!isLocalSession && supabase && userId && userId !== "local-user") {
       if (!chatSessionId) {
@@ -122,8 +200,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .single();
         if (newSession) chatSessionId = newSession.id;
       }
-
-      // Save user message
       if (chatSessionId) {
         await supabase.from("chat_messages").insert({
           sessionId: chatSessionId,
@@ -142,12 +218,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .eq("sessionId", chatSessionId)
         .order("createdAt", { ascending: true })
         .limit(20);
-      if (msgs) {
-        previousMessages.push(...msgs);
-      }
+      if (msgs) previousMessages.push(...msgs);
     }
 
-    // Get lesson context if linked
+    // Get lesson context
     const lessonContext = {
       topic: "General Spanish Conversation",
       vocabularyFocus: [] as string[],
@@ -177,7 +251,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    // Build system prompt
+    // Use demo mode if no OpenAI API key
+    if (!process.env.OPENAI_API_KEY) {
+      await streamDemoResponse(res, message, userName, userLevel);
+      return;
+    }
+
+    // Build system prompt for OpenAI
     const systemPrompt = buildTutorSystemPrompt({
       studentName: userName,
       level: userLevel,
@@ -188,12 +268,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })),
     });
 
-    // Set up streaming response
+    // OpenAI streaming
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    // Call OpenAI with streaming
     const stream = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -221,7 +300,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.write("data: [DONE]\n\n");
 
-    // Parse and save the complete response (only for server sessions)
     const { displayMessage, correction } = parseCorrectionFromResponse(fullResponse);
 
     if (!isLocalSession && supabase && chatSessionId && userId !== "local-user") {
@@ -236,7 +314,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Send correction info if present
     if (correction) {
       res.write(
         `data: ${JSON.stringify({

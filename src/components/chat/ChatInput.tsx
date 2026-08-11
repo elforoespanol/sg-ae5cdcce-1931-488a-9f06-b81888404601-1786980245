@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Send, Mic, MicOff } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -32,7 +33,10 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
 
   const startListening = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    if (!SpeechRecognition) {
+      toast.error("Voice input requires Chrome, Edge, or Safari");
+      return;
+    }
 
     const recognition = new SpeechRecognition();
     recognition.lang = "es-ES";
@@ -42,7 +46,14 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
 
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      if (event.error === "not-allowed") {
+        toast.error("Microphone permission denied. Please allow microphone access.");
+      } else if (event.error === "no-speech") {
+        toast.error("No speech detected. Please try again.");
+      }
+    };
 
     recognition.onresult = (event: any) => {
       let finalTranscript = "";
@@ -67,6 +78,18 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
     setIsListening(false);
   }, []);
 
+  const handleMicClick = () => {
+    if (!speechSupported) {
+      toast.error("Voice input requires Chrome, Edge, or Safari");
+      return;
+    }
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim() || isLoading || disabled) return;
@@ -89,14 +112,14 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
       <div className="flex items-end gap-3">
         <button
           type="button"
-          onClick={isListening ? stopListening : startListening}
-          disabled={!speechSupported || isLoading || disabled}
+          onClick={handleMicClick}
+          disabled={isLoading || disabled}
           className={`shrink-0 p-2.5 rounded-xl border transition-colors ${
             isListening
               ? "border-destructive text-destructive bg-destructive/10 animate-pulse"
               : "border-border text-muted-foreground hover:bg-muted"
           } disabled:opacity-40`}
-          title={speechSupported ? (isListening ? "Stop listening" : "Speak in Spanish") : "Voice input not supported in this browser"}
+          title={speechSupported ? (isListening ? "Stop listening" : "Speak in Spanish") : "Voice input requires Chrome, Edge, or Safari"}
         >
           {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
         </button>
