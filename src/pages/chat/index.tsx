@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Plus, Clock, ChevronRight, Loader2, BookOpen } from "lucide-react";
+import { MessageSquare, Plus, Clock, ChevronRight, Loader2, BookOpen, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,6 @@ import { useAuth } from "@/contexts/AuthContext";
 interface ChatSession {
   id: string;
   title: string;
-  summary: string | null;
   createdAt: string;
   updatedAt: string;
   lesson: { title: string } | null;
@@ -19,7 +18,7 @@ interface ChatSession {
 }
 
 export default function ChatSessionsPage() {
-  const { user: authUser, status } = useAuth();
+  const { status } = useAuth();
   const router = useRouter();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,26 +29,25 @@ export default function ChatSessionsPage() {
     }
   }, [status, router]);
 
+  // Load sessions from localStorage (client-side, works in preview)
   useEffect(() => {
-    if (!authUser?.id) return;
+    const stored = localStorage.getItem("sslid_chat_sessions");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setSessions(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        setSessions([]);
+      }
+    }
+    setIsLoading(false);
+  }, []);
 
-    const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
-    // Fetch sessions
-    fetch("/api/tutor/sessions", {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setSessions(data.sessions || []);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch sessions:", err);
-        setIsLoading(false);
-      });
-  }, [authUser?.id]);
+  const handleDelete = (sessionId: string) => {
+    const updated = sessions.filter((s) => s.id !== sessionId);
+    setSessions(updated);
+    localStorage.setItem("sslid_chat_sessions", JSON.stringify(updated));
+  };
 
   if (status === "loading" || isLoading) {
     return (
@@ -116,7 +114,7 @@ export default function ChatSessionsPage() {
             <div className="grid gap-4">
               <AnimatePresence>
                 {sessions.map((chatSession, index) => {
-                  const lastMessage = chatSession.messages[chatSession.messages.length - 1];
+                  const lastMessage = chatSession.messages?.[chatSession.messages.length - 1];
                   return (
                     <motion.div
                       key={chatSession.id}
@@ -126,7 +124,7 @@ export default function ChatSessionsPage() {
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
                       <Card
-                        className="cursor-pointer hover:shadow-md transition-shadow border-border/60"
+                        className="cursor-pointer hover:shadow-md transition-shadow border-border/60 group"
                         onClick={() => router.push(`/chat/${chatSession.id}`)}
                       >
                         <CardContent className="p-5">
@@ -154,10 +152,22 @@ export default function ChatSessionsPage() {
                                   <Clock className="h-3 w-3" />
                                   {formatDistanceToNow(new Date(chatSession.updatedAt), { addSuffix: true })}
                                 </span>
-                                <span>{chatSession.messages.length} messages</span>
+                                <span>{chatSession.messages?.length || 0} messages</span>
                               </div>
                             </div>
-                            <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0 mt-1" />
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(chatSession.id);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                                title="Delete chat"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0 mt-1" />
+                            </div>
                           </div>
                         </CardContent>
                       </Card>

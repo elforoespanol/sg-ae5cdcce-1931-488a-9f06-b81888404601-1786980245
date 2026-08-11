@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
-import { Loader2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+
+function generateSessionId() {
+  return `local-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
 
 export default function NewChatPage() {
-  const { user: authUser, status } = useAuth();
+  const { status } = useAuth();
   const router = useRouter();
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -15,52 +17,25 @@ export default function NewChatPage() {
       return;
     }
 
-    if (status === "authenticated" && authUser?.id) {
-      const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
-      // Create a new session via the chat API
-      fetch("/api/tutor/sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ title: "New Chat", topic: "general" }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.session?.id) {
-            router.push(`/chat/${data.session.id}`);
-          } else {
-            // Fallback: redirect to chat list
-            router.push("/chat");
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to create chat session:", err);
-          setError("Failed to start new chat. Please try again.");
-        });
+    if (status === "authenticated") {
+      // Create session client-side in localStorage (works regardless of Supabase)
+      const sessionId = generateSessionId();
+      const stored = localStorage.getItem("sslid_chat_sessions");
+      const sessions = stored ? JSON.parse(stored) : [];
+
+      sessions.unshift({
+        id: sessionId,
+        title: "New Chat",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lesson: null,
+        messages: [],
+      });
+
+      localStorage.setItem("sslid_chat_sessions", JSON.stringify(sessions.slice(0, 50)));
+      router.push(`/chat/${sessionId}`);
     }
-  }, [status, authUser?.id, router]);
-
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <AlertTriangle className="h-12 w-12 text-destructive mx-auto" />
-          <p className="text-muted-foreground">{error}</p>
-          <Button onClick={() => router.push("/chat")}>Back to Chats</Button>
-        </div>
-      </div>
-    );
-  }
+  }, [status, router]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
