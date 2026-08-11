@@ -44,6 +44,23 @@ export default function ChatPage() {
   useEffect(() => {
     if (!sessionId || typeof sessionId !== "string") return;
 
+    // Client-side session: load from localStorage
+    if (sessionId.startsWith("local-chat-")) {
+      const localSession = localStorage.getItem(`sslid_chat_session_${sessionId}`);
+      if (localSession) {
+        try {
+          const parsed = JSON.parse(localSession);
+          setSessionTitle(parsed.title || "Chat with Sofía");
+          setInitialMessages(parsed.messages || []);
+        } catch (e) {
+          console.error("Failed to parse local session:", e);
+        }
+      }
+      setIsLoading(false);
+      return;
+    }
+
+    // Server-side session: fetch from API
     fetch(`/api/tutor/messages?sessionId=${sessionId}`)
       .then((res) => res.json())
       .then((data) => {
@@ -78,6 +95,24 @@ export default function ChatPage() {
       })
       .catch(console.error);
   }, [sessionId, setInitialMessages]);
+
+  // Save messages to localStorage for client-side sessions
+  useEffect(() => {
+    if (typeof sessionId !== "string" || !sessionId.startsWith("local-chat-")) return;
+    if (messages.length === 0) return;
+    
+    const localSession = localStorage.getItem(`sslid_chat_session_${sessionId}`);
+    if (localSession) {
+      try {
+        const parsed = JSON.parse(localSession);
+        parsed.messages = messages;
+        parsed.updatedAt = new Date().toISOString();
+        localStorage.setItem(`sslid_chat_session_${sessionId}`, JSON.stringify(parsed));
+      } catch (e) {
+        console.error("Failed to save local session:", e);
+      }
+    }
+  }, [messages, sessionId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
