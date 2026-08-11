@@ -96,7 +96,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           content: isPlaceholder ? real.content : lesson.content,
           vocabularyJson: lesson.vocabularyJson || real.vocabularyJson,
           grammarJson: lesson.grammarJson || real.grammarJson,
-          exercisesJson: lesson.exercisesJson || real.exercisesJson,
           level: lesson.level || real.level,
           durationMinutes: lesson.durationMinutes || real.durationMinutes,
         };
