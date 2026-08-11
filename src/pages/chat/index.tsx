@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Plus, Clock, ChevronRight, Loader2, BookOpen } from "lucide-react";
+import { MessageSquare, Plus, Clock, ChevronRight, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +30,6 @@ export default function ChatSessionsPage() {
   useEffect(() => {
     if (status !== "authenticated") return;
 
-    // Load from localStorage
     const stored = localStorage.getItem("sslid_chat_sessions");
     if (stored) {
       try {
@@ -45,12 +44,9 @@ export default function ChatSessionsPage() {
       }
     }
 
-    // Fallback: load from API
     const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
     fetch("/api/tutor/sessions", {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
       .then((res) => res.json())
       .then((data) => {
@@ -62,6 +58,35 @@ export default function ChatSessionsPage() {
         setIsLoading(false);
       });
   }, [status]);
+
+  const handleStartNewChat = () => {
+    const sessionId = `local-chat-${Date.now()}`;
+    const userId = authUser?.id || authUser?.email || "anonymous";
+    const userName = authUser?.name || authUser?.email || "Student";
+    
+    const newSession = {
+      id: sessionId,
+      userId,
+      userName,
+      title: "New Chat",
+      topic: "general",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      messages: [],
+    };
+    localStorage.setItem(`sslid_chat_session_${sessionId}`, JSON.stringify(newSession));
+    
+    const sessionsList = JSON.parse(localStorage.getItem("sslid_chat_sessions") || "[]");
+    sessionsList.unshift({
+      id: sessionId,
+      title: "New Chat",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    localStorage.setItem("sslid_chat_sessions", JSON.stringify(sessionsList.slice(0, 50)));
+    
+    router.push(`/chat/${sessionId}`);
+  };
 
   if (status === "loading" || isLoading) {
     return (
@@ -90,7 +115,7 @@ export default function ChatSessionsPage() {
                 Practice Spanish conversation with Sofía, your AI tutor
               </p>
             </div>
-            <Button onClick={() => router.push("/chat/new")} className="gap-2">
+            <Button onClick={handleStartNewChat} className="gap-2">
               <Plus className="h-4 w-4" />
               Start New Chat
             </Button>
@@ -110,7 +135,7 @@ export default function ChatSessionsPage() {
             <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
               Start a new chat to practice Spanish with your AI tutor Sofía
             </p>
-            <Button onClick={() => router.push("/chat/new")} className="gap-2">
+            <Button onClick={handleStartNewChat} className="gap-2">
               <Plus className="h-4 w-4" />
               Start New Chat
             </Button>
