@@ -36,12 +36,6 @@ export default function ChatPage() {
   } = useAITutor({ sessionId: sessionId as string });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
-
-  useEffect(() => {
     if (!sessionId || typeof sessionId !== "string") {
       setIsLoading(false);
       return;
@@ -59,7 +53,6 @@ export default function ChatPage() {
           console.error("Failed to parse local session:", e);
         }
       } else {
-        // Session doesn't exist in localStorage yet - this is a new chat
         setSessionTitle("Chat with Sofía");
       }
       setIsLoading(false);
@@ -88,7 +81,6 @@ export default function ChatPage() {
       .catch(console.error)
       .finally(() => setIsLoading(false));
 
-    // Fetch session info
     fetch(`/api/tutor/sessions`)
       .then((res) => res.json())
       .then((data) => {
@@ -128,14 +120,6 @@ export default function ChatPage() {
   const handleSend = (text: string) => {
     sendMessage(text);
   };
-
-  if (status === "loading" || isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

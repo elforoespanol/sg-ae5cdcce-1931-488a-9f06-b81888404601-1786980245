@@ -17,59 +17,34 @@ interface ChatSession {
 }
 
 export default function ChatSessionsPage() {
-  const { user: authUser, status } = useAuth();
   const router = useRouter();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
-
-  useEffect(() => {
-    if (status !== "authenticated") return;
-
+    setIsLoading(true);
     const stored = localStorage.getItem("sslid_chat_sessions");
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           setSessions(parsed);
-          setIsLoading(false);
-          return;
         }
       } catch (e) {
         console.error("Failed to parse chat sessions from localStorage", e);
       }
     }
-
-    const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
-    fetch("/api/tutor/sessions", {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setSessions(data.sessions || []);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch sessions:", err);
-        setIsLoading(false);
-      });
-  }, [status]);
+    setIsLoading(false);
+  }, []);
 
   const handleStartNewChat = () => {
     try {
       const sessionId = `local-chat-${Date.now()}`;
-      const userId = authUser?.id || authUser?.email || "anonymous";
-      const userName = authUser?.name || authUser?.email || "Student";
       
       const newSession = {
         id: sessionId,
-        userId,
-        userName,
+        userId: "anonymous",
+        userName: "Student",
         title: "New Chat",
         topic: "general",
         createdAt: new Date().toISOString(),
@@ -94,7 +69,7 @@ export default function ChatSessionsPage() {
     }
   };
 
-  if (status === "loading" || isLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
