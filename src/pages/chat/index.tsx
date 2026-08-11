@@ -60,32 +60,37 @@ export default function ChatSessionsPage() {
   }, [status]);
 
   const handleStartNewChat = () => {
-    const sessionId = `local-chat-${Date.now()}`;
-    const userId = authUser?.id || authUser?.email || "anonymous";
-    const userName = authUser?.name || authUser?.email || "Student";
-    
-    const newSession = {
-      id: sessionId,
-      userId,
-      userName,
-      title: "New Chat",
-      topic: "general",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      messages: [],
-    };
-    localStorage.setItem(`sslid_chat_session_${sessionId}`, JSON.stringify(newSession));
-    
-    const sessionsList = JSON.parse(localStorage.getItem("sslid_chat_sessions") || "[]");
-    sessionsList.unshift({
-      id: sessionId,
-      title: "New Chat",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-    localStorage.setItem("sslid_chat_sessions", JSON.stringify(sessionsList.slice(0, 50)));
-    
-    router.push(`/chat/${sessionId}`);
+    try {
+      const sessionId = `local-chat-${Date.now()}`;
+      const userId = authUser?.id || authUser?.email || "anonymous";
+      const userName = authUser?.name || authUser?.email || "Student";
+      
+      const newSession = {
+        id: sessionId,
+        userId,
+        userName,
+        title: "New Chat",
+        topic: "general",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        messages: [],
+      };
+      localStorage.setItem(`sslid_chat_session_${sessionId}`, JSON.stringify(newSession));
+      
+      const sessionsList = JSON.parse(localStorage.getItem("sslid_chat_sessions") || "[]");
+      sessionsList.unshift({
+        id: sessionId,
+        title: "New Chat",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      localStorage.setItem("sslid_chat_sessions", JSON.stringify(sessionsList.slice(0, 50)));
+      
+      router.push(`/chat/${sessionId}`);
+    } catch (err) {
+      console.error("Failed to create chat session:", err);
+      toast.error("Failed to start chat. Please try again.");
+    }
   };
 
   if (status === "loading" || isLoading) {

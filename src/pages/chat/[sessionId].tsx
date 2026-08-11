@@ -23,7 +23,7 @@ export default function ChatPage() {
   const { user: authUser, status } = useAuth();
   const router = useRouter();
   const { sessionId } = router.query;
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [sessionTitle, setSessionTitle] = useState("");
   const [lessonTitle, setLessonTitle] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,7 +42,10 @@ export default function ChatPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!sessionId || typeof sessionId !== "string") return;
+    if (!sessionId || typeof sessionId !== "string") {
+      setIsLoading(false);
+      return;
+    }
 
     // Client-side session: load from localStorage
     if (sessionId.startsWith("local-chat-")) {
@@ -55,12 +58,16 @@ export default function ChatPage() {
         } catch (e) {
           console.error("Failed to parse local session:", e);
         }
+      } else {
+        // Session doesn't exist in localStorage yet - this is a new chat
+        setSessionTitle("Chat with Sofía");
       }
       setIsLoading(false);
       return;
     }
 
     // Server-side session: fetch from API
+    setIsLoading(true);
     fetch(`/api/tutor/messages?sessionId=${sessionId}`)
       .then((res) => res.json())
       .then((data) => {
