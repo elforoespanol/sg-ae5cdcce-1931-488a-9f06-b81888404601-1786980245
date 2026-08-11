@@ -77,13 +77,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
     }
 
-    // Deduplicate by slug (in case upsert created duplicates)
+    // Deduplicate by slug and enrich with real content
     const seenSlugs = new Set<string>();
-    result = result.filter((lesson: any) => {
-      if (seenSlugs.has(lesson.slug)) return false;
-      seenSlugs.add(lesson.slug);
-      return true;
-    });
+    result = result
+      .filter((lesson: any) => {
+        if (seenSlugs.has(lesson.slug)) return false;
+        seenSlugs.add(lesson.slug);
+        return true;
+      })
+      .map((lesson: any) => {
+        const real = LESSONS_DATA.find((l) => l.slug === lesson.slug || l.id === lesson.id);
+        if (!real) return lesson;
+        const isPlaceholder = !lesson.content || lesson.content === "Lesson content here..." || lesson.content.length < 50;
+        return {
+          ...lesson,
+          title: lesson.title || real.title,
+          description: lesson.description || real.description,
+          content: isPlaceholder ? real.content : lesson.content,
+          vocabularyJson: lesson.vocabularyJson || real.vocabularyJson,
+          grammarJson: lesson.grammarJson || real.grammarJson,
+          exercisesJson: lesson.exercisesJson || real.exercisesJson,
+          level: lesson.level || real.level,
+          durationMinutes: lesson.durationMinutes || real.durationMinutes,
+        };
+      });
 
     // Fetch user progress if authenticated
     if (userId) {

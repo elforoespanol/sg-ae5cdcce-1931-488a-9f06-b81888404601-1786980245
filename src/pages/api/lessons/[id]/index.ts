@@ -13,48 +13,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const supabase = getSupabaseAdmin();
+
+  // Find real lesson data by slug or ID
+  const realLesson = LESSONS_DATA.find((l) => l.id === id || l.slug === id);
+
   if (!supabase) {
-    // Demo lesson fallback
-    const demoLessons: Record<string, any> = {
-      "demo-1": {
-        id: "demo-1",
-        title: "Greetings & Introductions",
-        slug: "greetings-introductions",
-        description: "Learn how to greet people and introduce yourself in Spanish.",
-        content: "¡Hola! Welcome to your first Spanish lesson...",
-        difficulty: "BEGINNER",
-        level: "A1",
-        order: 1,
-        imageUrl: null,
-        durationMinutes: 15,
-        isPublished: true,
-        vocabulary: [
-          { word: "Hola", translation: "Hello", example: "¡Hola! ¿Cómo estás?" },
-          { word: "Adiós", translation: "Goodbye", example: "Adiós, nos vemos mañana." },
-          { word: "Gracias", translation: "Thank you", example: "Gracias por tu ayuda." },
-        ],
+    // No Supabase — return from real data or 404
+    if (realLesson) {
+      return res.status(200).json({
+        ...realLesson,
         userProgress: [],
-      },
-      "demo-2": {
-        id: "demo-2",
-        title: "Ordering at a Restaurant",
-        slug: "ordering-restaurant",
-        description: "Master the essential phrases for dining out.",
-        content: "In this lesson, you will learn how to order food and drinks...",
-        difficulty: "BEGINNER",
-        level: "A1",
-        order: 2,
-        imageUrl: null,
-        durationMinutes: 20,
-        isPublished: true,
-        vocabulary: [
-          { word: "La cuenta", translation: "The bill", example: "La cuenta, por favor." },
-          { word: "Delicioso", translation: "Delicious", example: "Está muy delicioso." },
-        ],
-        userProgress: [],
-      },
-    };
-    return res.status(200).json(demoLessons[id] || demoLessons["demo-1"]);
+      });
+    }
+    return res.status(404).json({ message: "Lesson not found" });
   }
 
   try {
@@ -65,12 +36,62 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .single();
 
     if (error || !lesson) {
+      // Try to find by slug if ID lookup failed
+      const { data: lessonBySlug } = await supabase
+        .from("lessons")
+        .select("*, userProgress:user_lesson_progress(isCompleted, timeSpentMinutes, lastAccessedAt, quizScore)")
+        .eq("slug", id)
+        .single();
+
+      if (lessonBySlug) {
+        // Enrich with real content if database has placeholders
+        const enriched = enrichLesson(lessonBySlug, realLesson);
+        return res.status(200).json(enriched);
+      }
+
+      // Return real data if available, else 404
+      if (realLesson) {
+        return res.status(200).json({
+          ...realLesson,
+          userProgress: [],
+        });
+      }
       return res.status(404).json({ message: "Lesson not found" });
     }
 
-    return res.status(200).json(lesson);
+    // Enrich with real content if database has placeholders
+    const enriched = enrichLesson(lesson, realLesson);
+    return res.status(200).json(enriched);
   } catch (error) {
     console.error("Error fetching lesson:", error);
+    if (realLesson) {
+      return res.status(200).json({
+        ...realLesson,
+        userProgress: [],
+      });
+    }
     return res.status(500).json({ message: "Failed to fetch lesson" });
   }
+}
+
+function enrichLesson(dbLesson: any, realLesson: any) {
+  if (!realLesson) return dbLesson;
+
+  const isPlaceholder =
+    !dbLesson.content ||
+    dbLesson.content === "Lesson content here..." ||
+    dbLesson.content.length < 50;
+
+  return {
+    ...dbLesson,
+    title: dbLesson.title || realLesson.title,
+    description: dbLesson.description || realLesson.description,
+    content: isPlaceholder ? realLesson.content : dbLesson.content,
+    vocabularyJson: dbLesson.vocabularyJson || realLesson.vocabularyJson,
+    grammarJson: dbLesson.grammarJson || realLesson.grammarJson,
+    exercisesJson: dbLesson.exercisesJson || realLesson.exercisesJson,
+    level: dbLesson.level || realLesson.level,
+    durationMinutes: dbLesson.durationMinutes || realLesson.durationMinutes,
+    isPublished: dbLesson.isPublished ?? true,
+  };
 }
