@@ -53,9 +53,13 @@ export function useAITutor(options: UseAITutorOptions = {}) {
       abortControllerRef.current = new AbortController();
 
       try {
+        const token = localStorage.getItem("sslid_auth_token") || sessionStorage.getItem("sslid_auth_token");
         const response = await fetch("/api/tutor/chat", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify({
             message: content.trim(),
             sessionId: options.sessionId,

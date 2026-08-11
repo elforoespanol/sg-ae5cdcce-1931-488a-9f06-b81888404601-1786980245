@@ -53,12 +53,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const session = await getSession({ req });
   (req as any).__session = session;
-  const userId = getUserIdFromRequest(req);
-
-  const supabase = getSupabaseAdmin();
-  if (!supabase || !userId) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+  let userId = getUserIdFromRequest(req);
+  let userName = "Student";
+  let userLevel: StudentLevel = "A1";
 
   const { message, sessionId, lessonId } = req.body;
 
@@ -66,61 +63,80 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Message is required" });
   }
 
+  // For local sessions, we don't need Supabase
+  const isLocalSession = sessionId?.startsWith("local-chat-");
+
   try {
-    // Get user info
-    const { data: user, error: userError } = await supabase
-      .from("users")
-      .select("name, level")
-      .eq("id", userId)
-      .single();
+    const supabase = getSupabaseAdmin();
 
-    if (userError || !user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Get or create chat session
-    let chatSessionId = sessionId;
-
-    if (!chatSessionId) {
-      const { data: newSession, error: createError } = await supabase
-        .from("chat_sessions")
-        .insert({
-          userId,
-          lessonId: lessonId || null,
-          title: message.slice(0, 50) + (message.length > 50 ? "..." : ""),
-        })
-        .select("id")
+    // Try to get user info from Supabase if available
+    if (supabase && userId) {
+      const { data: user } = await supabase
+        .from("users")
+        .select("name, level")
+        .eq("id", userId)
         .single();
-
-      if (createError) throw createError;
-      chatSessionId = newSession.id;
-    } else {
-      const { data: existingSession } = await supabase
-        .from("chat_sessions")
-        .select("id")
-        .eq("id", chatSessionId)
-        .eq("userId", userId)
-        .single();
-
-      if (!existingSession) {
-        return res.status(403).json({ message: "Invalid session" });
+      if (user) {
+        userName = user.name || "Student";
+        userLevel = (user.level as StudentLevel) || "A1";
+      }
+    } else if (!userId && isLocalSession) {
+      // For local sessions without auth, try to decode user from token payload
+      const authHeader = req.headers.authorization;
+      if (authHeader?.startsWith("Bearer ")) {
+        const token = authHeader.slice(7);
+        try {
+          const payload = JSON.parse(Buffer.from(token.split(".")[1], "base64url").toString());
+          userId = payload.sub || "local-user";
+          userName = payload.name || "Student";
+          userLevel = (payload.level as StudentLevel) || "A1";
+        } catch {
+          userId = "local-user";
+        }
+      } else {
+        userId = "local-user";
       }
     }
 
-    // Save user message
-    await supabase.from("chat_messages").insert({
-      sessionId: chatSessionId,
-      role: "user",
-      content: message,
-    });
+    // Only save to Supabase for server-side sessions
+    let chatSessionId = sessionId;
+    if (!isLocalSession && supabase && userId && userId !== "local-user") {
+      if (!chatSessionId) {
+        const { data: newSession } = await supabase
+          .from("chat_sessions")
+          .insert({
+            userId,
+            lessonId: lessonId || null,
+            title: message.slice(0, 50) + (message.length > 50 ? "..." : ""),
+          })
+          .select("id")
+          .single();
+        if (newSession) chatSessionId = newSession.id;
+      }
+
+      // Save user message
+      if (chatSessionId) {
+        await supabase.from("chat_messages").insert({
+          sessionId: chatSessionId,
+          role: "user",
+          content: message,
+        });
+      }
+    }
 
     // Get conversation history
-    const { data: previousMessages } = await supabase
-      .from("chat_messages")
-      .select("role, content")
-      .eq("sessionId", chatSessionId)
-      .order("createdAt", { ascending: true })
-      .limit(20);
+    const previousMessages: Array<{ role: string; content: string }> = [];
+    if (!isLocalSession && supabase && chatSessionId) {
+      const { data: msgs } = await supabase
+        .from("chat_messages")
+        .select("role, content")
+        .eq("sessionId", chatSessionId)
+        .order("createdAt", { ascending: true })
+        .limit(20);
+      if (msgs) {
+        previousMessages.push(...msgs);
+      }
+    }
 
     // Get lesson context if linked
     const lessonContext = {
@@ -129,13 +145,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       grammarFocus: [] as string[],
     };
 
-    if (lessonId) {
+    if (lessonId && supabase) {
       const { data: lesson } = await supabase
         .from("lessons")
         .select("title, vocabularyJson, grammarJson")
         .eq("id", lessonId)
         .single();
-
       if (lesson) {
         lessonContext.topic = lesson.title;
         try {
@@ -143,26 +158,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (Array.isArray(vocab)) {
             lessonContext.vocabularyFocus = vocab.map((v: any) => v.spanish || v.word || "");
           }
-        } catch {
-          // ignore
-        }
+        } catch { /* ignore */ }
         try {
           const grammar = lesson.grammarJson as any;
           if (Array.isArray(grammar)) {
             lessonContext.grammarFocus = grammar.map((g: any) => g.title || g.topic || "");
           }
-        } catch {
-          // ignore
-        }
+        } catch { /* ignore */ }
       }
     }
 
     // Build system prompt
     const systemPrompt = buildTutorSystemPrompt({
-      studentName: user.name || "Student",
-      level: (user.level as StudentLevel) || "A1",
+      studentName: userName,
+      level: userLevel,
       lesson: lessonContext,
-      conversationHistory: (previousMessages || []).map((m) => ({
+      conversationHistory: previousMessages.map((m) => ({
         role: m.role,
         content: m.content,
       })),
@@ -178,7 +189,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       model: "gpt-4o-mini",
       messages: [
         { role: "system", content: systemPrompt },
-        ...(previousMessages || []).slice(-10).map((m) => ({
+        ...previousMessages.slice(-10).map((m) => ({
           role: m.role as "user" | "assistant",
           content: m.content,
         })),
@@ -201,18 +212,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.write("data: [DONE]\n\n");
 
-    // Parse and save the complete response
+    // Parse and save the complete response (only for server sessions)
     const { displayMessage, correction } = parseCorrectionFromResponse(fullResponse);
 
-    await supabase.from("chat_messages").insert({
-      sessionId: chatSessionId,
-      role: "assistant",
-      content: displayMessage,
-      hasCorrection: !!correction,
-      originalText: correction?.original || null,
-      correctedText: correction?.corrected || null,
-      explanation: correction?.explanation || null,
-    });
+    if (!isLocalSession && supabase && chatSessionId && userId !== "local-user") {
+      await supabase.from("chat_messages").insert({
+        sessionId: chatSessionId,
+        role: "assistant",
+        content: displayMessage,
+        hasCorrection: !!correction,
+        originalText: correction?.original || null,
+        correctedText: correction?.corrected || null,
+        explanation: correction?.explanation || null,
+      });
+    }
 
     // Send correction info if present
     if (correction) {
