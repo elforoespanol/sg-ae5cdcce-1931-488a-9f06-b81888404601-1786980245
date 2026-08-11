@@ -1294,4 +1294,351 @@ Formed from the third-person plural preterite, dropping -ron and adding:
       { title: "Reported Speech (Estilo Indirecto)", content: "Tenses shift back: present → imperfect, preterite → pluperfect, future → conditional. 'Dijo que vendría' (He said he would come)." },
     ],
   },
+  // C1 - Advanced
+  {
+    id: "professional-c1",
+    title: "Professional Communication",
+    slug: "professional-communication",
+    description: "Master business presentations, negotiations, and high-level workplace discourse.",
+    content: `# Advanced Business Spanish
+
+## Presentations & Public Speaking
+
+**Me complace presentarles...** — I am pleased to present...
+
+**Como punto de partida...** — As a starting point...
+
+**Pasando al siguiente tema...** — Moving on to the next topic...
+
+**En resumen...** — In summary...
+
+**Quedo a su entera disposición.** — I remain entirely at your disposal.
+
+## Negotiation Language
+
+**Propongo que...** — I propose that...
+
+**Estamos dispuestos a...** — We are willing to...
+
+**Nuestra postura es la siguiente...** — Our position is as follows...
+
+**Lamentablemente, no podemos aceptar...** — Unfortunately, we cannot accept...
+
+**Busquemos un punto medio.** — Let's look for a middle ground.
+
+## Formal Register Markers
+
+- Use **usted/ustedes** consistently
+- Avoid contractions and colloquialisms
+- Prefer conditional over future for politeness
+- Use passive se for objectivity: **Se ha observado que...**
+
+> In Spanish business culture, relationship-building (confianza) often precedes deal-making. Invest time in personal connection.`,
+    difficulty: "ADVANCED",
+    level: "C1",
+    order: 21,
+    imageUrl: null,
+    durationMinutes: 25,
+    isPublished: true,
+    vocabularyJson: [
+      { word: "Propuesta", translation: "Proposal", partOfSpeech: "noun", example: "Nuestra propuesta es competitiva." },
+      { word: "Negociación", translation: "Negotiation", partOfSpeech: "noun", example: "La negociación fue exitosa." },
+      { word: "Estrategia", translation: "Strategy", partOfSpeech: "noun", example: "Necesitamos una nueva estrategia." },
+      { word: "Postura", translation: "Position / Stance", partOfSpeech: "noun", example: "Nuestra postura no ha cambiado." },
+      { word: "Convenio", translation: "Agreement", partOfSpeech: "noun", example: "Firmamos un convenio de colaboración." },
+      { word: "Disposición", translation: "Availability / Disposition", partOfSpeech: "noun", example: "Quedo a su disposición." },
+    ],
+    grammarJson: [
+      { title: "Subjunctive in Proposals", content: "Use subjunctive after verbs of proposal and suggestion: 'Propongo que revisemos el contrato' (I propose that we review the contract)." },
+      { title: "Passive Reflexive (Se)", content: "'Se ha determinado que...' (It has been determined that...). Use for objectivity and to avoid naming the agent in formal reports." },
+    ],
+  },
+  {
+    id: "literature-c1",
+    title: "Literary Analysis & Critical Reading",
+    slug: "literary-analysis",
+    description: "Analyze Spanish literature, understand stylistic devices, and write critical essays.",
+    content: `# Reading Like a Critic
+
+## Key Literary Terms
+
+| Term | Spanish | Meaning |
+|------|---------|---------|
+| Metaphor | la metáfora | Implied comparison without 'like' |
+| Simile | el símil | Explicit comparison with 'like' |
+| Symbolism | el simbolismo | Objects representing ideas |
+| Irony | la ironía | Saying the opposite of what is meant |
+| Hyperbole | la hipérbole | Exaggeration for effect |
+| Alliteration | la aliteración | Repetition of initial sounds |
+
+## Analyzing a Text
+
+**El autor emplea... para...** — The author uses... to...
+
+**Esta metáfora sugiere que...** — This metaphor suggests that...
+
+**El tono del pasaje es...** — The tone of the passage is...
+
+**Desde una perspectiva...** — From a... perspective
+
+## Essay Structure
+
+**Introducción:** Present the thesis and scope
+
+**Desarrollo:** Analyze with evidence and quotes
+
+**Conclusión:** Synthesize findings and implications
+
+> Read beyond the literal. Ask: What is the author NOT saying? What cultural assumptions underlie this text?`,
+    difficulty: "ADVANCED",
+    level: "C1",
+    order: 22,
+    imageUrl: null,
+    durationMinutes: 28,
+    isPublished: true,
+    vocabularyJson: [
+      { word: "Metáfora", translation: "Metaphor", partOfSpeech: "noun", example: "La metáfora del viaje aparece en todo el poema." },
+      { word: "Ironía", translation: "Irony", partOfSpeech: "noun", example: "La ironía del final sorprende al lector." },
+      { word: "Tono", translation: "Tone", partOfSpeech: "noun", example: "El tono melancólico permea la novela." },
+      { word: "Narrador", translation: "Narrator", partOfSpeech: "noun", example: "El narrador es poco fiable." },
+      { word: "Trama", translation: "Plot", partOfSpeech: "noun", example: "La trama se complica en el segundo acto." },
+      { word: "Estilo", translation: "Style", partOfSpeech: "noun", example: "Su estilo es barroco y elaborado." },
+    ],
+    grammarJson: [
+      { title: "Subjunctive in Literary Analysis", content: "Use subjunctive to express interpretation: 'Es probable que el autor quisiera...' (The author probably wanted...)." },
+      { title: "Complex Relative Clauses", content: "Use prepositions with relative pronouns: 'El personaje en quien confío' (The character in whom I trust), 'La época en que vivió' (The era in which he lived)." },
+    ],
+  },
+  {
+    id: "media-c1",
+    title: "Media & Current Affairs",
+    slug: "media-current-affairs",
+    description: "Understand news, political discourse, and journalistic writing in Spanish.",
+    content: `# Understanding the Spanish Media
+
+## News Structure
+
+Spanish news articles follow the **inverted pyramid**: most important information first.
+
+**Titular** — Headline: grabs attention, often uses wordplay
+
+**Entradilla** — Lead paragraph: answers who, what, when, where, why
+
+**Cuerpo** — Body: supporting details and quotes
+
+## Political Discourse Markers
+
+**Desde mi punto de vista...** — From my point of view...
+
+**No cabe duda de que...** — There is no doubt that...
+
+**Resulta evidente que...** — It is evident that...
+
+**Por el contrario...** — On the contrary...
+
+**En consecuencia...** — Consequently...
+
+## Journalistic Register
+
+- Use **third person** predominantly
+- Prefer **active voice** for clarity
+- Attribute opinions: **Según fuentes gubernamentales...**
+- Use quotes for direct speech
+
+> Bias detection: Watch for loaded adjectives, selective quoting, and omission of context. Compare coverage across outlets.`,
+    difficulty: "ADVANCED",
+    level: "C1",
+    order: 23,
+    imageUrl: null,
+    durationMinutes: 22,
+    isPublished: true,
+    vocabularyJson: [
+      { word: "Titular", translation: "Headline", partOfSpeech: "noun", example: "El titular resume la noticia." },
+      { word: "Editorial", translation: "Editorial", partOfSpeech: "noun", example: "El editorial critica la política." },
+      { word: "Política", translation: "Policy / Politics", partOfSpeech: "noun", example: "La política exterior es compleja." },
+      { word: "Gobierno", translation: "Government", partOfSpeech: "noun", example: "El gobierno anunció medidas nuevas." },
+      { word: "Opinión pública", translation: "Public opinion", partOfSpeech: "phrase", example: "La opinión pública está dividida." },
+      { word: "Periodismo", translation: "Journalism", partOfSpeech: "noun", example: "El periodismo de investigación es vital." },
+    ],
+    grammarJson: [
+      { title: "Impersonal Expressions", content: "'Resulta evidente que...' 'No cabe duda de que...' These introduce statements as objective facts while subtly asserting the speaker's position." },
+      { title: "Indirect Discourse in Journalism", content: "Journalists convert speech to indirect style: 'El presidente afirmó que se tomarían medidas' (The president stated that measures would be taken)." },
+    ],
+  },
+  // C2 - Mastery
+  {
+    id: "academic-c2",
+    title: "Academic Research & Writing",
+    slug: "academic-research",
+    description: "Write dissertations, theses, and academic papers with native-level precision.",
+    content: `# Academic Spanish Mastery
+
+## Thesis Structure
+
+**Resumen** — Abstract: 150-250 words summarizing the entire study
+
+**Introducción** — Introduction: research question, objectives, methodology
+
+**Marco teórico** — Theoretical framework: literature review and concepts
+
+**Metodología** — Methodology: how the research was conducted
+
+**Resultados** — Results: findings presented objectively
+
+**Discusión** — Discussion: interpretation of results
+
+**Conclusiones** — Conclusions: answers to research questions
+
+## Academic Register
+
+- Use **impersonal constructions**: **Se puede observar que...**
+- Prefer **nominalizations**: **La implementación de...** over **Implementando...**
+- Use ** hedging** for caution: **podría sugerirse que...** (it could be suggested that...)
+- Cite with **según** or **de acuerdo con**
+
+## Connector Words
+
+**No obstante** — Nevertheless
+
+**En consecuencia** — Consequently
+
+**A modo de conclusión** — By way of conclusion
+
+**A la luz de estos datos** — In light of these data
+
+**Dicho esto** — Having said that
+
+> Academic Spanish prizes precision over elegance. Every word must serve the argument.`,
+    difficulty: "MASTERY",
+    level: "C2",
+    order: 24,
+    imageUrl: null,
+    durationMinutes: 30,
+    isPublished: true,
+    vocabularyJson: [
+      { word: "Tesis", translation: "Thesis", partOfSpeech: "noun", example: "Mi tesis trata sobre lingüística." },
+      { word: "Metodología", translation: "Methodology", partOfSpeech: "noun", example: "La metodología cualitativa es apropiada." },
+      { word: "Hipótesis", translation: "Hypothesis", partOfSpeech: "noun", example: "La hipótesis se confirma parcialmente." },
+      { word: "Paradigma", translation: "Paradigm", partOfSpeech: "noun", example: "Este paradigma domina la disciplina." },
+      { word: "Disciplina", translation: "Discipline / Field", partOfSpeech: "noun", example: "La disciplina evoluciona constantemente." },
+      { word: "Investigación", translation: "Research", partOfSpeech: "noun", example: "La investigación aporta datos nuevos." },
+    ],
+    grammarJson: [
+      { title: "Nominalization", content: "Convert verbs to nouns for formality: 'La implementación de políticas' (The implementation of policies) vs. 'Implementando políticas.' Common suffixes: -ción, -miento, -aje." },
+      { title: "Hedging in Academic Writing", content: "Use modal verbs and tentative expressions: 'podría argumentarse' (it could be argued), 'parece probable que' (it seems likely that)." },
+    ],
+  },
+  {
+    id: "idioms-c2",
+    title: "Mastery of Idioms & Nuance",
+    slug: "idioms-nuance",
+    description: "Understand and use native-level expressions, humor, sarcasm, and regional slang.",
+    content: `# Native-Level Spanish
+
+## Idioms by Region
+
+| Region | Expression | Meaning |
+|--------|-----------|---------|
+| Spain | estar en las nubes | to be daydreaming |
+| Mexico | echarle ganas | to put effort into something |
+| Argentina | ser un queso | to be bad at something |
+| Colombia | qué chimba | how cool / awesome |
+| Venezuela | echar los perros | to flirt / hit on someone |
+
+## Sarcasm & Irony
+
+**Qué sorpresa.** — What a surprise. (when something was obviously going to happen)
+
+**No me digas.** — You don't say. (sarcastic disbelief)
+
+**Eso es nuevo.** — That's new. (when it's the same old thing)
+
+**Qué pena.** — What a shame. (often used sarcastically)
+
+## Humor in Spanish
+
+Spanish humor often relies on:
+- **Wordplay** (juegos de palabras)
+- **Double entendre** (doble sentido)
+- **Self-deprecation** (autocrítica)
+- **Absurdist observations**
+
+> Understanding humor requires cultural fluency, not just linguistic knowledge. Watch Spanish comedians to train your ear.`,
+    difficulty: "MASTERY",
+    level: "C2",
+    order: 25,
+    imageUrl: null,
+    durationMinutes: 22,
+    isPublished: true,
+    vocabularyJson: [
+      { word: "Modismo", translation: "Idiom", partOfSpeech: "noun", example: "Los modismos varían por región." },
+      { word: "Ironía", translation: "Irony", partOfSpeech: "noun", example: "La ironía es difícil de traducir." },
+      { word: "Sarcasmo", translation: "Sarcasm", partOfSpeech: "noun", example: "Su sarcasmo es muy sutil." },
+      { word: "Matiz", translation: "Nuance", partOfSpeech: "noun", example: "Este matiz solo lo entienden los nativos." },
+      { word: "Jerga", translation: "Slang", partOfSpeech: "noun", example: "La jerga juvenil cambia rápido." },
+      { word: "Doble sentido", translation: "Double meaning", partOfSpeech: "phrase", example: "Su comentario tenía doble sentido." },
+    ],
+    grammarJson: [
+      { title: "Colloquial Contractions", content: "Spoken Spanish uses contractions: 'pa' (para), 'ta' (está), 'na' (nada). Understanding these is key to following natural speech." },
+      { title: "Register Shifting", content: "Mastery means shifting seamlessly between registers: formal academic, professional, informal among friends, and colloquial street Spanish." },
+    ],
+  },
+  {
+    id: "translation-c2",
+    title: "Translation & Interpretation",
+    slug: "translation-interpretation",
+    description: "Develop professional translation skills and master bilingual cultural transfer.",
+    content: `# The Art of Translation
+
+## Translation Principles
+
+**Fidelidad** — Fidelity: stay true to the source meaning
+
+**Naturalidad** — Naturalness: the translation should read like original writing
+
+**Adecuación** — Appropriateness: match register, tone, and purpose
+
+## Common Challenges
+
+| Challenge | Example |
+|-----------|---------|
+| False friends | *actual* ≠ actual (it means "current") |
+| Untranslatable concepts | *sobremesa*, *duende* |
+| Cultural references | Football teams, historical events |
+| Register mismatches | Formal source → casual target |
+
+## Interpretation Modes
+
+**Simultánea** — Simultaneous: speaking while listening
+
+**Consecutiva** — Consecutive: listening then speaking
+
+**De enlace** — Liaison: short segments, bidirectional
+
+## Key Skills
+
+- **Anticipación** — Anticipating what the speaker will say
+- **Descarga** — Quickly unloading information from memory
+- **Reformulación** — Restructuring sentences on the fly
+
+> Good translators are invisible. The reader should never know a translation occurred.`,
+    difficulty: "MASTERY",
+    level: "C2",
+    order: 26,
+    imageUrl: null,
+    durationMinutes: 25,
+    isPublished: true,
+    vocabularyJson: [
+      { word: "Traducción", translation: "Translation", partOfSpeech: "noun", example: "La traducción literaria es un arte." },
+      { word: "Interpretación", translation: "Interpretation", partOfSpeech: "noun", example: "La interpretación simultánea exige concentración." },
+      { word: "Fidelidad", translation: "Fidelity", partOfSpeech: "noun", example: "La fidelidad al texto original es crucial." },
+      { word: "Naturalidad", translation: "Naturalness", partOfSpeech: "noun", example: "Busco la naturalidad en cada frase." },
+      { word: "Falso amigo", translation: "False friend", partOfSpeech: "noun", example: "'Actual' es un falso amigo común." },
+      { word: "Registro", translation: "Register", partOfSpeech: "noun", example: "Debo mantener el mismo registro." },
+    ],
+    grammarJson: [
+      { title: "Transposition", content: "Change grammatical categories when translating: Spanish nouns often become English verbs ('Tengo hambre' → 'I'm hungry' not 'I have hunger')." },
+      { title: "Modulation", content: "Change perspective while keeping meaning: 'No es fácil' → 'It's difficult' or 'It poses a challenge.' Choose based on context and register." },
+    ],
+  },
 ];
