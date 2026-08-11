@@ -328,6 +328,56 @@ export default function LessonPage() {
     }
   };
 
+  const handleGenerateFlashcards = () => {
+    if (!lesson) return;
+    const vocab = lesson.vocabularyJson || [];
+    if (vocab.length === 0) {
+      toast.error("No vocabulary found in this lesson to create flashcards.");
+      return;
+    }
+    const flashcards = vocab.map((item, idx) => ({
+      id: `fc-${lesson.id}-${idx}`,
+      spanishText: item.word,
+      englishText: item.translation,
+      exampleSentence: item.example || null,
+      interval: 0,
+      easeFactor: 2.5,
+      repetitions: 0,
+      isMastered: false,
+      totalReviews: 0,
+      totalCorrect: 0,
+    }));
+    localStorage.setItem(`sslid_flashcards_${lesson.id}`, JSON.stringify(flashcards));
+    toast.success(`${flashcards.length} flashcards generated!`);
+    router.push(`/flashcards?lessonId=${lesson.id}`);
+  };
+
+  const handlePracticeWithTutor = () => {
+    if (!lesson) return;
+    const sessionId = `local-chat-lesson-${lesson.id}-${Date.now()}`;
+    const newSession = {
+      id: sessionId,
+      userId: "anonymous",
+      userName: "Student",
+      title: `Practice: ${lesson.title}`,
+      topic: lesson.slug,
+      lessonId: lesson.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      messages: [],
+    };
+    localStorage.setItem(`sslid_chat_session_${sessionId}`, JSON.stringify(newSession));
+    const sessionsList = JSON.parse(localStorage.getItem("sslid_chat_sessions") || "[]");
+    sessionsList.unshift({
+      id: sessionId,
+      title: `Practice: ${lesson.title}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    localStorage.setItem("sslid_chat_sessions", JSON.stringify(sessionsList.slice(0, 50)));
+    router.push(`/chat/${sessionId}`);
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -443,11 +493,11 @@ export default function LessonPage() {
 
             {/* Action Buttons */}
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={handleGenerateFlashcards}>
                 <Sparkles className="h-4 w-4" />
                 Generate Flashcards
               </Button>
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={handlePracticeWithTutor}>
                 <MessageSquare className="h-4 w-4" />
                 Practice with AI Tutor
               </Button>

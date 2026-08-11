@@ -41,6 +41,25 @@ export default function FlashcardsPage() {
   const fetchCards = useCallback(async () => {
     try {
       setIsLoading(true);
+      
+      // Check for lesson-specific flashcards in localStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const lessonId = urlParams.get("lessonId");
+      if (lessonId) {
+        const stored = localStorage.getItem(`sslid_flashcards_${lessonId}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCards(parsed);
+            setCurrentIndex(0);
+            setSessionComplete(false);
+            setStats({ total: 0, correct: 0, ratings: [], startTime: Date.now() });
+            setIsLoading(false);
+            return;
+          }
+        }
+      }
+      
       const res = await fetch("/api/flashcards/review");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
