@@ -165,7 +165,8 @@ export function useAITutor(options: UseAITutorOptions = {}) {
       setMessages((prev) => [...prev, assistantMessage]);
 
       // Client-side demo mode for local sessions
-      if (options.sessionId?.startsWith("local-chat-")) {
+      const isLocalSession = typeof window !== "undefined" && window.location.pathname.includes("/chat/local-chat-");
+      if (isLocalSession) {
         try {
           await streamDemoResponse(setMessages, assistantMessageId, content.trim());
         } catch (err) {
