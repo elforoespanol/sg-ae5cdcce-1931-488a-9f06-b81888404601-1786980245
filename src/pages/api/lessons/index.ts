@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { LESSONS_DATA } from "@/lib/lessons-data";
 
 function getUserIdFromRequest(req: NextApiRequest): string | undefined {
   const session = (req as any).__session;
@@ -76,6 +77,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
     }
 
+    // Deduplicate by slug (in case upsert created duplicates)
+    const seenSlugs = new Set<string>();
+    result = result.filter((lesson: any) => {
+      if (seenSlugs.has(lesson.slug)) return false;
+      seenSlugs.add(lesson.slug);
+      return true;
+    });
+
     // Fetch user progress if authenticated
     if (userId) {
       const { data: progress } = await supabase
@@ -98,122 +107,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-const LESSONS_FALLBACK = [
-  {
-    id: "greetings-a1",
-    title: "Greetings & Introductions",
-    slug: "greetings-introductions",
-    description: "Learn how to greet people, introduce yourself, and ask basic questions in Spanish.",
-    difficulty: "BEGINNER",
-    level: "A1",
-    order: 1,
-    imageUrl: null,
-    durationMinutes: 15,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "numbers-a1",
-    title: "Numbers & Counting",
-    slug: "numbers-counting",
-    description: "Master Spanish numbers from 0 to 100, learn to tell time, and handle basic transactions.",
-    difficulty: "BEGINNER",
-    level: "A1",
-    order: 2,
-    imageUrl: null,
-    durationMinutes: 12,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "present-tense-a1",
-    title: "Present Tense Verbs",
-    slug: "present-tense-verbs",
-    description: "Conjugate regular -ar, -er, and -ir verbs in the present tense.",
-    difficulty: "BEGINNER",
-    level: "A1",
-    order: 3,
-    imageUrl: null,
-    durationMinutes: 20,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "family-a2",
-    title: "Family & Relationships",
-    slug: "family-relationships",
-    description: "Talk about your family, describe people, and discuss relationships.",
-    difficulty: "ELEMENTARY",
-    level: "A2",
-    order: 4,
-    imageUrl: null,
-    durationMinutes: 18,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "past-tense-a2",
-    title: "Past Tense: Pretérito",
-    slug: "past-tense-preterito",
-    description: "Learn the preterito tense to talk about completed actions in the past.",
-    difficulty: "ELEMENTARY",
-    level: "A2",
-    order: 5,
-    imageUrl: null,
-    durationMinutes: 22,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "future-b1",
-    title: "Future Plans & Intentions",
-    slug: "future-plans",
-    description: "Express future plans using ir a + infinitive and the simple future tense.",
-    difficulty: "INTERMEDIATE",
-    level: "B1",
-    order: 6,
-    imageUrl: null,
-    durationMinutes: 20,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "subjunctive-b2",
-    title: "The Subjunctive Mood",
-    slug: "subjunctive-mood",
-    description: "Master the present subjunctive for expressing doubt, emotion, and possibility.",
-    difficulty: "UPPER_INTERMEDIATE",
-    level: "B2",
-    order: 7,
-    imageUrl: null,
-    durationMinutes: 25,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "conditional-c1",
-    title: "Conditional & Hypotheticals",
-    slug: "conditional-hypotheticals",
-    description: "Discuss hypothetical situations using the conditional and imperfect subjunctive.",
-    difficulty: "ADVANCED",
-    level: "C1",
-    order: 8,
-    imageUrl: null,
-    durationMinutes: 22,
-    isPublished: true,
-    userProgress: [],
-  },
-  {
-    id: "idioms-c2",
-    title: "Idioms & Colloquialisms",
-    slug: "idioms-colloquialisms",
-    description: "Sound like a native with advanced idioms, slang, and regional expressions.",
-    difficulty: "MASTERY",
-    level: "C2",
-    order: 9,
-    imageUrl: null,
-    durationMinutes: 18,
-    isPublished: true,
-    userProgress: [],
-  },
-];
+const LESSONS_FALLBACK = LESSONS_DATA.map((l) => ({
+  ...l,
+  userProgress: [],
+}));
