@@ -138,6 +138,34 @@ export default function HomePage() {
           <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
         </section>
 
+        {/* Photo + About Section */}
+        <section className="py-20 md:py-28 bg-background">
+          <div className="container">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="max-w-3xl mx-auto text-center"
+            >
+              <img
+                src="/spanish-learners.png"
+                alt="Spanish learners"
+                className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg mb-12"
+              />
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                Speak Spanish Like I Did is your personal Spanish‑learning companion powered by the proven spaced‑repetition system (SRS). Whether you're starting from zero or levelling up your skills, Speak Spanish Like I Did guides you step by step—introducing new words, phrases, and grammar at the right intervals so they truly stick.
+              </p>
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mt-6">
+                Designed for beginners, travellers, adult learners, and anyone determined to master Spanish finally, Speak Spanish Like I Did helps you learn the same way real learners do: consistently, confidently, and with content that adapts to your progress.
+              </p>
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed mt-6">
+                With fun micro‑lessons, smart reviews, and a learning path that grows with you, Speak Spanish Like I Did makes Spanish feel achievable—and enjoyable—for every level.
+              </p>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="py-20 md:py-28 bg-background">
           <div className="container">
