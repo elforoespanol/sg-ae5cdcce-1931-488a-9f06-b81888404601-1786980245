@@ -7,12 +7,6 @@ import {
   Monitor,
   CheckCircle2,
   Quote,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Mail,
-  Rss,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
