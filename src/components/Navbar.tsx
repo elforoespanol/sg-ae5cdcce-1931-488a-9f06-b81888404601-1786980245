@@ -33,15 +33,15 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/40 bg-white/90 backdrop-blur-md" role="navigation" aria-label="Main navigation">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-20 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group" aria-label="Español Mastery - Home">
+        <Link href="/" className="flex items-center gap-3 group" aria-label="Español Mastery - Home">
           <img
             src="/logo.jpg"
             alt="Español Mastery"
-            className="h-12 w-12 rounded-lg object-cover"
+            className="h-20 w-20 rounded-xl object-cover"
           />
-          <span className="font-serif text-lg font-medium text-brand-blue tracking-tight">
+          <span className="font-serif text-xl font-medium text-brand-blue tracking-tight">
             Español Mastery
           </span>
         </Link>
