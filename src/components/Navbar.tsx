@@ -36,6 +36,11 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group" aria-label="Español Mastery - Home">
+          <img
+            src="/logo.jpg"
+            alt="Español Mastery"
+            className="h-8 w-8 rounded-lg object-cover"
+          />
           <span className="font-serif text-lg font-medium text-brand-blue tracking-tight">
             Español Mastery
           </span>
