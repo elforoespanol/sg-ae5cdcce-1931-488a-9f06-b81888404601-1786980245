@@ -12,6 +12,7 @@ import {
   Instagram,
   Linkedin,
   Mail,
+  Rss,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -337,201 +338,181 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-border/40">
-          <div className="h-1.5 bg-brand-terracotta w-full" />
-          <div className="container section-padding">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-              {/* Logo & Description */}
-              <div className="lg:col-span-1">
-                <div className="mb-4">
+        <footer className="bg-brand-blue text-white">
+          <div className="container py-16">
+            <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+              {/* Logo */}
+              <div className="space-y-4">
+                <a className="flex items-center space-x-3" href="/">
                   <img
                     src="/logo.jpg"
-                    alt="Español Mastery"
-                    className="h-16 w-16 rounded-lg object-contain"
+                    alt="Español Mastery - Spanish language course logo"
+                    className="rounded-lg h-[50px] w-[50px] object-contain"
                   />
-                </div>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Empowering global communication through quality Spanish education.
+                  <span className="font-serif text-lg font-bold leading-tight">
+                    Español<br />
+                    <span className="text-brand-terracotta">Mastery</span>
+                  </span>
+                </a>
+                <p className="text-sm text-white/80">
+                  Transform your Spanish skills with our proven online course. Join thousands of successful students worldwide.
                 </p>
               </div>
 
               {/* Quick Links */}
               <div>
-                <h3 className="font-medium text-brand-blue text-sm mb-4">
-                  Quick Links
-                </h3>
-                <ul className="space-y-3">
+                <h3 className="font-serif text-lg font-semibold mb-4">Quick Links</h3>
+                <ul className="space-y-3 text-sm">
                   <li>
-                    <Link
-                      href="/lessons"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Courses
-                    </Link>
+                    <a className="hover:text-brand-terracotta transition-colors" href="/lessons">
+                      Curriculum
+                    </a>
                   </li>
                   <li>
-                    <Link
-                      href="/dashboard"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Pricing
-                    </Link>
+                    <a className="hover:text-brand-terracotta transition-colors" href="/dashboard">
+                      Dashboard
+                    </a>
                   </li>
                   <li>
-                    <Link
-                      href="/chat"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Blog
-                    </Link>
+                    <a className="hover:text-brand-terracotta transition-colors" href="/register">
+                      Enroll Now
+                    </a>
                   </li>
                   <li>
-                    <Link
-                      href="/settings"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Contact
-                    </Link>
+                    <a className="hover:text-brand-terracotta transition-colors" href="mailto:hola@españolmastery.com">
+                      Contact Us
+                    </a>
                   </li>
                 </ul>
               </div>
 
               {/* Legal */}
               <div>
-                <h3 className="font-medium text-brand-blue text-sm mb-4">
-                  Legal
-                </h3>
-                <ul className="space-y-3">
+                <h3 className="font-serif text-lg font-semibold mb-4">Legal</h3>
+                <ul className="space-y-3 text-sm">
                   <li>
-                    <Link
-                      href="/settings"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Privacy Policy
-                    </Link>
+                    <a className="hover:text-brand-terracotta transition-colors" href="/privacy-and-gdpr-policy">
+                      Privacy and GDPR Policy
+                    </a>
                   </li>
                   <li>
-                    <Link
-                      href="/settings"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Terms of Service
-                    </Link>
+                    <a className="hover:text-brand-terracotta transition-colors" href="/cookie-and-consent-policy">
+                      Cookie & Consent Policy
+                    </a>
                   </li>
                   <li>
-                    <Link
-                      href="/settings"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Cookie Policy
-                    </Link>
+                    <a className="hover:text-brand-terracotta transition-colors" href="/terms-of-business">
+                      Terms of Business
+                    </a>
                   </li>
                 </ul>
               </div>
 
-              {/* Stay Updated */}
-              <div>
-                <h3 className="font-medium text-brand-blue text-sm mb-4">
-                  Stay Updated
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  Subscribe to our newsletter for learning tips and updates.
-                </p>
-                <form
-                  className="flex gap-2"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    alert("Thank you for subscribing!");
-                  }}
-                >
-                  <div className="relative flex-1">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      className="w-full h-10 pl-9 pr-3 text-sm rounded-lg border border-border/40 bg-white focus:outline-none focus:ring-2 focus:ring-brand-terracotta/30 focus:border-brand-terracotta/50"
-                      required
-                    />
+              {/* Stay Updated + Follow Us */}
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-serif text-lg font-semibold mb-4">Stay Updated</h3>
+                  <div className="flex flex-col gap-3">
+                    <p className="text-sm text-white/80 mb-1">
+                      Send us an email to join our newsletter.
+                    </p>
+                    <a href="mailto:hola@españolmastery.com?subject=Newsletter Subscription">
+                      <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-brand-blue shadow h-9 px-4 py-2 bg-white hover:bg-white/90 w-full">
+                        Subscribe
+                      </button>
+                    </a>
                   </div>
-                  <button
-                    type="submit"
-                    className="h-10 px-4 text-sm font-medium bg-brand-terracotta text-white rounded-lg hover:bg-brand-terracotta/90 transition-colors"
-                  >
-                    Subscribe
-                  </button>
-                </form>
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg font-semibold mb-4">Follow Us</h3>
+                  <div className="flex gap-3">
+                    <a
+                      href="https://www.facebook.com/profile.php?id=100069829061303"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
+                      aria-label="Facebook"
+                    >
+                      <Facebook className="h-5 w-5" />
+                    </a>
+                    <a
+                      href="https://rss.com/podcasts/learn-spanish-like-i-did/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
+                      aria-label="RSS Podcast"
+                    >
+                      <Rss className="h-5 w-5" />
+                    </a>
+                    <a
+                      href="https://instagram.com/learnspanishlikeidid"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
+                      aria-label="Instagram"
+                    >
+                      <Instagram className="h-5 w-5" />
+                    </a>
+                    <a
+                      href="https://www.youtube.com/@learnspanishlikeidid"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
+                      aria-label="YouTube"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg>
+                    </a>
+                    <a
+                      href="https://www.tiktok.com/@learnspanishlikei"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
+                      aria-label="TikTok"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Bottom Bar */}
-            <div className="mt-16 pt-8 border-t border-border/40">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                {/* Social Icons */}
-                <div>
-                  <h3 className="font-medium text-brand-blue text-sm mb-3 text-center md:text-left">
-                    Follow Us
-                  </h3>
-                  <div className="flex items-center gap-3">
-                    <a
-                      href="https://facebook.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
-                      aria-label="Facebook"
-                    >
-                      <Facebook className="h-4 w-4" />
-                    </a>
-                    <a
-                      href="https://twitter.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
-                      aria-label="Twitter"
-                    >
-                      <Twitter className="h-4 w-4" />
-                    </a>
-                    <a
-                      href="https://instagram.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
-                      aria-label="Instagram"
-                    >
-                      <Instagram className="h-4 w-4" />
-                    </a>
-                    <a
-                      href="https://linkedin.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
-                      aria-label="LinkedIn"
-                    >
-                      <Linkedin className="h-4 w-4" />
-                    </a>
-                  </div>
+            {/* Copyright */}
+            <div className="border-t border-white/20 mt-12 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/70">
+                <p>
+                  © 2026 españolmastery.com is a proud member of the Academia del Español Digital Language Learning Network. All rights reserved.
+                </p>
+                <div className="flex gap-2">
+                  <span>Contact:</span>
+                  <a href="mailto:hola@españolmastery.com" className="hover:text-brand-terracotta transition-colors">
+                    hola@españolmastery.com
+                  </a>
                 </div>
+              </div>
+            </div>
 
-                {/* Copyright */}
-                <div className="text-center md:text-right">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    © 2026 Español Mastery. All rights reserved.
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Designed with care for language learners worldwide.
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    A proud member of the{" "}
-                    <a
-                      href="https://academiadelespanol.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-terracotta hover:underline"
-                    >
-                      Academia del Español
-                    </a>{" "}
-                    educational network.
+            {/* Official Curriculum Banner */}
+            <div className="w-full bg-[#fcf9f2] py-4 mt-12 border-t border-[#eef2f6]">
+              <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex-1">
+                  <span className="inline-block font-sans text-[11px] font-extrabold uppercase tracking-[1.5px] text-brand-terracotta mb-1">
+                    Official Curriculum
+                  </span>
+                  <h3 className="font-serif text-lg font-bold text-brand-blue leading-tight mb-1">
+                    Español Mastery
+                  </h3>
+                  <p className="font-sans text-sm leading-relaxed text-[#4a5568]">
+                    This milestone-driven framework is an authorized educational division of the <strong className="text-brand-blue">Academia del Español Digital Language Learning Network</strong>, anchoring your language acquisition journey.
                   </p>
                 </div>
+                <a
+                  href="https://academiadelespanol.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block font-sans text-xs font-bold text-brand-blue no-underline border-b-2 border-brand-terracotta pb-0.5 hover:text-brand-terracotta transition-colors whitespace-nowrap"
+                >
+                  Ecosystem Directory ↗
+                </a>
               </div>
             </div>
           </div>
