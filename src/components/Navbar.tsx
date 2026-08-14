@@ -39,7 +39,7 @@ export function Navbar() {
           <img
             src="/logo.jpg"
             alt="Español Mastery"
-            className="h-8 w-8 rounded-lg object-cover"
+            className="h-12 w-12 rounded-lg object-cover"
           />
           <span className="font-serif text-lg font-medium text-brand-blue tracking-tight">
             Español Mastery
