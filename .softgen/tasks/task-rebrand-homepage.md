@@ -1,6 +1,6 @@
 ---
 title: Rebrand Homepage to Academia del Español
-status: in_progress
+status: done
 priority: urgent
 type: chore
 tags: [branding, homepage, design-system]
@@ -20,19 +20,19 @@ Brand rules:
 - Academic tone, subtle hover effects only
 
 ## Checklist
-- [ ] Update globals.css with Playfair Display, Inter, and brand color tokens
-- [ ] Update tailwind.config.ts font families
-- [ ] Rewrite src/pages/index.tsx with new homepage structure
-- [ ] Update Navbar.tsx with brand styling
-- [ ] Generate hero image for right side
-- [ ] Run check_for_errors
+- [x] Update globals.css with Playfair Display, Inter, and brand color tokens
+- [x] Update tailwind.config.ts font families
+- [x] Rewrite src/pages/index.tsx with new homepage structure
+- [x] Update Navbar.tsx with brand styling
+- [x] Generate hero image for right side
+- [x] Run check_for_errors
 
 ## Acceptance
-- Homepage shows hero with left-aligned headline, academic subheadline, 2 CTAs, right image
-- Three pillar value section with academic cards
-- Course preview grid with brand card style
-- Dashboard preview section
-- Testimonials section
-- Footer with red accent bar
-- All text uses Playfair Display / Inter
-- Colors match brand palette
+- [x] Homepage shows hero with left-aligned headline, academic subheadline, 2 CTAs, right image
+- [x] Three pillar value section with academic cards
+- [x] Course preview grid with brand card style
+- [x] Dashboard preview section
+- [x] Testimonials section
+- [x] Footer with red accent bar
+- [x] All text uses Playfair Display / Inter
+- [x] Colors match brand palette
