@@ -7,6 +7,11 @@ import {
   Monitor,
   CheckCircle2,
   Quote,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -334,45 +339,34 @@ export default function HomePage() {
         {/* Footer */}
         <footer className="bg-white border-t border-border/40">
           <div className="h-1.5 bg-brand-terracotta w-full" />
-          <div className="container section-padding-sm">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-              <div className="md:col-span-2">
-                <p className="font-serif text-xl text-brand-blue mb-4">
-                  Español Mastery
-                </p>
-                <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
-                  A Digital Language Network dedicated to helping students,
-                  professionals, and institutions achieve true fluency in
-                  Spanish through rigorous academic methodology.
+          <div className="container section-padding">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+              {/* Logo & Description */}
+              <div className="lg:col-span-1">
+                <div className="mb-4">
+                  <img
+                    src="/logo.jpg"
+                    alt="Español Mastery"
+                    className="h-16 w-16 rounded-lg object-contain"
+                  />
+                </div>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Empowering global communication through quality Spanish education.
                 </p>
               </div>
+
+              {/* Quick Links */}
               <div>
-                <p className="font-medium text-brand-blue text-sm mb-4">
-                  Platform
-                </p>
+                <h3 className="font-medium text-brand-blue text-sm mb-4">
+                  Quick Links
+                </h3>
                 <ul className="space-y-3">
                   <li>
                     <Link
                       href="/lessons"
                       className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
                     >
-                      Curriculum
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/chat"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      AI Tutor
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/flashcards"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Flashcards
+                      Courses
                     </Link>
                   </li>
                   <li>
@@ -380,30 +374,15 @@ export default function HomePage() {
                       href="/dashboard"
                       className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
                     >
-                      Dashboard
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <p className="font-medium text-brand-blue text-sm mb-4">
-                  Institution
-                </p>
-                <ul className="space-y-3">
-                  <li>
-                    <Link
-                      href="/register"
-                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
-                    >
-                      Enroll
+                      Pricing
                     </Link>
                   </li>
                   <li>
                     <Link
-                      href="/login"
+                      href="/chat"
                       className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
                     >
-                      Sign In
+                      Blog
                     </Link>
                   </li>
                   <li>
@@ -411,19 +390,149 @@ export default function HomePage() {
                       href="/settings"
                       className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
                     >
-                      Settings
+                      Contact
                     </Link>
                   </li>
                 </ul>
               </div>
+
+              {/* Legal */}
+              <div>
+                <h3 className="font-medium text-brand-blue text-sm mb-4">
+                  Legal
+                </h3>
+                <ul className="space-y-3">
+                  <li>
+                    <Link
+                      href="/settings"
+                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/settings"
+                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
+                    >
+                      Terms of Service
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/settings"
+                      className="text-sm text-muted-foreground hover:text-brand-terracotta transition-colors"
+                    >
+                      Cookie Policy
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Stay Updated */}
+              <div>
+                <h3 className="font-medium text-brand-blue text-sm mb-4">
+                  Stay Updated
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                  Subscribe to our newsletter for learning tips and updates.
+                </p>
+                <form
+                  className="flex gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    alert("Thank you for subscribing!");
+                  }}
+                >
+                  <div className="relative flex-1">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      className="w-full h-10 pl-9 pr-3 text-sm rounded-lg border border-border/40 bg-white focus:outline-none focus:ring-2 focus:ring-brand-terracotta/30 focus:border-brand-terracotta/50"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="h-10 px-4 text-sm font-medium bg-brand-terracotta text-white rounded-lg hover:bg-brand-terracotta/90 transition-colors"
+                  >
+                    Subscribe
+                  </button>
+                </form>
+              </div>
             </div>
-            <div className="mt-16 pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-xs text-muted-foreground">
-                © 2026 Español Mastery. All rights reserved.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Digital Language Network
-              </p>
+
+            {/* Bottom Bar */}
+            <div className="mt-16 pt-8 border-t border-border/40">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                {/* Social Icons */}
+                <div>
+                  <h3 className="font-medium text-brand-blue text-sm mb-3 text-center md:text-left">
+                    Follow Us
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href="https://facebook.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
+                      aria-label="Facebook"
+                    >
+                      <Facebook className="h-4 w-4" />
+                    </a>
+                    <a
+                      href="https://twitter.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
+                      aria-label="Twitter"
+                    >
+                      <Twitter className="h-4 w-4" />
+                    </a>
+                    <a
+                      href="https://instagram.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
+                      aria-label="Instagram"
+                    >
+                      <Instagram className="h-4 w-4" />
+                    </a>
+                    <a
+                      href="https://linkedin.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-lg bg-brand-cream flex items-center justify-center text-brand-blue hover:bg-brand-terracotta hover:text-white transition-colors"
+                      aria-label="LinkedIn"
+                    >
+                      <Linkedin className="h-4 w-4" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Copyright */}
+                <div className="text-center md:text-right">
+                  <p className="text-xs text-muted-foreground mb-1">
+                    © 2026 Español Mastery. All rights reserved.
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Designed with care for language learners worldwide.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    A proud member of the{" "}
+                    <a
+                      href="https://academiadelespanol.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-brand-terracotta hover:underline"
+                    >
+                      Academia del Español
+                    </a>{" "}
+                    educational network.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </footer>
