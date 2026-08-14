@@ -35,9 +35,9 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-border/40 bg-white/90 backdrop-blur-md" role="navigation" aria-label="Main navigation">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group" aria-label="Academia del Español - Home">
+        <Link href="/" className="flex items-center gap-2.5 group" aria-label="Español Mastery - Home">
           <span className="font-serif text-lg font-medium text-brand-blue tracking-tight">
-            Academia del Español
+            Español Mastery
           </span>
         </Link>
 

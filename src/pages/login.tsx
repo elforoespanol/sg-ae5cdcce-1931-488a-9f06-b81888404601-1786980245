@@ -78,7 +78,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 sm:p-6">
       <Head>
-        <title>Sign In — Speak Spanish Like I Did</title>
+        <title>Sign In — Español Mastery</title>
       </Head>
 
       <motion.div
@@ -89,7 +89,7 @@ export default function LoginPage() {
       >
         <Card className="border-0 shadow-xl">
           <CardHeader className="text-center pb-6">
-            <img src="/logo.jpg" alt="Speak Spanish Like I Did" className="mx-auto h-20 w-auto object-contain mb-4" />
+            <img src="/logo.jpg" alt="Español Mastery" className="mx-auto h-20 w-auto object-contain mb-4" />
             <CardTitle className="text-2xl font-serif">Welcome Back</CardTitle>
             <CardDescription>Continue your Spanish learning journey</CardDescription>
           </CardHeader>

@@ -105,7 +105,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="max-w-xl">
                 <p className="text-sm font-semibold tracking-widest uppercase text-brand-terracotta mb-6">
-                  Academia del Español
+                  Español Mastery
                 </p>
                 <h1 className="font-serif text-5xl md:text-6xl font-medium text-brand-blue leading-[1.1] mb-8">
                   Speak Spanish
@@ -338,7 +338,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
               <div className="md:col-span-2">
                 <p className="font-serif text-xl text-brand-blue mb-4">
-                  Academia del Español
+                  Español Mastery
                 </p>
                 <p className="text-muted-foreground text-sm leading-relaxed max-w-sm">
                   A Digital Language Network dedicated to helping students,
@@ -419,7 +419,7 @@ export default function HomePage() {
             </div>
             <div className="mt-16 pt-8 border-t border-border/40 flex flex-col md:flex-row items-center justify-between gap-4">
               <p className="text-xs text-muted-foreground">
-                © 2026 Academia del Español. All rights reserved.
+                © 2026 Español Mastery. All rights reserved.
               </p>
               <p className="text-xs text-muted-foreground">
                 Digital Language Network
