@@ -91,7 +91,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Academia del Español — Digital Language Network</title>
+        <title>Español Mastery — Digital Language Network</title>
         <meta
           name="description"
           content="A structured academic system designed to help you speak Spanish clearly, naturally, and correctly."
