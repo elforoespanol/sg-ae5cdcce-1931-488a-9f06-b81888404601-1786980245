@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,41 +9,47 @@
     --radius: 0.625rem;
 
     --background: 40 33% 98%;
-    --foreground: 224 65% 20%;
+    --foreground: 220 60% 15%;
 
-    --card: 40 40% 97%;
-    --card-foreground: 224 65% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 60% 15%;
 
-    --popover: 40 33% 98%;
-    --popover-foreground: 224 65% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 60% 15%;
 
     --primary: 14 75% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 224 65% 33%;
+    --secondary: 220 65% 33%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 40 30% 94%;
-    --muted-foreground: 224 30% 45%;
+    --muted: 40 25% 96%;
+    --muted-foreground: 220 15% 45%;
 
-    --accent: 45 93% 47%;
-    --accent-foreground: 224 65% 20%;
+    --accent: 14 75% 60%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 20% 88%;
-    --input: 40 20% 88%;
+    --border: 40 15% 90%;
+    --input: 40 15% 90%;
     --ring: 14 75% 60%;
 
-    --sidebar: 40 30% 96%;
-    --sidebar-foreground: 224 65% 20%;
+    --sidebar: 40 25% 97%;
+    --sidebar-foreground: 220 60% 15%;
     --sidebar-primary: 14 75% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 30% 94%;
-    --sidebar-accent-foreground: 224 65% 20%;
-    --sidebar-border: 40 20% 88%;
+    --sidebar-accent: 40 25% 96%;
+    --sidebar-accent-foreground: 220 60% 15%;
+    --sidebar-border: 40 15% 90%;
     --sidebar-ring: 14 75% 60%;
+
+    --brand-cream: #fdfbf7;
+    --brand-cream-alt: #fcf9f2;
+    --brand-terracotta: #e6734d;
+    --brand-blue: #1e3a8a;
+    --brand-white: #ffffff;
   }
 
   * {
@@ -63,7 +69,7 @@
   }
 
   ::selection {
-    @apply bg-primary/20 text-foreground;
+    @apply bg-primary/15 text-foreground;
   }
 
   ::-webkit-scrollbar {
@@ -99,32 +105,36 @@
     text-wrap: balance;
   }
 
-  .perspective-1000 {
-    perspective: 1000px;
+  .bg-brand-cream {
+    background-color: var(--brand-cream);
   }
 
-  .backface-hidden {
-    backface-visibility: hidden;
+  .bg-brand-cream-alt {
+    background-color: var(--brand-cream-alt);
   }
 
-  .rotate-y-180 {
-    transform: rotateY(180deg);
+  .text-brand-terracotta {
+    color: var(--brand-terracotta);
   }
 
-  .preserve-3d {
-    transform-style: preserve-3d;
+  .text-brand-blue {
+    color: var(--brand-blue);
   }
 
-  .bg-gradient-warm {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  .bg-brand-terracotta {
+    background-color: var(--brand-terracotta);
   }
 
-  .bg-gradient-hero {
-    background: linear-gradient(160deg, hsl(var(--background)) 0%, hsl(35 50% 96%) 50%, hsl(var(--secondary) / 0.08) 100%);
+  .bg-brand-blue {
+    background-color: var(--brand-blue);
   }
 
-  .bg-gradient-card {
-    background: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(40 30% 96%) 100%);
+  .border-brand-terracotta {
+    border-color: var(--brand-terracotta);
+  }
+
+  .border-brand-blue {
+    border-color: var(--brand-blue);
   }
 
   .animate-skeleton {
@@ -156,7 +166,15 @@
   }
 
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+    @apply transition-all duration-200 hover:shadow-md;
+  }
+
+  .section-padding {
+    @apply py-20 md:py-28;
+  }
+
+  .section-padding-sm {
+    @apply py-16 md:py-20;
   }
 }
 
