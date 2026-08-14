@@ -33,13 +33,13 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/40 bg-white/90 backdrop-blur-md" role="navigation" aria-label="Main navigation">
-      <div className="container flex h-[180px] items-center justify-between">
+      <div className="container flex h-[220px] items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-4 group" aria-label="Español Mastery - Home">
           <img
             src="/logo.jpg"
             alt="Español Mastery"
-            className="h-[160px] w-[160px] rounded-xl object-contain"
+            className="h-[200px] w-[200px] rounded-xl object-contain"
           />
           <span className="font-serif text-3xl font-medium text-brand-blue tracking-tight">
             Español Mastery
