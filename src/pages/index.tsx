@@ -338,8 +338,8 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-brand-blue text-white w-full">
-          <div className="container py-8">
+        <footer className="bg-brand-blue text-white">
+          <div className="container py-16">
             <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
               {/* Logo */}
               <div className="space-y-4">
@@ -349,9 +349,9 @@ export default function HomePage() {
                     alt="Español Mastery - Spanish language course logo"
                     className="rounded-lg h-[50px] w-[50px] object-contain"
                   />
-                  <span className="text-lg font-bold leading-tight">
+                  <span className="font-serif text-lg font-bold leading-tight">
                     Español<br />
-                    <span className="text-red-500">Mastery</span>
+                    <span className="text-brand-terracotta">Mastery</span>
                   </span>
                 </a>
                 <p className="text-sm text-white/80">
@@ -361,25 +361,25 @@ export default function HomePage() {
 
               {/* Quick Links */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+                <h3 className="font-serif text-lg font-semibold mb-4">Quick Links</h3>
                 <ul className="space-y-3 text-sm">
                   <li>
-                    <a className="hover:text-red-500 transition-colors" href="/lessons">
+                    <a className="hover:text-brand-terracotta transition-colors" href="/lessons">
                       Curriculum
                     </a>
                   </li>
                   <li>
-                    <a className="hover:text-red-500 transition-colors" href="/dashboard">
+                    <a className="hover:text-brand-terracotta transition-colors" href="/dashboard">
                       Dashboard
                     </a>
                   </li>
                   <li>
-                    <a className="hover:text-red-500 transition-colors" href="/register">
+                    <a className="hover:text-brand-terracotta transition-colors" href="/register">
                       Enroll Now
                     </a>
                   </li>
                   <li>
-                    <a className="hover:text-red-500 transition-colors" href="mailto:hola@españolmastery.com">
+                    <a className="hover:text-brand-terracotta transition-colors" href="mailto:hola@españolmastery.com">
                       Contact Us
                     </a>
                   </li>
@@ -388,20 +388,20 @@ export default function HomePage() {
 
               {/* Legal */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Legal</h3>
+                <h3 className="font-serif text-lg font-semibold mb-4">Legal</h3>
                 <ul className="space-y-3 text-sm">
                   <li>
-                    <a className="hover:text-red-500 transition-colors" href="/privacy-and-gdpr-policy">
+                    <a className="hover:text-brand-terracotta transition-colors" href="/privacy-and-gdpr-policy">
                       Privacy and GDPR Policy
                     </a>
                   </li>
                   <li>
-                    <a className="hover:text-red-500 transition-colors" href="/cookie-and-consent-policy">
+                    <a className="hover:text-brand-terracotta transition-colors" href="/cookie-and-consent-policy">
                       Cookie & Consent Policy
                     </a>
                   </li>
                   <li>
-                    <a className="hover:text-red-500 transition-colors" href="/terms-of-business">
+                    <a className="hover:text-brand-terracotta transition-colors" href="/terms-of-business">
                       Terms of Business
                     </a>
                   </li>
@@ -411,7 +411,7 @@ export default function HomePage() {
               {/* Stay Updated + Follow Us */}
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Stay Updated</h3>
+                  <h3 className="font-serif text-lg font-semibold mb-4">Stay Updated</h3>
                   <div className="flex flex-col gap-3">
                     <p className="text-sm text-white/80 mb-1">
                       Send us an email to join our newsletter.
@@ -424,52 +424,52 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
+                  <h3 className="font-serif text-lg font-semibold mb-4">Follow Us</h3>
                   <div className="flex gap-3">
                     <a
                       href="https://www.facebook.com/profile.php?id=100069829061303"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-red-500 transition-colors"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
                       aria-label="Facebook"
                     >
-                      <Facebook className="h-5 w-5" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
                     </a>
                     <a
                       href="https://rss.com/podcasts/learn-spanish-like-i-did/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-red-500 transition-colors"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
                       aria-label="RSS Podcast"
                     >
-                      <Rss className="h-5 w-5" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
                     </a>
                     <a
                       href="https://instagram.com/learnspanishlikeidid"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-red-500 transition-colors"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
                       aria-label="Instagram"
                     >
-                      <Instagram className="h-5 w-5" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
                     </a>
                     <a
                       href="https://www.youtube.com/@learnspanishlikeidid"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-red-500 transition-colors"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
                       aria-label="YouTube"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-youtube h-5 w-5"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg>
                     </a>
                     <a
                       href="https://www.tiktok.com/@learnspanishlikei"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-red-500 transition-colors"
+                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
                       aria-label="TikTok"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-music h-5 w-5"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
                     </a>
                   </div>
                 </div>
@@ -484,7 +484,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex gap-2">
                   <span>Contact:</span>
-                  <a href="mailto:hola@españolmastery.com" className="hover:text-red-500 transition-colors">
+                  <a href="mailto:hola@españolmastery.com" className="hover:text-brand-terracotta transition-colors">
                     hola@españolmastery.com
                   </a>
                 </div>
@@ -492,10 +492,10 @@ export default function HomePage() {
             </div>
 
             {/* Official Curriculum Banner */}
-            <div className="w-full bg-[#fcf9f2] py-4 mt-12 border-t border-gray-100">
+            <div className="w-full bg-[#fcf9f2] py-4 mt-12 border-t border-[#eef2f6]">
               <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex-1">
-                  <span className="inline-block font-sans text-[11px] font-extrabold uppercase tracking-[1.5px] text-red-500 mb-1">
+                  <span className="inline-block font-sans text-[11px] font-extrabold uppercase tracking-[1.5px] text-brand-terracotta mb-1">
                     Official Curriculum
                   </span>
                   <h3 className="font-serif text-lg font-bold text-brand-blue leading-tight mb-1">
@@ -509,7 +509,7 @@ export default function HomePage() {
                   href="https://academiadelespanol.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block font-sans text-xs font-bold text-brand-blue no-underline border-b-2 border-red-500 pb-0.5 hover:text-red-500 transition-colors whitespace-nowrap"
+                  className="inline-block font-sans text-xs font-bold text-brand-blue no-underline border-b-2 border-brand-terracotta pb-0.5 hover:text-brand-terracotta transition-colors whitespace-nowrap"
                 >
                   Ecosystem Directory ↗
                 </a>
