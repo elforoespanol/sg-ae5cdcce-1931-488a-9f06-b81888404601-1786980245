@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signOut } from "next-auth/react";
@@ -9,10 +9,28 @@ import { TranslateButton } from "./TranslateButton";
 
 export function Navbar() {
   const { user: authUser } = useAuth();
-  const isAdmin = authUser?.role === "ADMIN" || authUser?.email?.toLowerCase() === "admin@sslid.com";
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [cookieRole, setCookieRole] = useState<string | null>(null);
+
+  // Read role from cookie as fallback
+  useEffect(() => {
+    const match = document.cookie.match(/sslid_auth=([^;]+)/);
+    if (match) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(match[1]));
+        setCookieRole(parsed.role || null);
+      } catch {
+        setCookieRole(null);
+      }
+    }
+  }, [authUser?.email]);
+
+  const isAdmin =
+    authUser?.role === "ADMIN" ||
+    authUser?.email?.toLowerCase() === "admin@sslid.com" ||
+    cookieRole === "ADMIN";
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, shortcut: "D" },

@@ -25,20 +25,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Try NextAuth first for proper session establishment
-      const result = await signIn("credentials", {
-        email: email.trim(),
-        password,
-        redirect: false,
-        callbackUrl: "/dashboard",
-      });
-
-      if (result?.ok) {
-        router.push("/dashboard");
-        return;
-      }
-
-      // Fallback to custom login API
+      // Always call custom API first to set fallback cookie with role
       const customRes = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -47,22 +34,30 @@ export default function LoginPage() {
 
       const customData = await customRes.json();
 
-      if (customRes.ok && customData.token) {
+      if (customRes.ok && customData.user) {
         const authData = {
+          id: customData.user.id,
           email: customData.user.email,
+          name: customData.user.name,
           role: customData.user.role,
+          level: customData.user.level,
           timestamp: Date.now(),
         };
         localStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
-        localStorage.setItem("sslid_auth_token", customData.token);
         sessionStorage.setItem("sslid_auth_fallback", JSON.stringify(authData));
-        sessionStorage.setItem("sslid_auth_token", customData.token);
-        // Notify all AuthContext instances to re-read auth
+      }
+
+      // Also establish NextAuth session
+      const result = await signIn("credentials", {
+        email: email.trim(),
+        password,
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
+
+      if (result?.ok || (customRes.ok && customData.token)) {
         window.dispatchEvent(new Event("sslid-auth-refresh"));
-        // Small delay to let AuthContext update before navigation
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 50);
+        router.push("/dashboard");
         return;
       }
 

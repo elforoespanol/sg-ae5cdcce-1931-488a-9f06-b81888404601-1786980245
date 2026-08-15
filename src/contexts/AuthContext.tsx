@@ -101,13 +101,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (session?.user) {
       // NextAuth session available — use it, but merge with storage for any missing fields
       const storedUser = readAuthFromStorage();
-      setUser({
+      const mergedUser = {
         ...(session.user as CustomUser),
         // Ensure role is preserved from storage if missing in session
         role: (session.user as CustomUser).role || storedUser?.role,
         level: (session.user as CustomUser).level || storedUser?.level,
-      });
+      };
+      setUser(mergedUser);
       setStatus("authenticated");
+
+      // If role is still missing, try to fetch from API
+      if (!mergedUser.role && mergedUser.email) {
+        fetch("/api/user/profile")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.role) {
+              setUser((prev) => (prev ? { ...prev, role: data.role } : prev));
+            }
+          })
+          .catch(() => {});
+      }
       return;
     }
 
