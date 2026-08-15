@@ -78,11 +78,6 @@
   display: none !important;
 }
 
-/* Hide the default Google Translate toolbar */
-.skiptranslate {
-  display: none !important;
-}
-
 /* Remove the extra padding that Google adds to body when translating */
 body {
   top: 0 !important;

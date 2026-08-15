@@ -52,15 +52,14 @@ export function TranslateButton() {
   useEffect(() => {
     if (document.getElementById("google-translate-script")) return;
 
-    // Ensure container exists before script loads
+    // Create the widget container in the normal document flow
+    // It must be visible for Google Translate to initialize properly
     if (!document.getElementById("google_translate_element")) {
-      const wrapper = document.createElement("div");
-      wrapper.style.cssText =
-        "position:fixed;top:-9999px;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;z-index:-1;";
       const container = document.createElement("div");
       container.id = "google_translate_element";
-      wrapper.appendChild(container);
-      document.body.appendChild(wrapper);
+      // Use a wrapper to keep it out of layout but still "visible" to Google
+      container.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;";
+      document.body.appendChild(container);
     }
 
     // Define callback
@@ -121,7 +120,7 @@ export function TranslateButton() {
     document.cookie = `googtrans=${value}; path=/; domain=${hostname};`;
     document.cookie = `googtrans=${value}; path=/; domain=.${hostname};`;
 
-    // Also try to trigger the widget combo box if it's already loaded
+    // Trigger the widget combo box if it's loaded
     const combo = document.querySelector(
       ".goog-te-combo"
     ) as HTMLSelectElement | null;
