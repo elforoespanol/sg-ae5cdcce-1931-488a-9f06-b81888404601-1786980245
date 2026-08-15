@@ -34,27 +34,27 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/40 bg-white/90 backdrop-blur-md" role="navigation" aria-label="Main navigation">
-      <div className="container flex h-[260px] items-center justify-between">
+      <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-4 group" aria-label="Español Mastery - Home">
+        <Link href="/" className="flex items-center gap-3 group shrink-0" aria-label="Español Mastery - Home">
           <img
             src="/logo.jpg"
             alt="Español Mastery"
-            className="h-[240px] w-[240px] rounded-xl object-contain"
+            className="h-10 w-10 rounded-lg object-contain"
           />
-          <span className="font-serif text-3xl font-medium text-brand-blue tracking-tight">
+          <span className="font-serif text-xl font-semibold text-brand-blue tracking-tight hidden sm:block">
             Español Mastery
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-0.5">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50",
+                "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50",
                 isActive(link.href)
                   ? "bg-brand-terracotta/10 text-brand-terracotta"
                   : "text-muted-foreground hover:text-brand-blue hover:bg-brand-cream"
@@ -63,19 +63,19 @@ export function Navbar() {
               title={`${link.label} (Ctrl+${link.shortcut})`}
             >
               <link.icon className="h-4 w-4" aria-hidden="true" />
-              {link.label}
+              <span className="hidden xl:inline">{link.label}</span>
             </Link>
           ))}
         </div>
 
         {/* Desktop Auth */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2 shrink-0">
           <TranslateButton />
           {authUser ? (
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
                 aria-label="User menu"
                 aria-expanded={dropdownOpen}
                 aria-haspopup="true"
@@ -83,7 +83,7 @@ export function Navbar() {
                 <div className="h-8 w-8 rounded-full bg-brand-terracotta/10 flex items-center justify-center text-brand-terracotta font-semibold text-sm">
                   {authUser.name?.charAt(0).toUpperCase() || "U"}
                 </div>
-                <span className="text-sm font-medium text-brand-blue">
+                <span className="text-sm font-medium text-brand-blue hidden lg:inline">
                   {authUser.name || "User"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
