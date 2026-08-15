@@ -12,6 +12,7 @@ export function Navbar() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [adminChecked, setAdminChecked] = useState(false);
 
   // Synchronous cookie read for instant admin detection
   const getCookieRole = (): string | null => {
@@ -28,10 +29,32 @@ export function Navbar() {
     return null;
   };
 
+  // Also check localStorage as fallback
+  const getStorageRole = (): string | null => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem("sslid_auth_fallback");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return parsed.role || null;
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  };
+
   const isAdmin =
     authUser?.role === "ADMIN" ||
     authUser?.email?.toLowerCase() === "admin@sslid.com" ||
-    getCookieRole() === "ADMIN";
+    getCookieRole() === "ADMIN" ||
+    getStorageRole() === "ADMIN";
+
+  // Force re-check after mount to catch delayed auth initialization
+  useEffect(() => {
+    const timer = setTimeout(() => setAdminChecked(true), 300);
+    return () => clearTimeout(timer);
+  }, [authUser]);
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, shortcut: "D" },

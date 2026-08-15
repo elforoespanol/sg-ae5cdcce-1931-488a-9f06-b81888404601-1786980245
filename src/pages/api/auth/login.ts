@@ -3,7 +3,7 @@ import { compare } from "bcryptjs";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { SignJWT } from "jose";
 
-const fallbackSecret = "speak-spanish-like-i-did-fallback-secret-key-2024";
+const fallbackSecret = "speak-spanish-fallback-secret-key-2024";
 const jwtSecret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || fallbackSecret);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
