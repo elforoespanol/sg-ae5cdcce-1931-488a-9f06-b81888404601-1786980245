@@ -99,7 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(() => {
     if (session?.user) {
-      setUser(session.user);
+      // NextAuth session available — use it
+      setUser(session.user as CustomUser);
       setStatus("authenticated");
       return;
     }
@@ -117,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Initial auth check + re-check when session changes
   useEffect(() => {
     refresh();
-  }, [refresh]);
+  }, [refresh, sessionStatus]);
 
   // Listen for auth refresh events from login/logout
   useEffect(() => {
