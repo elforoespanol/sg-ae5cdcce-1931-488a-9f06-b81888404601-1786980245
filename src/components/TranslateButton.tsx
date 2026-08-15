@@ -26,39 +26,25 @@ const languages = [
   { code: "it", name: "Italiano", flag: "🇮🇹" },
 ];
 
-function getCookie(name: string): string | null {
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  return match ? match[2] : null;
-}
-
-function setCookie(name: string, value: string, days = 365) {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = name + "=" + encodeURIComponent(value) + "; expires=" + expires + "; path=/";
-}
-
-function deleteCookie(name: string) {
-  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+function getLangFromUrl(): string {
+  if (typeof window === "undefined") return "en";
+  const params = new URLSearchParams(window.location.search);
+  const googtrans = params.get("googtrans");
+  if (googtrans) {
+    const parts = googtrans.split("/");
+    const lang = parts[parts.length - 1];
+    if (lang && languages.some((l) => l.code === lang)) return lang;
+  }
+  return "en";
 }
 
 export function TranslateButton() {
-  const [currentLang, setCurrentLang] = useState("en");
+  const [currentLang, setCurrentLang] = useState(getLangFromUrl);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Detect current language from cookie on mount
-  useEffect(() => {
-    const googTrans = getCookie("googtrans");
-    if (googTrans) {
-      const parts = googTrans.split("/");
-      const lang = parts[parts.length - 1];
-      if (lang && languages.some((l) => l.code === lang)) {
-        setCurrentLang(lang);
-      }
-    }
-  }, []);
-
-  // Initialize Google Translate widget (hidden)
+  // Initialize Google Translate widget
   useEffect(() => {
     if (document.getElementById("google-translate-script")) {
       setLoaded(true);
@@ -99,43 +85,21 @@ export function TranslateButton() {
 
   const selectLanguage = useCallback((code: string) => {
     setOpen(false);
-
+    const url = new URL(window.location.href);
     if (code === "en") {
-      // Remove translation cookies to reset to English
-      deleteCookie("googtrans");
-      // Google also sets a domain cookie — clear that too
-      const domain = window.location.hostname;
-      if (domain !== "localhost") {
-        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + domain;
-      }
+      url.searchParams.delete("googtrans");
     } else {
-      // Set translation cookie — Google Translate reads this on page load
-      setCookie("googtrans", "/en/" + code);
+      url.searchParams.set("googtrans", "/en/" + code);
     }
-
-    // Reload to apply translation
-    window.location.reload();
+    window.location.href = url.toString();
   }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
 
   return (
     <>
-      {/* Hidden Google Translate widget */}
-      <div
-        id="google_translate_element"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          opacity: 0,
-          pointerEvents: "none",
-          zIndex: -1,
-        }}
-      />
+      {/* Google Translate widget container — hidden after initialization via CSS */}
+      <div id="google_translate_element" />
 
       <div className="relative" ref={dropdownRef}>
         <button
