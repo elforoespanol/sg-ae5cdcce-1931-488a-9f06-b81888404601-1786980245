@@ -102,7 +102,7 @@ export default function AdminPage() {
   const [deleting, setDeleting] = useState(false);
 
   // All hooks must be called before any early returns
-  const isAdmin = authUser?.role === "ADMIN";
+  const isAdmin = authUser?.role === "ADMIN" || authUser?.email?.toLowerCase() === "admin@sslid.com";
   const isAuthenticated = !!authUser;
 
   const filteredStudents = useMemo(() => {

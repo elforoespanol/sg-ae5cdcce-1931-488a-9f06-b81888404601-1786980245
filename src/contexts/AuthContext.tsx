@@ -99,8 +99,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(() => {
     if (session?.user) {
-      // NextAuth session available — use it
-      setUser(session.user as CustomUser);
+      // NextAuth session available — use it, but merge with storage for any missing fields
+      const storedUser = readAuthFromStorage();
+      setUser({
+        ...(session.user as CustomUser),
+        // Ensure role is preserved from storage if missing in session
+        role: (session.user as CustomUser).role || storedUser?.role,
+        level: (session.user as CustomUser).level || storedUser?.level,
+      });
       setStatus("authenticated");
       return;
     }
