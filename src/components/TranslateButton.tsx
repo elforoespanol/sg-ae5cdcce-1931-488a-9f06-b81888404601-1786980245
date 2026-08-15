@@ -5,6 +5,7 @@ import { Globe, ChevronDown } from "lucide-react";
 
 declare global {
   interface Window {
+    __googleTranslateInit?: boolean;
     googleTranslateElementInit?: () => void;
     google?: {
       translate: {
@@ -57,15 +58,13 @@ export function TranslateButton() {
     }
   }, []);
 
-  // Initialize Google Translate widget (must be in DOM but we hide it with CSS)
+  // Initialize Google Translate widget
   useEffect(() => {
-    const w = window as unknown as Record<string, unknown>;
-
-    if (w["__googleTranslateInit"]) {
+    if (window.__googleTranslateInit) {
       setLoaded(true);
       return;
     }
-    w["__googleTranslateInit"] = true;
+    window.__googleTranslateInit = true;
 
     window.googleTranslateElementInit = () => {
       if (window.google?.translate?.TranslateElement) {
@@ -74,7 +73,6 @@ export function TranslateButton() {
             pageLanguage: "en",
             includedLanguages: "en,es,fr,de,pt,it",
             layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false,
           },
           "google_translate_element_real"
         );
@@ -115,7 +113,7 @@ export function TranslateButton() {
       document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain};`;
       document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
     } else {
-      // Set translation cookie — this is how Google Translate knows which language to use
+      // Set translation cookie — Google Translate reads this on page load
       const value = `/en/${code}`;
       document.cookie = `googtrans=${value}; path=/; domain=${domain};`;
       document.cookie = `googtrans=${value}; path=/; domain=.${domain};`;
@@ -130,20 +128,8 @@ export function TranslateButton() {
 
   return (
     <>
-      {/* Google Translate widget container — autoDisplay:false keeps it hidden */}
-      <div
-        style={{
-          position: "fixed",
-          top: -10000,
-          left: 0,
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          opacity: 0,
-          pointerEvents: "none",
-          zIndex: -1,
-        }}
-      >
+      {/* Google Translate widget container — hidden via CSS, not removed from DOM */}
+      <div id="google_translate_container" className="google-translate-hidden">
         <div id="google_translate_element_real" />
       </div>
 
