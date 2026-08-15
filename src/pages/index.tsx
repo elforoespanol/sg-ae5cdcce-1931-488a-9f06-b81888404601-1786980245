@@ -104,9 +104,6 @@ export default function HomePage() {
           <div className="container">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="max-w-xl">
-                <p className="text-sm font-semibold tracking-widest uppercase text-brand-terracotta mb-6">
-                  Español Mastery
-                </p>
                 <h1 className="font-serif text-5xl md:text-6xl font-medium text-brand-blue leading-[1.1] mb-8">
                   Speak Spanish
                   <br />
