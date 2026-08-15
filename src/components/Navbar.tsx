@@ -125,12 +125,6 @@ export function Navbar() {
               >
                 Sign in
               </Link>
-              <Link
-                href="/register"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-brand-terracotta text-white hover:bg-brand-terracotta/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
-              >
-                Get Started
-              </Link>
             </div>
           )}
         </div>
@@ -215,13 +209,6 @@ export function Navbar() {
                   >
                     <User className="h-4 w-4" aria-hidden="true" />
                     Sign in
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-brand-terracotta text-white hover:bg-brand-terracotta/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
-                  >
-                    Get Started
                   </Link>
                 </div>
               )}
