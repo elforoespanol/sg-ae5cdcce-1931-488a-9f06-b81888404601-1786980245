@@ -105,6 +105,23 @@ export default function AdminPage() {
   const isAdmin = authUser?.role === "ADMIN" || authUser?.email?.toLowerCase() === "admin@sslid.com";
   const isAuthenticated = !!authUser;
 
+  // Synchronous cookie fallback for admin detection
+  const getCookieRole = (): string | null => {
+    if (typeof document === "undefined") return null;
+    const match = document.cookie.match(/sslid_auth=([^;]+)/);
+    if (match) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(match[1]));
+        return parsed.role || null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const effectiveIsAdmin = isAdmin || getCookieRole() === "ADMIN";
+
   const filteredStudents = useMemo(() => {
     return students.filter((s) => {
       const matchesSearch =
@@ -134,12 +151,12 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (isAdmin) {
+    if (effectiveIsAdmin) {
       fetchData();
     } else {
       setLoading(false);
     }
-  }, [isAdmin]);
+  }, [effectiveIsAdmin]);
 
   async function fetchData() {
     try {
@@ -222,7 +239,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!effectiveIsAdmin) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-6">
         <Card className="max-w-md w-full text-center p-8">

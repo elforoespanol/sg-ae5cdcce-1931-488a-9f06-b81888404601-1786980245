@@ -12,25 +12,26 @@ export function Navbar() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [cookieRole, setCookieRole] = useState<string | null>(null);
 
-  // Read role from cookie as fallback
-  useEffect(() => {
+  // Synchronous cookie read for instant admin detection
+  const getCookieRole = (): string | null => {
+    if (typeof document === "undefined") return null;
     const match = document.cookie.match(/sslid_auth=([^;]+)/);
     if (match) {
       try {
         const parsed = JSON.parse(decodeURIComponent(match[1]));
-        setCookieRole(parsed.role || null);
+        return parsed.role || null;
       } catch {
-        setCookieRole(null);
+        return null;
       }
     }
-  }, [authUser?.email]);
+    return null;
+  };
 
   const isAdmin =
     authUser?.role === "ADMIN" ||
     authUser?.email?.toLowerCase() === "admin@sslid.com" ||
-    cookieRole === "ADMIN";
+    getCookieRole() === "ADMIN";
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, shortcut: "D" },
