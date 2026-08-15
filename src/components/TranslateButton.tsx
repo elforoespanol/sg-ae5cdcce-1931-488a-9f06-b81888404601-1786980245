@@ -46,11 +46,13 @@ export function TranslateButton() {
 
   // Initialize Google Translate widget
   useEffect(() => {
-    if (document.getElementById("google-translate-script")) {
+    // If already initialized, just mark as loaded
+    if (document.querySelector(".goog-te-combo")) {
       setLoaded(true);
       return;
     }
 
+    // Define the callback
     window.googleTranslateElementInit = () => {
       if (window.google?.translate?.TranslateElement) {
         new window.google.translate.TranslateElement(
@@ -61,15 +63,33 @@ export function TranslateButton() {
           },
           "google_translate_element"
         );
-        setLoaded(true);
+
+        // Poll for the combo box to appear
+        let attempts = 0;
+        const poll = () => {
+          const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+          if (combo) {
+            setLoaded(true);
+          } else if (attempts < 30) {
+            attempts += 1;
+            setTimeout(poll, 300);
+          }
+        };
+        setTimeout(poll, 500);
       }
     };
 
-    const script = document.createElement("script");
-    script.id = "google-translate-script";
-    script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-    script.async = true;
-    document.body.appendChild(script);
+    // Load script if not present
+    if (!document.getElementById("google-translate-script")) {
+      const script = document.createElement("script");
+      script.id = "google-translate-script";
+      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.async = true;
+      document.body.appendChild(script);
+    } else {
+      // Script already there, call init manually
+      window.googleTranslateElementInit?.();
+    }
   }, []);
 
   // Close dropdown on outside click
@@ -85,26 +105,43 @@ export function TranslateButton() {
 
   const selectLanguage = useCallback((code: string) => {
     setOpen(false);
-    const url = new URL(window.location.href);
-    if (code === "en") {
-      url.searchParams.delete("googtrans");
-    } else {
-      url.searchParams.set("googtrans", "/en/" + code);
-    }
-    window.location.href = url.toString();
+
+    const tryTranslate = (attempts = 0) => {
+      const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+
+      if (combo) {
+        if (code === "en") {
+          // For English, select the first option (usually English/Original)
+          combo.selectedIndex = 0;
+        } else {
+          combo.value = code;
+        }
+
+        // Trigger the change event that Google Translate listens to
+        const event = new Event("change", { bubbles: true });
+        combo.dispatchEvent(event);
+
+        setCurrentLang(code);
+      } else if (attempts < 20) {
+        setTimeout(() => tryTranslate(attempts + 1), 200);
+      }
+    };
+
+    tryTranslate();
   }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
 
   return (
     <>
-      {/* Google Translate widget container — hidden after initialization via CSS */}
+      {/* Google Translate widget container — must be in DOM for initialization */}
       <div id="google_translate_element" />
 
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
+          disabled={!loaded}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50 disabled:opacity-50"
           aria-label="Select language"
           aria-expanded={open}
         >
