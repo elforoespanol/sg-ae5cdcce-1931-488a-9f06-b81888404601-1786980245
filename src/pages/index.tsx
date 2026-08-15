@@ -358,11 +358,6 @@ export default function HomePage() {
                 <h3 className="font-serif text-lg font-semibold mb-4">Quick Links</h3>
                 <ul className="space-y-3 text-sm">
                   <li>
-                    <a className="hover:text-brand-terracotta transition-colors" href="/lessons">
-                      Curriculum
-                    </a>
-                  </li>
-                  <li>
                     <a className="hover:text-brand-terracotta transition-colors" href="/dashboard">
                       Dashboard
                     </a>
@@ -402,70 +397,18 @@ export default function HomePage() {
                 </ul>
               </div>
 
-              {/* Stay Updated + Follow Us */}
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-serif text-lg font-semibold mb-4">Stay Updated</h3>
-                  <div className="flex flex-col gap-3">
-                    <p className="text-sm text-white/80 mb-1">
-                      Send us an email to join our newsletter.
-                    </p>
-                    <a href="mailto:hola@españolmastery.com?subject=Newsletter Subscription">
-                      <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-brand-blue shadow h-9 px-4 py-2 bg-white hover:bg-white/90 w-full">
-                        Subscribe
-                      </button>
-                    </a>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-serif text-lg font-semibold mb-4">Follow Us</h3>
-                  <div className="flex gap-3">
-                    <a
-                      href="https://www.facebook.com/profile.php?id=100069829061303"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
-                      aria-label="Facebook"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                    </a>
-                    <a
-                      href="https://rss.com/podcasts/learn-spanish-like-i-did/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
-                      aria-label="RSS Podcast"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
-                    </a>
-                    <a
-                      href="https://instagram.com/learnspanishlikeidid"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
-                      aria-label="Instagram"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-                    </a>
-                    <a
-                      href="https://www.youtube.com/@learnspanishlikeidid"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
-                      aria-label="YouTube"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg>
-                    </a>
-                    <a
-                      href="https://www.tiktok.com/@learnspanishlikei"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-white/10 rounded-lg hover:bg-brand-terracotta transition-colors"
-                      aria-label="TikTok"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
-                    </a>
-                  </div>
+              {/* Stay Updated */}
+              <div>
+                <h3 className="font-serif text-lg font-semibold mb-4">Stay Updated</h3>
+                <div className="flex flex-col gap-3">
+                  <p className="text-sm text-white/80 mb-1">
+                    Send us an email to join our newsletter.
+                  </p>
+                  <a href="mailto:hola@españolmastery.com?subject=Newsletter Subscription">
+                    <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-brand-blue shadow h-9 px-4 py-2 bg-white hover:bg-white/90 w-full">
+                      Subscribe
+                    </button>
+                  </a>
                 </div>
               </div>
             </div>
