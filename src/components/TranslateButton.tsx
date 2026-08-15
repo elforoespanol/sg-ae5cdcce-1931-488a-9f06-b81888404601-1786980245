@@ -3,20 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Globe, ChevronDown } from "lucide-react";
 
-declare global {
-  interface Window {
-    googleTranslateElementInit?: () => void;
-    google?: {
-      translate: {
-        TranslateElement: {
-          new (options: object, elementId: string): void;
-          InlineLayout: { SIMPLE: number };
-        };
-      };
-    };
-  }
-}
-
 const languages = [
   { code: "en", name: "English", flag: "🇬🇧" },
   { code: "es", name: "Español", flag: "🇪🇸" },
@@ -26,8 +12,9 @@ const languages = [
   { code: "it", name: "Italiano", flag: "🇮🇹" },
 ];
 
-function getLangFromUrl(): string {
+function getCurrentLang(): string {
   if (typeof window === "undefined") return "en";
+  // Check URL param first
   const params = new URLSearchParams(window.location.search);
   const googtrans = params.get("googtrans");
   if (googtrans) {
@@ -39,58 +26,10 @@ function getLangFromUrl(): string {
 }
 
 export function TranslateButton() {
-  const [currentLang, setCurrentLang] = useState(getLangFromUrl);
-  const [loaded, setLoaded] = useState(false);
+  const [currentLang, setCurrentLang] = useState(getCurrentLang);
+  const [loaded, setLoaded] = useState(true);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Initialize Google Translate widget
-  useEffect(() => {
-    // If already initialized, just mark as loaded
-    if (document.querySelector(".goog-te-combo")) {
-      setLoaded(true);
-      return;
-    }
-
-    // Define the callback
-    window.googleTranslateElementInit = () => {
-      if (window.google?.translate?.TranslateElement) {
-        new window.google.translate.TranslateElement(
-          {
-            pageLanguage: "en",
-            includedLanguages: "en,es,fr,de,pt,it",
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          },
-          "google_translate_element"
-        );
-
-        // Poll for the combo box to appear
-        let attempts = 0;
-        const poll = () => {
-          const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-          if (combo) {
-            setLoaded(true);
-          } else if (attempts < 30) {
-            attempts += 1;
-            setTimeout(poll, 300);
-          }
-        };
-        setTimeout(poll, 500);
-      }
-    };
-
-    // Load script if not present
-    if (!document.getElementById("google-translate-script")) {
-      const script = document.createElement("script");
-      script.id = "google-translate-script";
-      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      script.async = true;
-      document.body.appendChild(script);
-    } else {
-      // Script already there, call init manually
-      window.googleTranslateElementInit?.();
-    }
-  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -106,70 +45,54 @@ export function TranslateButton() {
   const selectLanguage = useCallback((code: string) => {
     setOpen(false);
 
-    const tryTranslate = (attempts = 0) => {
-      const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+    if (code === "en") {
+      // Remove googtrans param to return to English
+      const url = new URL(window.location.href);
+      url.searchParams.delete("googtrans");
+      window.location.href = url.toString();
+      return;
+    }
 
-      if (combo) {
-        if (code === "en") {
-          // For English, select the first option (usually English/Original)
-          combo.selectedIndex = 0;
-        } else {
-          combo.value = code;
-        }
-
-        // Trigger the change event that Google Translate listens to
-        const event = new Event("change", { bubbles: true });
-        combo.dispatchEvent(event);
-
-        setCurrentLang(code);
-      } else if (attempts < 20) {
-        setTimeout(() => tryTranslate(attempts + 1), 200);
-      }
-    };
-
-    tryTranslate();
+    // Set googtrans param and reload — Google Translate reads this on page load
+    const url = new URL(window.location.href);
+    url.searchParams.set("googtrans", `/en/${code}`);
+    window.location.href = url.toString();
   }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
 
   return (
-    <>
-      {/* Google Translate widget container — must be in DOM for initialization */}
-      <div id="google_translate_element" />
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50 disabled:opacity-50"
+        aria-label="Select language"
+        aria-expanded={open}
+      >
+        <Globe className="h-4 w-4" aria-hidden="true" />
+        <span>{current.flag}</span>
+        <span className="hidden sm:inline">{current.name}</span>
+        <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
+      </button>
 
-      <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={() => setOpen(!open)}
-          disabled={!loaded}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50 disabled:opacity-50"
-          aria-label="Select language"
-          aria-expanded={open}
-        >
-          <Globe className="h-4 w-4" aria-hidden="true" />
-          <span>{current.flag}</span>
-          <span className="hidden sm:inline">{current.name}</span>
-          <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
-        </button>
-
-        {open && (
-          <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border/40 bg-white shadow-lg py-1 z-50">
-            {languages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => selectLanguage(lang.code)}
-                className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-brand-cream ${
-                  currentLang === lang.code
-                    ? "text-brand-terracotta font-medium"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <span className="text-base">{lang.flag}</span>
-                <span>{lang.name}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+      {open && (
+        <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border/40 bg-white shadow-lg py-1 z-50">
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => selectLanguage(lang.code)}
+              className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-brand-cream ${
+                currentLang === lang.code
+                  ? "text-brand-terracotta font-medium"
+                  : "text-muted-foreground"
+              }`}
+            >
+              <span className="text-base">{lang.flag}</span>
+              <span>{lang.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
