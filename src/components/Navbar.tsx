@@ -9,7 +9,7 @@ import { TranslateButton } from "./TranslateButton";
 
 export function Navbar() {
   const { user: authUser } = useAuth();
-  const isAdmin = authUser?.role === "ADMIN";
+  const isAdmin = authUser?.role === "ADMIN" || authUser?.email?.toLowerCase() === "admin@sslid.com";
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);

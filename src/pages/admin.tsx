@@ -25,6 +25,7 @@ import {
   Calendar,
   Activity,
   BarChart3,
+  Trash2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -97,6 +98,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // All hooks must be called before any early returns
   const isAdmin = authUser?.role === "ADMIN";
@@ -173,6 +176,26 @@ export default function AdminPage() {
       console.error("Failed to fetch student detail:", error);
     } finally {
       setDetailLoading(false);
+    }
+  }
+
+  async function deleteStudent(id: string) {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/students/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setStudents((prev) => prev.filter((s) => s.id !== id));
+        setDeleteConfirmId(null);
+      } else {
+        console.error("Failed to delete student");
+      }
+    } catch (error) {
+      console.error("Delete student error:", error);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -343,33 +366,77 @@ export default function AdminPage() {
                       {filteredStudents.map((student) => (
                         <tr
                           key={student.id}
-                          className="border-b hover:bg-muted/50 cursor-pointer transition-colors"
-                          onClick={() => fetchStudentDetail(student.id)}
+                          className="border-b hover:bg-muted/50 transition-colors"
                         >
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 cursor-pointer" onClick={() => fetchStudentDetail(student.id)}>
                             <div>
                               <p className="font-medium">{student.name || "Anonymous"}</p>
                               <p className="text-sm text-muted-foreground">{student.email}</p>
                             </div>
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 cursor-pointer" onClick={() => fetchStudentDetail(student.id)}>
                             <Badge variant="outline">{student.level}</Badge>
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 cursor-pointer" onClick={() => fetchStudentDetail(student.id)}>
                             <div className="flex items-center gap-1">
                               <Flame className="h-4 w-4 text-orange-500" />
                               <span>{student.streak}</span>
                             </div>
                           </td>
-                          <td className="py-3 px-4">{student.totalStudyMinutes}m</td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4 cursor-pointer" onClick={() => fetchStudentDetail(student.id)}>{student.totalStudyMinutes}m</td>
+                          <td className="py-3 px-4 cursor-pointer" onClick={() => fetchStudentDetail(student.id)}>
                             <Badge variant="outline" className={getSubBadgeColor(student.subscription_type)}>
                               {student.subscription_type}
                             </Badge>
                           </td>
-                          <td className="py-3 px-4 text-muted-foreground">{formatDate(student.lastActiveDate)}</td>
+                          <td className="py-3 px-4 text-muted-foreground cursor-pointer" onClick={() => fetchStudentDetail(student.id)}>{formatDate(student.lastActiveDate)}</td>
                           <td className="py-3 px-4">
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  fetchStudentDetail(student.id);
+                                }}
+                                className="p-2 rounded-lg hover:bg-brand-cream transition-colors text-muted-foreground hover:text-brand-blue"
+                                title="View details"
+                              >
+                                <ChevronRight className="h-4 w-4" />
+                              </button>
+                              {deleteConfirmId === student.id ? (
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      deleteStudent(student.id);
+                                    }}
+                                    disabled={deleting}
+                                    className="px-2 py-1 rounded-md bg-destructive text-white text-xs font-medium hover:bg-destructive/90 transition-colors disabled:opacity-50"
+                                  >
+                                    {deleting ? "..." : "Confirm"}
+                                  </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setDeleteConfirmId(null);
+                                    }}
+                                    className="px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs font-medium hover:bg-muted/80 transition-colors"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteConfirmId(student.id);
+                                  }}
+                                  className="p-2 rounded-lg hover:bg-red-50 transition-colors text-muted-foreground hover:text-destructive"
+                                  title="Delete student"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
