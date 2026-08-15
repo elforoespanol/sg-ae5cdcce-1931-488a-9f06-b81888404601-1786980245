@@ -26,48 +26,20 @@ const languages = [
   { code: "it", name: "Italiano", flag: "🇮🇹" },
 ];
 
-function getCookie(name: string): string | null {
-  const match = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
-  return match ? (match.pop() ?? null) : null;
-}
-
-function setCookie(name: string, value: string, days = 365) {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  const hostname = window.location.hostname;
-  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
-
-  // Base cookie
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
-
-  if (!isLocalhost) {
-    // Domain-scoped cookies for subdomains
-    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; domain=${hostname}; SameSite=Lax`;
-    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; domain=.${hostname}; SameSite=Lax`;
-  }
-}
-
-function deleteCookie(name: string) {
-  const past = "Thu, 01 Jan 1970 00:00:00 GMT";
-  const hostname = window.location.hostname;
-  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
-
-  document.cookie = `${name}=; expires=${past}; path=/;`;
-  if (!isLocalhost) {
-    document.cookie = `${name}=; expires=${past}; path=/; domain=${hostname};`;
-    document.cookie = `${name}=; expires=${past}; path=/; domain=.${hostname};`;
-  }
-}
-
 export function TranslateButton() {
   const [currentLang, setCurrentLang] = useState("en");
+  const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
 
-  // Detect current language from cookie on mount
+  // Detect current language from URL on mount
   useEffect(() => {
-    const googTrans = getCookie("googtrans");
-    if (googTrans) {
-      const parts = googTrans.split("/");
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const gtParam = url.searchParams.get("googtrans");
+    if (gtParam) {
+      const parts = gtParam.split("/");
       const lang = parts[parts.length - 1];
       if (lang && languages.some((l) => l.code === lang)) {
         setCurrentLang(lang);
@@ -75,28 +47,26 @@ export function TranslateButton() {
     }
   }, []);
 
-  // Initialize Google Translate widget (hidden)
+  // Initialize Google Translate widget
   useEffect(() => {
-    if (document.getElementById("google-translate-script")) return;
-
-    // Create hidden container for the widget
-    if (!document.getElementById("google_translate_element")) {
-      const container = document.createElement("div");
-      container.id = "google_translate_element";
-      container.style.cssText = "position:absolute;top:-9999px;left:0;width:1px;height:1px;overflow:hidden;";
-      document.body.appendChild(container);
+    if (typeof window === "undefined") return;
+    if (document.getElementById("google-translate-script")) {
+      // Already loading or loaded — check if combo exists
+      checkComboReady();
+      return;
     }
 
     window.googleTranslateElementInit = () => {
-      if (window.google?.translate?.TranslateElement) {
+      if (window.google?.translate?.TranslateElement && widgetRef.current) {
         new window.google.translate.TranslateElement(
           {
             pageLanguage: "en",
             includedLanguages: "en,es,fr,de,pt,it",
             layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
           },
-          "google_translate_element"
+          "google_translate_widget"
         );
+        checkComboReady();
       }
     };
 
@@ -105,7 +75,26 @@ export function TranslateButton() {
     script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
     script.async = true;
     document.body.appendChild(script);
-  }, []);
+
+    // Fallback: if script already cached and callback won't fire
+    setTimeout(() => {
+      if (!loaded) checkComboReady();
+    }, 3000);
+
+    function checkComboReady() {
+      let attempts = 0;
+      const poll = () => {
+        const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+        if (combo) {
+          setLoaded(true);
+        } else if (attempts < 40) {
+          attempts += 1;
+          setTimeout(poll, 250);
+        }
+      };
+      poll();
+    }
+  }, [loaded]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -122,49 +111,85 @@ export function TranslateButton() {
     setOpen(false);
 
     if (code === "en") {
-      deleteCookie("googtrans");
-    } else {
-      setCookie("googtrans", `/en/${code}`);
+      // Reset to English by reloading without the googtrans param
+      const url = new URL(window.location.href);
+      url.searchParams.delete("googtrans");
+      window.location.href = url.toString();
+      return;
     }
 
-    // Reload so Google Translate reads the cookie and applies translation
-    window.location.reload();
+    const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+    if (combo) {
+      combo.value = code;
+      combo.dispatchEvent(new Event("change", { bubbles: true }));
+      setCurrentLang(code);
+
+      // Also update URL so translation persists on navigation
+      const url = new URL(window.location.href);
+      url.searchParams.set("googtrans", `/en/${code}`);
+      window.history.replaceState({}, "", url.toString());
+    } else {
+      // Fallback: reload with googtrans param
+      const url = new URL(window.location.href);
+      url.searchParams.set("googtrans", `/en/${code}`);
+      window.location.href = url.toString();
+    }
   }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
-        aria-label="Select language"
-        aria-expanded={open}
+    <>
+      {/* Google Translate widget — rendered in-flow so it initializes, then hidden by CSS */}
+      <div
+        ref={widgetRef}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          opacity: 0,
+          pointerEvents: "none",
+          zIndex: -1,
+          width: "auto",
+          height: "auto",
+        }}
       >
-        <Globe className="h-4 w-4" aria-hidden="true" />
-        <span>{current.flag}</span>
-        <span className="hidden sm:inline">{current.name}</span>
-        <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
-      </button>
+        <div id="google_translate_widget" />
+      </div>
 
-      {open && (
-        <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border/40 bg-white shadow-lg py-1 z-50">
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => selectLanguage(lang.code)}
-              className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-brand-cream ${
-                currentLang === lang.code
-                  ? "text-brand-terracotta font-medium"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <span className="text-base">{lang.flag}</span>
-              <span>{lang.name}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setOpen(!open)}
+          disabled={!loaded}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50 disabled:opacity-40"
+          aria-label="Select language"
+          aria-expanded={open}
+        >
+          <Globe className="h-4 w-4" aria-hidden="true" />
+          <span>{current.flag}</span>
+          <span className="hidden sm:inline">{current.name}</span>
+          <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
+        </button>
+
+        {open && (
+          <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border/40 bg-white shadow-lg py-1 z-50">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => selectLanguage(lang.code)}
+                className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-brand-cream ${
+                  currentLang === lang.code
+                    ? "text-brand-terracotta font-medium"
+                    : "text-muted-foreground"
+                }`}
+              >
+                <span className="text-base">{lang.flag}</span>
+                <span>{lang.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
