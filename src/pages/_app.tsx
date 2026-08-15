@@ -2,6 +2,7 @@ import { SessionProvider } from "next-auth/react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import { Navbar } from "@/components/Navbar";
+import { CookieConsent } from "@/components/CookieConsent";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 
@@ -13,6 +14,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
         <main className="min-h-screen">
           <Component {...pageProps} />
         </main>
+        <CookieConsent />
         <Toaster
           position="top-right"
           toastOptions={{
