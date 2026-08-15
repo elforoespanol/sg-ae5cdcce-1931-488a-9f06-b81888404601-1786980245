@@ -84,9 +84,6 @@ export function Navbar() {
             alt="Español Mastery"
             className="h-10 w-10 rounded-lg object-contain"
           />
-          <span className="font-serif text-xl font-semibold text-brand-blue tracking-tight hidden sm:block">
-            Español Mastery
-          </span>
         </Link>
 
         {/* Desktop Nav */}
