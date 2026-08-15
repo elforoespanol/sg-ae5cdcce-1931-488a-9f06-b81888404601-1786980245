@@ -5,13 +5,12 @@ import { Globe, ChevronDown } from "lucide-react";
 
 declare global {
   interface Window {
-    __googleTranslateState?: { initialized: boolean; engineReady: boolean };
     googleTranslateElementInit?: () => void;
     google?: {
       translate: {
         TranslateElement: {
           new (options: object, elementId: string): void;
-          InlineLayout: { SIMPLE: number; HORIZONTAL: number };
+          InlineLayout: { SIMPLE: number };
         };
       };
     };
@@ -34,10 +33,8 @@ function getCookie(name: string): string | null {
 
 export function TranslateButton() {
   const [currentLang, setCurrentLang] = useState("en");
-  const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const initPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Detect current language from cookie on mount
   useEffect(() => {
@@ -51,84 +48,51 @@ export function TranslateButton() {
     }
   }, []);
 
-  // Initialize Google Translate
+  // Load Google Translate script once
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (document.getElementById("google-translate-script")) return;
 
-    // Prevent double init in React StrictMode
-    window.__googleTranslateState = window.__googleTranslateState || { initialized: false, engineReady: false };
-    if (window.__googleTranslateState.initialized) {
-      setLoaded(window.__googleTranslateState.engineReady);
-      return;
-    }
-    window.__googleTranslateState.initialized = true;
-
-    // Create the hidden widget container
-    let container = document.getElementById("google_translate_element_real");
-    if (!container) {
+    // Ensure container exists before script loads
+    if (!document.getElementById("google_translate_element")) {
       const wrapper = document.createElement("div");
-      wrapper.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;z-index:-1;";
-      container = document.createElement("div");
-      container.id = "google_translate_element_real";
+      wrapper.style.cssText =
+        "position:fixed;top:-9999px;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;z-index:-1;";
+      const container = document.createElement("div");
+      container.id = "google_translate_element";
       wrapper.appendChild(container);
       document.body.appendChild(wrapper);
     }
 
-    // Define callback BEFORE loading script
+    // Define callback
     window.googleTranslateElementInit = () => {
-      if (!window.google?.translate?.TranslateElement) return;
-
-      new window.google.translate.TranslateElement(
-        {
-          pageLanguage: "en",
-          includedLanguages: "en,es,fr,de,pt,it",
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          autoDisplay: true,
-        },
-        "google_translate_element_real"
-      );
-
-      // Poll until the combo box appears — that's when the engine is truly ready
-      let attempts = 0;
-      const poll = setInterval(() => {
-        const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-        if (combo) {
-          clearInterval(poll);
-          window.__googleTranslateState = { initialized: true, engineReady: true };
-          setLoaded(true);
-        } else if (attempts > 50) {
-          clearInterval(poll);
-          window.__googleTranslateState = { initialized: true, engineReady: true };
-          setLoaded(true); // enable anyway, user can try
-        }
-        attempts++;
-      }, 200);
-    };
-
-    // Load the script
-    const existing = document.getElementById("google-translate-script");
-    if (existing) {
-      // Script exists but callback may have already fired; re-trigger if engine not ready
-      if (!window.__googleTranslateState.engineReady) {
-        window.googleTranslateElementInit();
+      if (window.google?.translate?.TranslateElement) {
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "en,es,fr,de,pt,it",
+            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+          },
+          "google_translate_element"
+        );
       }
-    } else {
-      const script = document.createElement("script");
-      script.id = "google-translate-script";
-      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      script.async = true;
-      document.body.appendChild(script);
-    }
-
-    return () => {
-      if (initPollRef.current) clearInterval(initPollRef.current);
     };
+
+    // Load script
+    const script = document.createElement("script");
+    script.id = "google-translate-script";
+    script.src =
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.async = true;
+    document.body.appendChild(script);
   }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -139,38 +103,36 @@ export function TranslateButton() {
   const selectLanguage = useCallback((code: string) => {
     setOpen(false);
 
+    const hostname = window.location.hostname;
+
     if (code === "en") {
-      // Reset to English: remove cookies and reload
-      const expires = "expires=Thu, 01 Jan 1970 00:00:00 UTC";
-      document.cookie = `googtrans=; ${expires}; path=/;`;
-      document.cookie = `googtrans=; ${expires}; path=/; domain=${window.location.hostname};`;
-      document.cookie = `googtrans=; ${expires}; path=/; domain=.${window.location.hostname};`;
+      // Reset to English: remove all googtrans cookies
+      const past = "Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = `googtrans=; expires=${past}; path=/;`;
+      document.cookie = `googtrans=; expires=${past}; path=/; domain=${hostname};`;
+      document.cookie = `googtrans=; expires=${past}; path=/; domain=.${hostname};`;
       window.location.reload();
       return;
     }
 
-    // Try direct combo box manipulation first (no reload needed)
-    const tryCombo = (attempts = 0) => {
-      const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-      if (combo) {
-        combo.value = code;
-        combo.dispatchEvent(new Event("change", { bubbles: true }));
-        setCurrentLang(code);
+    // Set translation cookie on multiple domain scopes
+    const value = `/en/${code}`;
+    document.cookie = `googtrans=${value}; path=/;`;
+    document.cookie = `googtrans=${value}; path=/; domain=${hostname};`;
+    document.cookie = `googtrans=${value}; path=/; domain=.${hostname};`;
 
-        // Persist choice in cookie so it survives reloads
-        const value = `/en/${code}`;
-        document.cookie = `googtrans=${value}; path=/;`;
-      } else if (attempts < 15) {
-        setTimeout(() => tryCombo(attempts + 1), 300);
-      } else {
-        // Fallback: cookie + reload
-        const value = `/en/${code}`;
-        document.cookie = `googtrans=${value}; path=/;`;
-        window.location.reload();
-      }
-    };
-
-    tryCombo();
+    // Also try to trigger the widget combo box if it's already loaded
+    const combo = document.querySelector(
+      ".goog-te-combo"
+    ) as HTMLSelectElement | null;
+    if (combo) {
+      combo.value = code;
+      combo.dispatchEvent(new Event("change", { bubbles: true }));
+      setCurrentLang(code);
+    } else {
+      // Widget not ready yet — reload so Google Translate reads the cookie
+      window.location.reload();
+    }
   }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
@@ -179,15 +141,17 @@ export function TranslateButton() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setOpen(!open)}
-        disabled={!loaded}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50 disabled:opacity-50"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
         aria-label="Select language"
         aria-expanded={open}
       >
         <Globe className="h-4 w-4" aria-hidden="true" />
         <span>{current.flag}</span>
         <span className="hidden sm:inline">{current.name}</span>
-        <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
+        <ChevronDown
+          className="h-3 w-3 text-muted-foreground"
+          aria-hidden="true"
+        />
       </button>
 
       {open && (

@@ -73,26 +73,13 @@
 
 /* ─── Google Translate overrides ─── */
 
-/* Hide the Google Translate widget container */
-.google-translate-hidden {
-  position: fixed !important;
-  top: -9999px !important;
-  left: 0 !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  z-index: -1 !important;
-}
-
 /* Hide the default Google Translate banner at the top of the page */
 .goog-te-banner-frame {
   display: none !important;
 }
 
 /* Hide the default Google Translate toolbar */
-body > .skiptranslate {
+.skiptranslate {
   display: none !important;
 }
 
