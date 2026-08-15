@@ -26,20 +26,31 @@ const languages = [
   { code: "it", name: "Italiano", flag: "🇮🇹" },
 ];
 
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+  return match ? match[2] : null;
+}
+
+function setCookie(name: string, value: string, days = 365) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = name + "=" + encodeURIComponent(value) + "; expires=" + expires + "; path=/";
+}
+
+function deleteCookie(name: string) {
+  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+}
+
 export function TranslateButton() {
   const [currentLang, setCurrentLang] = useState("en");
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const widgetRef = useRef<HTMLDivElement>(null);
 
-  // Detect current language from URL on mount
+  // Detect current language from cookie on mount
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const url = new URL(window.location.href);
-    const gtParam = url.searchParams.get("googtrans");
-    if (gtParam) {
-      const parts = gtParam.split("/");
+    const googTrans = getCookie("googtrans");
+    if (googTrans) {
+      const parts = googTrans.split("/");
       const lang = parts[parts.length - 1];
       if (lang && languages.some((l) => l.code === lang)) {
         setCurrentLang(lang);
@@ -47,26 +58,24 @@ export function TranslateButton() {
     }
   }, []);
 
-  // Initialize Google Translate widget
+  // Initialize Google Translate widget (hidden)
   useEffect(() => {
-    if (typeof window === "undefined") return;
     if (document.getElementById("google-translate-script")) {
-      // Already loading or loaded — check if combo exists
-      checkComboReady();
+      setLoaded(true);
       return;
     }
 
     window.googleTranslateElementInit = () => {
-      if (window.google?.translate?.TranslateElement && widgetRef.current) {
+      if (window.google?.translate?.TranslateElement) {
         new window.google.translate.TranslateElement(
           {
             pageLanguage: "en",
             includedLanguages: "en,es,fr,de,pt,it",
             layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
           },
-          "google_translate_widget"
+          "google_translate_element"
         );
-        checkComboReady();
+        setLoaded(true);
       }
     };
 
@@ -75,26 +84,7 @@ export function TranslateButton() {
     script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
     script.async = true;
     document.body.appendChild(script);
-
-    // Fallback: if script already cached and callback won't fire
-    setTimeout(() => {
-      if (!loaded) checkComboReady();
-    }, 3000);
-
-    function checkComboReady() {
-      let attempts = 0;
-      const poll = () => {
-        const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-        if (combo) {
-          setLoaded(true);
-        } else if (attempts < 40) {
-          attempts += 1;
-          setTimeout(poll, 250);
-        }
-      };
-      poll();
-    }
-  }, [loaded]);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -111,57 +101,46 @@ export function TranslateButton() {
     setOpen(false);
 
     if (code === "en") {
-      // Reset to English by reloading without the googtrans param
-      const url = new URL(window.location.href);
-      url.searchParams.delete("googtrans");
-      window.location.href = url.toString();
-      return;
-    }
-
-    const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-    if (combo) {
-      combo.value = code;
-      combo.dispatchEvent(new Event("change", { bubbles: true }));
-      setCurrentLang(code);
-
-      // Also update URL so translation persists on navigation
-      const url = new URL(window.location.href);
-      url.searchParams.set("googtrans", `/en/${code}`);
-      window.history.replaceState({}, "", url.toString());
+      // Remove translation cookies to reset to English
+      deleteCookie("googtrans");
+      // Google also sets a domain cookie — clear that too
+      const domain = window.location.hostname;
+      if (domain !== "localhost") {
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=." + domain;
+      }
     } else {
-      // Fallback: reload with googtrans param
-      const url = new URL(window.location.href);
-      url.searchParams.set("googtrans", `/en/${code}`);
-      window.location.href = url.toString();
+      // Set translation cookie — Google Translate reads this on page load
+      setCookie("googtrans", "/en/" + code);
     }
+
+    // Reload to apply translation
+    window.location.reload();
   }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
 
   return (
     <>
-      {/* Google Translate widget — rendered in-flow so it initializes, then hidden by CSS */}
+      {/* Hidden Google Translate widget */}
       <div
-        ref={widgetRef}
+        id="google_translate_element"
         style={{
           position: "fixed",
           top: 0,
           left: 0,
+          width: 1,
+          height: 1,
+          overflow: "hidden",
           opacity: 0,
           pointerEvents: "none",
           zIndex: -1,
-          width: "auto",
-          height: "auto",
         }}
-      >
-        <div id="google_translate_widget" />
-      </div>
+      />
 
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setOpen(!open)}
-          disabled={!loaded}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50 disabled:opacity-40"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-brand-blue hover:bg-brand-cream transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-terracotta/50"
           aria-label="Select language"
           aria-expanded={open}
         >
