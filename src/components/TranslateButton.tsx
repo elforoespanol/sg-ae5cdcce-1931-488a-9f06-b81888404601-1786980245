@@ -31,6 +31,33 @@ function getCookie(name: string): string | null {
   return match ? (match.pop() ?? null) : null;
 }
 
+function setCookie(name: string, value: string, days = 365) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
+
+  // Base cookie
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+
+  if (!isLocalhost) {
+    // Domain-scoped cookies for subdomains
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; domain=${hostname}; SameSite=Lax`;
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; domain=.${hostname}; SameSite=Lax`;
+  }
+}
+
+function deleteCookie(name: string) {
+  const past = "Thu, 01 Jan 1970 00:00:00 GMT";
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1";
+
+  document.cookie = `${name}=; expires=${past}; path=/;`;
+  if (!isLocalhost) {
+    document.cookie = `${name}=; expires=${past}; path=/; domain=${hostname};`;
+    document.cookie = `${name}=; expires=${past}; path=/; domain=.${hostname};`;
+  }
+}
+
 export function TranslateButton() {
   const [currentLang, setCurrentLang] = useState("en");
   const [open, setOpen] = useState(false);
@@ -48,21 +75,18 @@ export function TranslateButton() {
     }
   }, []);
 
-  // Load Google Translate script once
+  // Initialize Google Translate widget (hidden)
   useEffect(() => {
     if (document.getElementById("google-translate-script")) return;
 
-    // Create the widget container in the normal document flow
-    // It must be visible for Google Translate to initialize properly
+    // Create hidden container for the widget
     if (!document.getElementById("google_translate_element")) {
       const container = document.createElement("div");
       container.id = "google_translate_element";
-      // Use a wrapper to keep it out of layout but still "visible" to Google
-      container.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;";
+      container.style.cssText = "position:absolute;top:-9999px;left:0;width:1px;height:1px;overflow:hidden;";
       document.body.appendChild(container);
     }
 
-    // Define callback
     window.googleTranslateElementInit = () => {
       if (window.google?.translate?.TranslateElement) {
         new window.google.translate.TranslateElement(
@@ -76,11 +100,9 @@ export function TranslateButton() {
       }
     };
 
-    // Load script
     const script = document.createElement("script");
     script.id = "google-translate-script";
-    script.src =
-      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
     script.async = true;
     document.body.appendChild(script);
   }, []);
@@ -88,10 +110,7 @@ export function TranslateButton() {
   // Close dropdown on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     };
@@ -102,36 +121,14 @@ export function TranslateButton() {
   const selectLanguage = useCallback((code: string) => {
     setOpen(false);
 
-    const hostname = window.location.hostname;
-
     if (code === "en") {
-      // Reset to English: remove all googtrans cookies
-      const past = "Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie = `googtrans=; expires=${past}; path=/;`;
-      document.cookie = `googtrans=; expires=${past}; path=/; domain=${hostname};`;
-      document.cookie = `googtrans=; expires=${past}; path=/; domain=.${hostname};`;
-      window.location.reload();
-      return;
-    }
-
-    // Set translation cookie on multiple domain scopes
-    const value = `/en/${code}`;
-    document.cookie = `googtrans=${value}; path=/;`;
-    document.cookie = `googtrans=${value}; path=/; domain=${hostname};`;
-    document.cookie = `googtrans=${value}; path=/; domain=.${hostname};`;
-
-    // Trigger the widget combo box if it's loaded
-    const combo = document.querySelector(
-      ".goog-te-combo"
-    ) as HTMLSelectElement | null;
-    if (combo) {
-      combo.value = code;
-      combo.dispatchEvent(new Event("change", { bubbles: true }));
-      setCurrentLang(code);
+      deleteCookie("googtrans");
     } else {
-      // Widget not ready yet — reload so Google Translate reads the cookie
-      window.location.reload();
+      setCookie("googtrans", `/en/${code}`);
     }
+
+    // Reload so Google Translate reads the cookie and applies translation
+    window.location.reload();
   }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
@@ -147,10 +144,7 @@ export function TranslateButton() {
         <Globe className="h-4 w-4" aria-hidden="true" />
         <span>{current.flag}</span>
         <span className="hidden sm:inline">{current.name}</span>
-        <ChevronDown
-          className="h-3 w-3 text-muted-foreground"
-          aria-hidden="true"
-        />
+        <ChevronDown className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
       </button>
 
       {open && (
