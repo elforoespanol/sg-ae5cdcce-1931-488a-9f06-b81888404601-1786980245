@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Menu, X, BookOpen, LayoutDashboard, Library, LogOut, User, ChevronDown, MessageSquare, Trophy, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TranslateButton } from "./TranslateButton";
 
 export function Navbar() {
   const { user: authUser } = useAuth();
@@ -69,6 +70,7 @@ export function Navbar() {
 
         {/* Desktop Auth */}
         <div className="hidden md:flex items-center gap-3">
+          <TranslateButton />
           {authUser ? (
             <div className="relative">
               <button
