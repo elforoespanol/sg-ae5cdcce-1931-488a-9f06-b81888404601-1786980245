@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Globe, ChevronDown } from "lucide-react";
 
 declare global {
@@ -31,6 +31,7 @@ export function TranslateButton() {
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const initAttempts = useRef(0);
 
   useEffect(() => {
     const existing = document.getElementById("google-translate-script");
@@ -51,11 +52,22 @@ export function TranslateButton() {
             },
             "google_translate_element"
           );
-          setLoaded(true);
+          // Wait a moment for the widget to create its DOM elements
+          setTimeout(() => setLoaded(true), 500);
         }
       };
     } else {
-      setLoaded(true);
+      // Script already exists, check if widget is ready
+      const checkReady = () => {
+        const combo = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+        if (combo) {
+          setLoaded(true);
+        } else if (initAttempts.current < 20) {
+          initAttempts.current += 1;
+          setTimeout(checkReady, 300);
+        }
+      };
+      checkReady();
     }
   }, []);
 
@@ -69,21 +81,34 @@ export function TranslateButton() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const selectLanguage = (code: string) => {
-    const select = document.querySelector(".goog-te-combo") as HTMLSelectElement;
-    if (select) {
-      select.value = code;
-      select.dispatchEvent(new Event("change"));
-      setCurrentLang(code);
-    }
-    setOpen(false);
-  };
+  const selectLanguage = useCallback((code: string) => {
+    const trySelect = (attempts = 0) => {
+      const select = document.querySelector(".goog-te-combo") as HTMLSelectElement;
+      if (select) {
+        select.value = code;
+        select.dispatchEvent(new Event("change"));
+        setCurrentLang(code);
+        setOpen(false);
+      } else if (attempts < 10) {
+        setTimeout(() => trySelect(attempts + 1), 200);
+      } else {
+        // Fallback: try to find iframe and reload
+        const iframe = document.querySelector(".goog-te-menu-frame") as HTMLIFrameElement;
+        if (iframe) {
+          iframe.contentWindow?.location.reload();
+        }
+        setOpen(false);
+      }
+    };
+    trySelect();
+  }, []);
 
   const current = languages.find((l) => l.code === currentLang) || languages[0];
 
   return (
     <>
-      <div id="google_translate_element" className="hidden" />
+      {/* Google Translate widget container - positioned off-screen so it works but isn't visible */}
+      <div id="google_translate_element" className="absolute -top-[9999px] left-0" />
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setOpen(!open)}
