@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CustomUser {
   id: string;
@@ -93,51 +93,75 @@ function readAuthFromStorage(): CustomUser | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, status: sessionStatus } = useSession();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
   const [user, setUser] = useState<CustomUser | null>(null);
 
   const refresh = useCallback(() => {
-    if (session?.user) {
-      // NextAuth session available — use it, but merge with storage for any missing fields
-      const storedUser = readAuthFromStorage();
-      const mergedUser = {
-        ...(session.user as CustomUser),
-        // Ensure role is preserved from storage if missing in session
-        role: (session.user as CustomUser).role || storedUser?.role,
-        level: (session.user as CustomUser).level || storedUser?.level,
-      };
-      setUser(mergedUser);
-      setStatus("authenticated");
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        // Supabase session available
+        const storedUser = readAuthFromStorage();
+        const mergedUser: CustomUser = {
+          id: session.user.id,
+          name: session.user.user_metadata?.name || session.user.email?.split("@")[0],
+          email: session.user.email,
+          image: session.user.user_metadata?.image || null,
+          role: (session.user.user_metadata?.role as string) || storedUser?.role,
+          level: (session.user.user_metadata?.level as string) || storedUser?.level,
+        };
+        setUser(mergedUser);
+        setStatus("authenticated");
 
-      // If role is still missing, try to fetch from API
-      if (!mergedUser.role && mergedUser.email) {
-        fetch("/api/user/profile")
-          .then((res) => res.json())
-          .then((data) => {
-            if (data?.role) {
-              setUser((prev) => (prev ? { ...prev, role: data.role } : prev));
-            }
-          })
-          .catch(() => {});
+        // If role is still missing, try to fetch from API
+        if (!mergedUser.role && mergedUser.email) {
+          fetch("/api/user/profile")
+            .then((res) => res.json())
+            .then((data) => {
+              if (data?.role) {
+                setUser((prev) => (prev ? { ...prev, role: data.role } : prev));
+              }
+            })
+            .catch(() => {});
+        }
+        return;
       }
-      return;
-    }
 
-    const storedUser = readAuthFromStorage();
-    if (storedUser) {
-      setUser(storedUser);
-      setStatus("authenticated");
-    } else {
-      setUser(null);
-      setStatus("unauthenticated");
-    }
-  }, [session]);
+      const storedUser = readAuthFromStorage();
+      if (storedUser) {
+        setUser(storedUser);
+        setStatus("authenticated");
+      } else {
+        setUser(null);
+        setStatus("unauthenticated");
+      }
+    });
+  }, []);
 
-  // Initial auth check + re-check when session changes
+  // Initial auth check
   useEffect(() => {
     refresh();
-  }, [refresh, sessionStatus]);
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const mergedUser: CustomUser = {
+          id: session.user.id,
+          name: session.user.user_metadata?.name || session.user.email?.split("@")[0],
+          email: session.user.email,
+          image: session.user.user_metadata?.image || null,
+          role: session.user.user_metadata?.role as string,
+          level: session.user.user_metadata?.level as string,
+        };
+        setUser(mergedUser);
+        setStatus("authenticated");
+      } else {
+        setUser(null);
+        setStatus("unauthenticated");
+      }
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [refresh]);
 
   // Listen for auth refresh events from login/logout
   useEffect(() => {
