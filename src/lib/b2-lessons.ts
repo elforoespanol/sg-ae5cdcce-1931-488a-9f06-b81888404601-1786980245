@@ -611,7 +611,7 @@ const b2_04_vocab: RegionalVocabItem[] = [
   { word: "Sorry", spainVariant: "Lo siento", latamVariant: "Perdón", phoneticSpain: "[lo ˈsjen.to]", phoneticLatam: "[peɾ.ˈðon]", english: "I'm sorry / excuse me", partOfSpeech: "expression" },
   { word: "To apologize", spainVariant: "Pedir perdón", latamVariant: "Disculparse", phoneticSpain: "[pe.ˈðiɾ peɾ.ˈðon]", phoneticLatam: "[dis.kul.ˈpaɾ.se]", english: "To apologize", partOfSpeech: "expression/verb" },
   { word: "Problem", spainVariant: "Problema", latamVariant: "Bronca", phoneticSpain: "[pɾo.ˈble.ma]", phoneticLatam: "[ˈbɾoŋ.ka]", english: "Problem, issue", partOfSpeech: "noun" },
-  { word: "To calm down", spainVariant: "Calmarse", latamVariant: "Tranquilizarse", phoneticSpain: "[kal.ˈmaɾ.se]", phonamicLatam: "[tɾan.ki.li.ˈθaɾ.se]", english: "To calm down", partOfSpeech: "verb (reflexive)" },
+  { word: "To calm down", spainVariant: "Calmarse", latamVariant: "Tranquilizarse", phoneticSpain: "[kal.ˈmaɾ.se]", phoneticLatam: "[tɾan.ki.li.ˈθaɾ.se]", english: "To calm down", partOfSpeech: "verb (reflexive)" },
   { word: "Fault", spainVariant: "Culpa", latamVariant: "Culpa", phoneticSpain: "[ˈkul.pa]", phoneticLatam: "[ˈkul.pa]", english: "Fault, blame", partOfSpeech: "noun" },
   { word: "To understand", spainVariant: "Entender", latamVariant: "Captar", phoneticSpain: "[en.ten.ˈðeɾ]", phoneticLatam: "[kap.ˈtaɾ]", english: "To understand, to get", partOfSpeech: "verb" },
   { word: "Boundary", spainVariant: "Límite", latamVariant: "Límite", phoneticSpain: "[ˈli.mi.te]", phoneticLatam: "[ˈli.mi.te]", english: "Boundary, limit", partOfSpeech: "noun" },
