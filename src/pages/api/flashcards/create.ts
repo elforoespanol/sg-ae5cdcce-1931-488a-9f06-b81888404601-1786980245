@@ -2,13 +2,34 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react";
 import { prisma } from "@/lib/prisma";
 
+function getUserIdFromRequest(req: NextApiRequest): string | null {
+  // Try NextAuth session first
+  const session = (req as any).session || null;
+  if (session?.user?.id) return session.user.id;
+
+  // Fallback to custom sslid_auth cookie
+  const cookie = req.headers.cookie || "";
+  const match = cookie.match(/sslid_auth=([^;]+)/);
+  if (match) {
+    try {
+      const decoded = decodeURIComponent(match[1]);
+      const parsed = JSON.parse(decoded);
+      if (parsed.id) return parsed.id;
+    } catch {
+      // invalid cookie
+    }
+  }
+
+  return null;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const session = await getSession({ req });
-  if (!session?.user?.id) {
+  const userId = getUserIdFromRequest(req);
+  if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -21,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const flashcard = await prisma.flashcard.create({
       data: {
-        userId: session.user.id,
+        userId,
         spanishText: spanishText.trim(),
         englishText: englishText.trim(),
         exampleSentence: exampleSentence || null,

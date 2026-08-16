@@ -3,18 +3,39 @@ import { getSession } from "next-auth/react";
 import { prisma } from "@/lib/prisma";
 import { calculateNextReview } from "@/lib/spaced-repetition";
 
+function getUserIdFromRequest(req: NextApiRequest): string | null {
+  // Try NextAuth session first
+  const session = (req as any).session || null;
+  if (session?.user?.id) return session.user.id;
+
+  // Fallback to custom sslid_auth cookie
+  const cookie = req.headers.cookie || "";
+  const match = cookie.match(/sslid_auth=([^;]+)/);
+  if (match) {
+    try {
+      const decoded = decodeURIComponent(match[1]);
+      const parsed = JSON.parse(decoded);
+      if (parsed.id) return parsed.id;
+    } catch {
+      // invalid cookie
+    }
+  }
+
+  return null;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getSession({ req });
-  if (!session?.user?.id) {
+  const userId = getUserIdFromRequest(req);
+  if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   if (req.method === "GET") {
     try {
       const cards = await prisma.flashcard.findMany({
-        where: { userId: session.user.id },
+        where: { userId },
         orderBy: [{ nextReviewDate: "asc" }, { createdAt: "desc" }],
-        take: 20,
+        take: 100,
       });
       return res.status(200).json({ cards });
     } catch (error) {
@@ -27,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { flashcardId, rating } = req.body;
       const card = await prisma.flashcard.findFirst({
-        where: { id: flashcardId, userId: session.user.id },
+        where: { id: flashcardId, userId },
       });
       if (!card) return res.status(404).json({ message: "Card not found" });
 
@@ -55,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await prisma.flashcardReviewLog.create({
         data: {
           flashcardId,
-          userId: session.user.id,
+          userId,
           rating,
           reviewedAt: new Date(),
         },
@@ -75,7 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ message: "ID required" });
       }
       await prisma.flashcard.deleteMany({
-        where: { id, userId: session.user.id },
+        where: { id, userId },
       });
       return res.status(200).json({ message: "Deleted" });
     } catch (error) {
