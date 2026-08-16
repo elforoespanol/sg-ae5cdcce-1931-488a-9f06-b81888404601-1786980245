@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRegion } from "@/contexts/RegionContext";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import {
@@ -18,6 +19,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { VocabularyPopover } from "@/components/VocabularyPopover";
+import { RegionToggle } from "@/components/lessons/RegionToggle";
+import { VocabularyComparisonTable } from "@/components/lessons/VocabularyComparisonTable";
+import { DialogueCard } from "@/components/lessons/DialogueCard";
+import { LessonQuiz } from "@/components/lessons/LessonQuiz";
+import { RegionAwareFlashcard } from "@/components/lessons/RegionAwareFlashcard";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +59,12 @@ interface Lesson {
   durationMinutes: number;
   vocabularyJson: VocabularyItem[] | null;
   grammarJson: GrammarItem[] | null;
+  // New region-aware fields
+  vocabularyTable?: import("@/lib/lessons-data").RegionalVocabItem[];
+  grammarSection?: import("@/lib/lessons-data").GrammarItem[];
+  dialogues?: import("@/lib/lessons-data").DialogueScenario[];
+  quiz?: import("@/lib/lessons-data").QuizQuestion[];
+  flashcards?: import("@/lib/lessons-data").FlashcardItem[];
   userProgress: {
     isCompleted: boolean;
     timeSpentMinutes: number;
@@ -247,6 +259,12 @@ function renderInline(text: string, vocabulary: VocabularyItem[]) {
   return finalResult;
 }
 
+function GrammarContent({ item }: { item: { spainContent: string; latamContent: string } }) {
+  const { isSpain } = useRegion();
+  const content = isSpain ? item.spainContent : item.latamContent;
+  return <p className="text-sm text-muted-foreground leading-relaxed">{content}</p>;
+}
+
 export default function LessonPage() {
   const { user: authUser, status } = useAuth();
   const router = useRouter();
@@ -439,22 +457,25 @@ export default function LessonPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              {isCompleted ? (
-                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg">
-                  <CheckCircle2 className="h-5 w-5" />
-                  <span className="font-medium">Completed</span>
-                </div>
-              ) : (
-                <Button
-                  onClick={handleMarkComplete}
-                  disabled={markingComplete}
-                  className="gap-2 bg-primary hover:bg-primary/90"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                  {markingComplete ? "Saving..." : "Mark Complete"}
-                </Button>
-              )}
+            <div className="flex flex-col items-end gap-3">
+              <RegionToggle />
+              <div className="flex items-center gap-3">
+                {isCompleted ? (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg">
+                    <CheckCircle2 className="h-5 w-5" />
+                    <span className="font-medium">Completed</span>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleMarkComplete}
+                    disabled={markingComplete}
+                    className="gap-2 bg-primary hover:bg-primary/90"
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    {markingComplete ? "Saving..." : "Mark Complete"}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -503,6 +524,111 @@ export default function LessonPage() {
                 Practice with AI Tutor
               </Button>
             </div>
+
+            {/* 4-Part Lesson Layout */}
+
+            {/* 1. Vocabulary Comparison Table */}
+            {lesson.vocabularyTable && lesson.vocabularyTable.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="mt-12"
+              >
+                <h2 className="font-serif text-2xl text-foreground mb-4">
+                  Vocabulary Comparison
+                </h2>
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-5">
+                    <VocabularyComparisonTable items={lesson.vocabularyTable} />
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* 2. Grammar & Pragmatics */}
+            {lesson.grammarSection && lesson.grammarSection.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="mt-12"
+              >
+                <h2 className="font-serif text-2xl text-foreground mb-4">
+                  Grammar & Pragmatics
+                </h2>
+                <div className="space-y-4">
+                  {lesson.grammarSection.map((item, idx) => (
+                    <Card key={idx} className="border-0 shadow-sm">
+                      <CardContent className="p-5">
+                        <h3 className="font-serif text-lg text-foreground mb-2">{item.title}</h3>
+                        <GrammarContent item={item} />
+                        {item.note && (
+                          <p className="mt-3 text-xs text-muted-foreground bg-muted p-2 rounded">
+                            <strong>Note:</strong> {item.note}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* 3. Contextual Dialogues */}
+            {lesson.dialogues && lesson.dialogues.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="mt-12"
+              >
+                <h2 className="font-serif text-2xl text-foreground mb-4">
+                  Contextual Dialogues
+                </h2>
+                <DialogueCard scenarios={lesson.dialogues} />
+              </motion.div>
+            )}
+
+            {/* 4. Interactive Practice Quiz */}
+            {lesson.quiz && lesson.quiz.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.4 }}
+                className="mt-12"
+              >
+                <h2 className="font-serif text-2xl text-foreground mb-4">
+                  Practice Quiz
+                </h2>
+                <LessonQuiz questions={lesson.quiz} />
+              </motion.div>
+            )}
+
+            {/* Lesson Flashcards */}
+            {lesson.flashcards && lesson.flashcards.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.5 }}
+                className="mt-12"
+              >
+                <h2 className="font-serif text-2xl text-foreground mb-4">
+                  Lesson Flashcards
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {lesson.flashcards.map((fc) => (
+                    <RegionAwareFlashcard
+                      key={fc.id}
+                      flashcard={fc}
+                      onAddToFlashcards={(card) => {
+                        toast.success(`"${card.backEnglish}" added to your deck`);
+                      }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Sidebar */}
