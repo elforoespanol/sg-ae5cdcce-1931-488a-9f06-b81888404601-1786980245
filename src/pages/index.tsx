@@ -338,7 +338,7 @@ export default function HomePage() {
                   <img
                     src="/logo.jpg"
                     alt="Español Mastery - Spanish language course logo"
-                    className="rounded-lg h-auto w-auto max-h-32 max-w-[320px] object-contain"
+                    className="rounded-lg h-auto w-auto max-h-40 max-w-[400px] object-contain"
                   />
                   <span className="font-serif text-lg font-bold leading-tight">
                     Español<br />
