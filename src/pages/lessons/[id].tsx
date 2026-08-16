@@ -549,8 +549,8 @@ export default function LessonPage() {
                   <div className="space-y-4">
                     {grammar.map((item, idx) => (
                       <div key={idx} className="p-3 rounded-lg bg-primary/5 border border-primary/10">
-                        <h4 className="font-medium text-foreground mb-1">{item.title}</h4>
-                        <p className="text-sm text-muted-foreground">{item.content}</p>
+                        <h4 className="font-medium text-foreground mb-1">{renderInline(item.title, vocabulary)}</h4>
+                        <p className="text-sm text-muted-foreground">{renderInline(item.content, vocabulary)}</p>
                       </div>
                     ))}
                   </div>
