@@ -1,37 +1,26 @@
-import { SessionProvider } from "next-auth/react";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@/contexts/ThemeProvider";
+import { RegionProvider } from "@/contexts/RegionContext";
+import { Toaster } from "@/components/ui/toaster";
 import { Navbar } from "@/components/Navbar";
 import { CookieConsent } from "@/components/CookieConsent";
-import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 
-export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+import "@/styles/globals.css";
+
+export default function App({ Component, pageProps }: AppProps) {
   return (
-    <SessionProvider session={session}>
+    <ThemeProvider>
       <AuthProvider>
-        <Navbar />
-        <main className="min-h-screen">
-          <Component {...pageProps} />
-        </main>
-        <CookieConsent />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              borderRadius: "12px",
-              padding: "12px 16px",
-            },
-            success: {
-              iconTheme: {
-                primary: "#e6734d",
-                secondary: "#fff",
-              },
-            },
-          }}
-        />
+        <RegionProvider>
+          <Navbar />
+          <main className="min-h-[calc(100vh-200px)]">
+            <Component {...pageProps} />
+          </main>
+          <CookieConsent />
+          <Toaster />
+        </RegionProvider>
       </AuthProvider>
-    </SessionProvider>
+    </ThemeProvider>
   );
 }
