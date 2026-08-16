@@ -14,7 +14,10 @@ import {
   LESSON_B2_08,
   LESSON_B2_09,
   LESSON_B2_10,
+  B2_LESSONS,
 } from "./b2-lessons";
+import { C1_LESSONS } from "./c1-lessons";
+import { C2_LESSONS } from "./c2-lessons";
 
 export type RegionMode = "SPAIN" | "LATAM";
 
@@ -98,18 +101,11 @@ export interface LessonData {
 }
 
 // ============================================================
-// ACTIVE LESSONS DATA — B2 (Upper-Intermediate) Complete
+// ACTIVE LESSONS DATA — All Levels A1–C2
 // ============================================================
 
 export const LESSONS_DATA: LessonData[] = [
-  LESSON_B2_01,
-  LESSON_B2_02,
-  LESSON_B2_03,
-  LESSON_B2_04,
-  LESSON_B2_05,
-  LESSON_B2_06,
-  LESSON_B2_07,
-  LESSON_B2_08,
-  LESSON_B2_09,
-  LESSON_B2_10,
+  ...B2_LESSONS,
+  ...C1_LESSONS,
+  ...C2_LESSONS,
 ];
