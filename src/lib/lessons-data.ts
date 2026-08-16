@@ -1,13 +1,61 @@
-export interface VocabularyItem {
+// ============================================================
+// REGION-AWARE SPANISH LESSON SCHEMA
+// CEFR Framework with Spain vs LATAM toggle support
+// ============================================================
+
+export type RegionMode = "SPAIN" | "LATAM";
+
+export interface RegionalVocabItem {
   word: string;
-  translation: string;
+  spainVariant: string;
+  latamVariant: string;
+  phoneticSpain: string;
+  phoneticLatam: string;
+  english: string;
   partOfSpeech: string;
-  example: string;
 }
 
 export interface GrammarItem {
   title: string;
-  content: string;
+  spainContent: string;
+  latamContent: string;
+  note: string;
+}
+
+export interface DialogueLine {
+  speaker: string;
+  text: string;
+  region: RegionMode;
+  setting: string;
+}
+
+export interface DialogueScenario {
+  id: string;
+  title: string;
+  region: RegionMode;
+  setting: string;
+  lines: DialogueLine[];
+}
+
+export interface QuizQuestion {
+  questionId: string;
+  type: "multiple-choice";
+  questionText: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+  regionContext?: RegionMode;
+}
+
+export interface FlashcardItem {
+  id: string;
+  frontSpain: string;
+  frontLatam: string;
+  backEnglish: string;
+  variantDifferenceNote: string;
+  exampleSentenceSpain: string;
+  exampleSentenceLatam: string;
+  partOfSpeech: string;
 }
 
 export interface LessonData {
@@ -15,15 +63,27 @@ export interface LessonData {
   title: string;
   slug: string;
   description: string;
-  content: string;
   difficulty: string;
   level: string;
   order: number;
   imageUrl: string | null;
   durationMinutes: number;
   isPublished: boolean;
-  vocabularyJson: VocabularyItem[];
-  grammarJson: GrammarItem[];
+  // Core 4-part layout
+  vocabularyTable: RegionalVocabItem[];
+  grammarSection: GrammarItem[];
+  dialogues: DialogueScenario[];
+  quiz: QuizQuestion[];
+  // Flashcards linked to this lesson
+  flashcards: FlashcardItem[];
+  // Legacy fields (for backward compatibility)
+  vocabularyJson: { word: string; translation: string; partOfSpeech: string; example: string }[];
+  grammarJson: { title: string; content: string }[];
+  content: string;
 }
+
+// ============================================================
+// ACTIVE LESSONS DATA (empty — awaiting batch imports)
+// ============================================================
 
 export const LESSONS_DATA: LessonData[] = [];
