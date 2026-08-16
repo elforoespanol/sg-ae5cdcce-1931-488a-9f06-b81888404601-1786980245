@@ -16,6 +16,9 @@ import {
   LESSON_B2_10,
   B2_LESSONS,
 } from "./b2-lessons";
+import { A1_LESSONS } from "./a1-lessons";
+import { A2_LESSONS } from "./a2-lessons";
+import { B1_LESSONS } from "./b1-lessons";
 import { C1_LESSONS } from "./c1-lessons";
 import { C2_LESSONS } from "./c2-lessons";
 
@@ -105,6 +108,9 @@ export interface LessonData {
 // ============================================================
 
 export const LESSONS_DATA: LessonData[] = [
+  ...A1_LESSONS,
+  ...A2_LESSONS,
+  ...B1_LESSONS,
   ...B2_LESSONS,
   ...C1_LESSONS,
   ...C2_LESSONS,
