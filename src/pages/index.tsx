@@ -336,9 +336,9 @@ export default function HomePage() {
               <div className="space-y-4">
                 <a className="flex items-center space-x-3" href="/">
                   <img
-                    src="/logo-new.png"
+                    src="/logo.jpg"
                     alt="Español Mastery - Spanish language course logo"
-                    className="rounded-lg h-64 w-auto object-contain"
+                    className="rounded-lg h-24 w-24 object-contain"
                   />
                   <span className="font-serif text-lg font-bold leading-tight">
                     Español<br />
