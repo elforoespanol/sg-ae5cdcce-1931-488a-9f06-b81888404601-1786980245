@@ -3,6 +3,19 @@
 // CEFR Framework with Spain vs LATAM toggle support
 // ============================================================
 
+import {
+  LESSON_B2_01,
+  LESSON_B2_02,
+  LESSON_B2_03,
+  LESSON_B2_04,
+  LESSON_B2_05,
+  LESSON_B2_06,
+  LESSON_B2_07,
+  LESSON_B2_08,
+  LESSON_B2_09,
+  LESSON_B2_10,
+} from "./b2-lessons";
+
 export type RegionMode = "SPAIN" | "LATAM";
 
 export interface RegionalVocabItem {
@@ -83,7 +96,18 @@ export interface LessonData {
 }
 
 // ============================================================
-// ACTIVE LESSONS DATA (empty — awaiting batch imports)
+// ACTIVE LESSONS DATA — B2 (Upper-Intermediate) Complete
 // ============================================================
 
-export const LESSONS_DATA: LessonData[] = [];
+export const LESSONS_DATA: LessonData[] = [
+  LESSON_B2_01,
+  LESSON_B2_02,
+  LESSON_B2_03,
+  LESSON_B2_04,
+  LESSON_B2_05,
+  LESSON_B2_06,
+  LESSON_B2_07,
+  LESSON_B2_08,
+  LESSON_B2_09,
+  LESSON_B2_10,
+];
