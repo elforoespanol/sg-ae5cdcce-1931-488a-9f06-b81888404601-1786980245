@@ -76,13 +76,13 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/40 bg-white/90 backdrop-blur-md" role="navigation" aria-label="Main navigation">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-20 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group shrink-0" aria-label="Español Mastery - Home">
           <img
             src="/logo.jpg"
             alt="Español Mastery"
-            className="h-14 w-14 rounded-lg object-contain"
+            className="h-16 w-16 rounded-lg object-contain"
           />
         </Link>
 
