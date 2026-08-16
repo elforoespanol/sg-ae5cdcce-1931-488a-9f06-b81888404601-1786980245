@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Volume2, X } from "lucide-react";
+import { Plus, Volume2, X, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface VocabularyItem {
@@ -17,6 +17,38 @@ interface VocabularyPopoverProps {
 
 export function VocabularyPopover({ item, children }: VocabularyPopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  const handleAddToFlashcards = async () => {
+    if (adding || added) return;
+    setAdding(true);
+
+    try {
+      const res = await fetch("/api/flashcards/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          spanishText: item.word,
+          englishText: item.translation,
+          exampleSentence: item.example,
+          partOfSpeech: item.partOfSpeech,
+        }),
+      });
+
+      if (res.ok) {
+        setAdded(true);
+        setTimeout(() => setAdded(false), 2000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        console.error("Failed to add flashcard:", data.message || res.statusText);
+      }
+    } catch (err) {
+      console.error("Add to flashcard error:", err);
+    } finally {
+      setAdding(false);
+    }
+  };
 
   return (
     <span className="relative inline-block">
@@ -71,16 +103,23 @@ export function VocabularyPopover({ item, children }: VocabularyPopoverProps) {
                 </div>
 
                 <Button
-                  variant="outline"
+                  variant={added ? "default" : "outline"}
                   size="sm"
                   className="w-full gap-2 text-xs"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // TODO: Add to flashcards
+                    handleAddToFlashcards();
                   }}
+                  disabled={adding || added}
                 >
-                  <Plus className="h-3.5 w-3.5" />
-                  Add to Flashcards
+                  {adding ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : added ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    <Plus className="h-3.5 w-3.5" />
+                  )}
+                  {added ? "Added!" : "Add to Flashcards"}
                 </Button>
               </div>
 
