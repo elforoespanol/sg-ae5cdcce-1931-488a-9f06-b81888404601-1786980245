@@ -1,6 +1,6 @@
 ---
 title: Spain/LATAM Toggle Architecture & Lesson Framework
-status: in_progress
+status: done
 priority: urgent
 type: feature
 tags: [architecture, lessons, spain-latam, toggle]
@@ -12,58 +12,17 @@ position: 1
 Initialize the structural framework for CEFR-based Spanish lessons with a Spain vs LATAM regional toggle. Lessons array stays empty until data batches arrive.
 
 ## Checklist
-- [ ] Create RegionContext (global Spain/LATAM toggle state)
-- [ ] Update lessons-data.ts with new schema (vocab comparison, dialogues, quiz, flashcards)
-- [ ] Create VocabularyComparisonTable component
-- [ ] Create DialogueCard component (3 Spain + 3 LATAM)
-- [ ] Create LessonQuiz component (5 MCQs)
-- [ ] Create RegionAwareFlashcard component
-- [ ] Wrap _app.tsx with RegionProvider
-- [ ] Update lesson detail page to render new sections
-- [ ] Verify build passes
-]]></update_file_sections><create_file file_path="src/contexts/RegionContext.tsx"><![CDATA[
-import React, { createContext, useContext, useState, useCallback } from "react";
+- [x] Create RegionContext (global Spain/LATAM toggle state)
+- [x] Update lessons-data.ts with new schema (vocab comparison, dialogues, quiz, flashcards)
+- [x] Create VocabularyComparisonTable component
+- [x] Create DialogueCard component (3 Spain + 3 LATAM)
+- [x] Create LessonQuiz component (5 MCQs)
+- [x] Create RegionAwareFlashcard component
+- [x] Wrap _app.tsx with RegionProvider
+- [x] Update lesson detail page to render new sections
+- [x] Verify build passes
 
-export type RegionMode = "SPAIN" | "LATAM";
-
-interface RegionContextValue {
-  currentMode: RegionMode;
-  setMode: (mode: RegionMode) => void;
-  toggleMode: () => void;
-  isSpain: boolean;
-  isLatam: boolean;
-}
-
-const RegionContext = createContext<RegionContextValue | undefined>(undefined);
-
-export function RegionProvider({ children }: { children: React.ReactNode }) {
-  const [currentMode, setCurrentMode] = useState<RegionMode>("LATAM");
-
-  const setMode = useCallback((mode: RegionMode) => {
-    setCurrentMode(mode);
-  }, []);
-
-  const toggleMode = useCallback(() => {
-    setCurrentMode((prev) => (prev === "SPAIN" ? "LATAM" : "SPAIN"));
-  }, []);
-
-  return (
-    <RegionContext.Provider
-      value={{
-        currentMode,
-        setMode,
-        toggleMode,
-        isSpain: currentMode === "SPAIN",
-        isLatam: currentMode === "LATAM",
-      }}
-    >
-      {children}
-    </RegionContext.Provider>
-  );
-}
-
-export function useRegion() {
-  const ctx = useContext(RegionContext);
-  if (!ctx) throw new Error("useRegion must be used within RegionProvider");
-  return ctx;
-}
+## Acceptance
+- [ ] Region toggle visible in lesson header
+- [ ] Switching toggle updates vocabulary table, grammar content, dialogues, and flashcards
+- [ ] Quiz component renders 5 questions with scoring
