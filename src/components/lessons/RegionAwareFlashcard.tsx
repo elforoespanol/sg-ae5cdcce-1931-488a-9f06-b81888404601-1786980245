@@ -11,9 +11,10 @@ interface RegionAwareFlashcardProps {
 }
 
 export function RegionAwareFlashcard({ flashcard, onAddToFlashcards }: RegionAwareFlashcardProps) {
-  const { isSpain } = useRegion();
+  const { region } = useRegion();
   const [flipped, setFlipped] = useState(false);
 
+  const isSpain = region === "SPAIN";
   const frontText = isSpain ? flashcard.frontSpain : flashcard.frontLatam;
   const exampleText = isSpain
     ? flashcard.exampleSentenceSpain
