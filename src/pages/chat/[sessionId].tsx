@@ -1,17 +1,19 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
-import { Loader2, MessageSquare, BookOpen, ArrowLeft } from "lucide-react";
+import { Send, ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ChatBubble } from "@/components/chat/ChatBubble";
-import { ChatInput } from "@/components/chat/ChatInput";
+import { CorrectionDisplay } from "@/components/chat/CorrectionDisplay";
+import Head from "next/head";
 import { useAITutor } from "@/hooks/useAITutor";
-import { dynamic } from "next/dynamic";
 
 export const dynamic = "force-dynamic";
 
-interface ChatMessageData {
+interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
