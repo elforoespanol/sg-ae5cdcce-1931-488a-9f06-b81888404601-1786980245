@@ -20,19 +20,29 @@ interface UserStats {
 }
 
 export default function AccountPage() {
-  const { data: session, status, update } = useSession();
+  const [isMounted, setIsMounted] = useState(false);
+  const sessionData = useSession();
   const router = useRouter();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const session = sessionData?.data;
+  const status = sessionData?.status ?? "loading";
+  const update = sessionData?.update;
+
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     if (status === "unauthenticated") {
       router.push("/login");
     } else if (status === "authenticated") {
       fetchStats();
     }
-  }, [status, router]);
+  }, [status, router, isMounted]);
 
   async function fetchStats() {
     try {
@@ -59,7 +69,7 @@ export default function AccountPage() {
     }
   }
 
-  if (status === "loading" || loading) {
+  if (!isMounted || status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gradient-hero">
         <div className="container py-8">
