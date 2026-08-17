@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Home, Search, Compass, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+export const dynamic = "force-dynamic";
+
 export default function NotFound() {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
