@@ -1,11 +1,16 @@
 import Head from "next/head";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { Trophy, Sparkles } from "lucide-react";
-import { AchievementCard } from "@/components/achievements/AchievementCard";
-import { ACHIEVEMENTS } from "@/lib/achievements";
 import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
+import { Trophy, Star, Flame, Zap, Award, Lock } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { AchievementCard } from "@/components/achievements/AchievementCard";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+import { ACHIEVEMENTS } from "@/lib/achievements";
+
+export const dynamic = "force-dynamic";
 
 interface UnlockedAchievement {
   achievementId: string;

@@ -2,12 +2,15 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Plus, Clock, ChevronRight, Loader2 } from "lucide-react";
+import { MessageSquare, Plus, Trash2, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+
+export const dynamic = "force-dynamic";
 
 interface ChatSession {
   id: string;

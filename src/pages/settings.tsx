@@ -12,6 +12,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProfileForm } from "@/components/settings/ProfileForm";
+import { PasswordChange } from "@/components/settings/PasswordChange";
+import { DailyGoalSelector } from "@/components/settings/DailyGoalSelector";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+
+export const dynamic = "force-dynamic";
 
 export default function SettingsPage() {
   const { user: authUser, status } = useAuth();

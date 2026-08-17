@@ -8,6 +8,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getLevelInfo, getLevelColor } from "@/lib/achievements";
 import { formatDate } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 export default function ProfilePage() {
   const { user: authUser, status } = useAuth();
