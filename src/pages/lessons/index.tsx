@@ -129,9 +129,16 @@ export default function LessonsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Link href={`/lessons/${lesson.id}`}>
-                    <LessonCard lesson={lesson} isCompleted={false} />
-                  </Link>
+                  <LessonCard
+                    id={lesson.id}
+                    title={lesson.title}
+                    description={lesson.description}
+                    level={lesson.level}
+                    difficulty={lesson.difficulty}
+                    durationMinutes={lesson.durationMinutes}
+                    imageUrl={lesson.imageUrl}
+                    order={lesson.order}
+                  />
                 </motion.div>
               ))}
             </motion.div>
