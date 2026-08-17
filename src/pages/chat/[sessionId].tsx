@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { ChatBubble } from "@/components/chat/ChatBubble";
 import { ChatInput } from "@/components/chat/ChatInput";
 import { useAITutor } from "@/hooks/useAITutor";
+import { dynamic } from "next/dynamic";
+
+export const dynamic = "force-dynamic";
 
 interface ChatMessageData {
   id: string;

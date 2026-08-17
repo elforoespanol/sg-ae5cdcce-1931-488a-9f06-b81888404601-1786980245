@@ -35,6 +35,8 @@ import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
+export const dynamic = "force-dynamic";
+
 interface AdminStats {
   totalUsers: number;
   totalLessons: number;
