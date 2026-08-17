@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
-import { Send, ChevronLeft } from "lucide-react";
+import { Send, ArrowLeft, BookOpen, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChatBubble } from "@/components/chat/ChatBubble";
 import { CorrectionDisplay } from "@/components/chat/CorrectionDisplay";
+import { ChatInput } from "@/components/chat/ChatInput";
 import Head from "next/head";
-import { useAITutor } from "@/hooks/useAITutor";
 
 export const dynamic = "force-dynamic";
 
@@ -17,203 +17,171 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  hasCorrection: boolean;
-  originalText: string | null;
-  correctedText: string | null;
-  explanation: string | null;
-  createdAt: string;
+  correction?: {
+    original: string;
+    corrected: string;
+    explanation: string;
+  };
+  timestamp: Date;
 }
 
-export default function ChatPage() {
-  const { user: authUser, status } = useAuth();
+export default function ChatSessionPage() {
   const router = useRouter();
   const { sessionId } = router.query;
-  const [isLoading, setIsLoading] = useState(false);
-  const [sessionTitle, setSessionTitle] = useState("");
-  const [lessonTitle, setLessonTitle] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const {
-    messages,
-    isLoading: aiLoading,
-    error,
-    sendMessage,
-    setInitialMessages,
-  } = useAITutor({ sessionId: sessionId as string });
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
-    if (!sessionId || typeof sessionId !== "string") {
-      setIsLoading(false);
-      return;
+    if (!sessionId) return;
+    fetchMessages();
+  }, [sessionId]);
+
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch(`/api/tutor/messages?sessionId=${sessionId}`);
+      if (!res.ok) throw new Error("Failed to fetch messages");
+      const data = await res.json();
+      setMessages(data.messages || []);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
     }
-
-    // Client-side session: load from localStorage
-    if (sessionId.startsWith("local-chat-")) {
-      const localSession = localStorage.getItem(`sslid_chat_session_${sessionId}`);
-      if (localSession) {
-        try {
-          const parsed = JSON.parse(localSession);
-          setSessionTitle(parsed.title || "Chat with Sofía");
-          setInitialMessages(parsed.messages || []);
-        } catch (e) {
-          console.error("Failed to parse local session:", e);
-        }
-      } else {
-        setSessionTitle("Chat with Sofía");
-      }
-      setIsLoading(false);
-      return;
-    }
-
-    // Server-side session: fetch from API
-    setIsLoading(true);
-    fetch(`/api/tutor/messages?sessionId=${sessionId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.messages) {
-          const formatted = data.messages.map((m: ChatMessageData) => ({
-            id: m.id,
-            role: m.role as "user" | "assistant",
-            content: m.content,
-            hasCorrection: m.hasCorrection,
-            originalText: m.originalText || undefined,
-            correctedText: m.correctedText || undefined,
-            explanation: m.explanation || undefined,
-            createdAt: m.createdAt,
-          }));
-          setInitialMessages(formatted);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
-
-    fetch(`/api/tutor/sessions`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.sessions) {
-          const s = data.sessions.find((sess: any) => sess.id === sessionId);
-          if (s) {
-            setSessionTitle(s.title || "Chat with Sofía");
-            if (s.lesson) setLessonTitle(s.lesson.title);
-          }
-        }
-      })
-      .catch(console.error);
-  }, [sessionId, setInitialMessages]);
-
-  // Save messages to localStorage for client-side sessions
-  useEffect(() => {
-    if (typeof sessionId !== "string" || !sessionId.startsWith("local-chat-")) return;
-    if (messages.length === 0) return;
-    
-    const localSession = localStorage.getItem(`sslid_chat_session_${sessionId}`);
-    if (localSession) {
-      try {
-        const parsed = JSON.parse(localSession);
-        parsed.messages = messages;
-        parsed.updatedAt = new Date().toISOString();
-        localStorage.setItem(`sslid_chat_session_${sessionId}`, JSON.stringify(parsed));
-      } catch (e) {
-        console.error("Failed to save local session:", e);
-      }
-    }
-  }, [messages, sessionId]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const handleSend = (text: string) => {
-    sendMessage(text);
   };
 
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: inputValue,
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/tutor/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          userMessage: inputValue,
+          conversationHistory: messages,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to send message");
+      const data = await res.json();
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: data.response || "",
+        correction: data.correction,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!sessionId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="container py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push("/chat")}
-              className="gap-2 text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
+    <>
+      <Head>
+        <title>Chat Session | EspañolMastery</title>
+        <meta name="description" content="Practice conversation with AI tutor" />
+      </Head>
+
+      <div className="flex flex-col h-screen bg-background">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-card border-b p-4"
+        >
+          <div className="flex items-center gap-4 max-w-4xl mx-auto">
+            <Link href="/chat" className="p-2 hover:bg-muted rounded-lg">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
             <div className="flex-1">
-              <h1 className="font-serif text-lg font-semibold text-foreground">
-                {sessionTitle || "Chat with Sofía"}
+              <h1 className="font-bold text-lg flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                Spanish Conversation
               </h1>
-              {lessonTitle && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <BookOpen className="h-3 w-3" />
-                  {lessonTitle}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span className="text-xs text-muted-foreground">Sofía is online</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="container py-6 space-y-6">
-          {messages.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-16"
-            >
-              <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-amber-100 mb-4">
-                <MessageSquare className="h-7 w-7 text-amber-700" />
-              </div>
-              <h3 className="font-serif text-lg font-semibold text-foreground mb-2">
-                Hola! I'm Sofía
-              </h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Your AI Spanish tutor from Madrid. Start a conversation in Spanish and I'll help you improve!
+              <p className="text-sm text-muted-foreground">
+                Practice real-world dialogue
               </p>
-            </motion.div>
-          )}
+            </div>
+            <Link href="/lessons" className="p-2 hover:bg-muted rounded-lg">
+              <BookOpen className="w-5 h-5" />
+            </Link>
+          </div>
+        </motion.div>
 
-          {messages.map((msg, index) => (
-            <ChatBubble
-              key={msg.id}
-              role={msg.role}
-              content={msg.content}
-              timestamp={new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              correction={
-                msg.hasCorrection && msg.originalText && msg.correctedText
-                  ? {
-                      original: msg.originalText,
-                      corrected: msg.correctedText,
-                      explanation: msg.explanation || "",
-                    }
-                  : null
-              }
-              isStreaming={aiLoading && index === messages.length - 1 && msg.role === "assistant"}
-            />
-          ))}
-          <div ref={messagesEndRef} />
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto p-4 max-w-4xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="space-y-4"
+          >
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full gap-4">
+                <MessageSquare className="w-12 h-12 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  Start a conversation with your AI tutor
+                </p>
+              </div>
+            ) : (
+              messages.map((msg) => (
+                <div key={msg.id} className="space-y-2">
+                  <ChatBubble
+                    role={msg.role}
+                    content={msg.content}
+                    timestamp={msg.timestamp}
+                  />
+                  {msg.correction && (
+                    <CorrectionDisplay correction={msg.correction} />
+                  )}
+                </div>
+              ))
+            )}
+            {loading && (
+              <div className="flex gap-2 items-center text-muted-foreground">
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                <p>Tutor is thinking...</p>
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Input Area */}
+        <div className="bg-card border-t p-4 max-w-4xl mx-auto w-full">
+          <ChatInput
+            value={inputValue}
+            onChange={setInputValue}
+            onSend={handleSendMessage}
+            disabled={loading}
+            placeholder="Type your Spanish message..."
+          />
         </div>
       </div>
-
-      {/* Error */}
-      {error && (
-        <div className="container pb-2">
-          <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-2 text-sm text-destructive">
-            {error}
-          </div>
-        </div>
-      )}
-
-      {/* Input */}
-      <ChatInput onSend={handleSend} isLoading={aiLoading} />
-    </div>
+    </>
   );
 }
