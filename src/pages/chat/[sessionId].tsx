@@ -178,11 +178,9 @@ export default function ChatSessionPage() {
         {/* Input Area */}
         <div className="bg-card border-t p-4 max-w-4xl mx-auto w-full">
           <ChatInput
-            value={inputValue}
-            onChange={setInputValue}
             onSend={handleSendMessage}
+            isLoading={loading}
             disabled={loading}
-            placeholder="Type your Spanish message..."
           />
         </div>
       </div>
