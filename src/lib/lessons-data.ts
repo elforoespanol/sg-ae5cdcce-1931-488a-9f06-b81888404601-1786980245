@@ -3,12 +3,12 @@
 // CEFR Framework with Spain vs LATAM toggle support
 // ============================================================
 
-import { LESSON_A1_01 } from "./a1-lessons";
-import { LESSON_A2_01 } from "./a2-lessons-01-05";
-import { LESSON_B1_01 } from "./b1-lessons";
-import { LESSON_B2_01, LESSON_B2_02, LESSON_B2_03, LESSON_B2_04, LESSON_B2_05, LESSON_B2_06, LESSON_B2_07, LESSON_B2_08, LESSON_B2_09, LESSON_B2_10 } from "./b2-lessons";
-import { LESSON_C1_01, LESSON_C1_02, LESSON_C1_03, LESSON_C1_04, LESSON_C1_05, LESSON_C1_06, LESSON_C1_07, LESSON_C1_08, LESSON_C1_09, LESSON_C1_10 } from "./c1-lessons";
-import { LESSON_C2_01, LESSON_C2_02, LESSON_C2_03, LESSON_C2_04, LESSON_C2_05, LESSON_C2_06, LESSON_C2_07, LESSON_C2_08, LESSON_C2_09, LESSON_C2_10 } from "./c2-lessons";
+import { A1_LESSONS } from "./a1-lessons";
+import { A2_LESSONS } from "./a2-lessons-01-05";
+import { B1_LESSONS } from "./b1-lessons";
+import { B2_LESSONS } from "./b2-lessons";
+import { C1_LESSONS } from "./c1-lessons";
+import { C2_LESSONS } from "./c2-lessons";
 
 export type RegionMode = "SPAIN" | "LATAM";
 
