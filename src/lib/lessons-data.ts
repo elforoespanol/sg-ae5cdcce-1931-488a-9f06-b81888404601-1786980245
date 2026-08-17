@@ -3,8 +3,6 @@
 // CEFR Framework with Spain vs LATAM toggle support
 // ============================================================
 
-import type { RegionMode } from "./lessons-data";
-
 export type RegionMode = "SPAIN" | "LATAM";
 
 export interface RegionalVocabItem {
