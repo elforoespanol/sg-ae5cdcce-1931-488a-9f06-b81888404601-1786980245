@@ -82,17 +82,7 @@ export interface LessonData {
   imageUrl: string | null;
   durationMinutes: number;
   isPublished: boolean;
-  vocabularyTable: Array<{
-    word: string;
-    spainVariant: string;
-    latamVariant: string;
-    phoneticSpain: string;
-    phoneticLatam: string;
-    english: string;
-    partOfSpeech: string;
-    exampleSentenceSpain: string;
-    exampleSentenceLatam: string;
-  }>;
+  vocabularyTable: RegionalVocabItem[];
   grammarSection: Array<{
     title: string;
     spainContent: string;
