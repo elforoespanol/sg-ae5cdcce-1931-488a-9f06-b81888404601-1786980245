@@ -8,20 +8,5 @@
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
     "NEXTAUTH_URL",
     "NEXTAUTH_SECRET"
-  ],
-  "skipped_prerender": [
-    "/account",
-    "/dashboard",
-    "/profile",
-    "/settings",
-    "/admin",
-    "/chat",
-    "/chat/[sessionId]",
-    "/chat/new",
-    "/flashcards",
-    "/flashcards/manage",
-    "/lessons/[id]",
-    "/achievements",
-    "/password"
   ]
 }
