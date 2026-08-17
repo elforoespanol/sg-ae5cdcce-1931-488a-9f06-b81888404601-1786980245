@@ -1,0 +1,10 @@
+.git
+.gitignore
+README.md
+node_modules
+npm-debug.log
+.next
+.env.local
+.env.*.local
+.vercel
+.softgen
