@@ -1,16 +1,14 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { BookOpen, Lock } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 import { LessonCard } from "@/components/LessonCard";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
-import { RegionToggle } from "@/components/lessons/RegionToggle";
-import { useAuth } from "@/contexts/AuthContext";
-import { RegionContext } from "@/contexts/RegionContext";
-import type { LessonData } from "@/lib/lessons-data";
+import type { Lesson } from "@/lib/lessons-data";
 
 export const dynamic = "force-dynamic";
 
