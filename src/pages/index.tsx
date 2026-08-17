@@ -1,5 +1,9 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   ArrowRight,
   BookOpen,
@@ -7,8 +11,14 @@ import {
   Monitor,
   CheckCircle2,
   Quote,
+  Zap,
+  Users,
+  Target,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+export const dynamic = "force-dynamic";
 
 const pillars = [
   {
