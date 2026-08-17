@@ -28,7 +28,7 @@ export function RegionProvider({ children }: { children: ReactNode }) {
 }
 
 export function useRegion() {
-  const context = React.useContext(RegionContext);
+  const context = useContext(RegionContext);
   if (!context) {
     throw new Error("useRegion must be used within RegionProvider");
   }
