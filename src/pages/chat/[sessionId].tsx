@@ -154,7 +154,7 @@ export default function ChatSessionPage() {
                   <ChatBubble
                     role={msg.role}
                     content={msg.content}
-                    timestamp={msg.timestamp}
+                    timestamp={msg.timestamp.toISOString()}
                   />
                   {msg.correction && (
                     <CorrectionDisplay correction={msg.correction} />
