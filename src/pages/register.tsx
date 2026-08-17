@@ -14,6 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import Head from "next/head";
+import { motion } from "framer-motion";
+import { UserPlus } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default function RegisterPage() {
   const router = useRouter();

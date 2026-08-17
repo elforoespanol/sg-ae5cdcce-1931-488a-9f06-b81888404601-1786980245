@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -5,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle, AlertTriangle, Database, User, BookOpen, Trophy } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default function SeedPage() {
   const [loading, setLoading] = useState(false);

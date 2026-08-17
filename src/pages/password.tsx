@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PasswordChange } from "@/components/settings/PasswordChange";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 
+export const dynamic = "force-dynamic";
+
 export default function PasswordPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
