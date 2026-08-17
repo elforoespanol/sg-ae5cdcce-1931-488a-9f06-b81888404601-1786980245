@@ -3,10 +3,7 @@
 // CEFR Framework with Spain vs LATAM toggle support
 // ============================================================
 
-import { A1_LESSONS } from "./a1-lessons";
-import { A2_LESSONS } from "./a2-lessons-01-05";
-import { B1_LESSONS } from "./b1-lessons";
-import { B2_LESSONS } from "./b2-lessons";
+import type { RegionMode } from "./lessons-data";
 
 export type RegionMode = "SPAIN" | "LATAM";
 
@@ -65,37 +62,33 @@ export interface FlashcardItem {
   partOfSpeech: string;
 }
 
+export interface LessonContent {
+  title: string;
+  description: string;
+  dialogue?: { character: string; text: string; region: RegionMode }[];
+  vocabulary?: { word: string; translation: string; region?: RegionMode }[];
+  grammarNote?: string;
+  culturalNote?: string;
+}
+
 export interface LessonData {
   id: string;
   title: string;
-  slug: string;
-  description: string;
-  difficulty: string;
-  level: string;
-  order: number;
-  imageUrl: string | null;
-  durationMinutes: number;
-  isPublished: boolean;
-  // Core 4-part layout
-  vocabularyTable: RegionalVocabItem[];
-  grammarSection: GrammarItem[];
-  dialogues: DialogueScenario[];
-  quiz: QuizQuestion[];
-  // Flashcards linked to this lesson
-  flashcards: FlashcardItem[];
-  // Legacy fields (for backward compatibility)
-  vocabularyJson: { word: string; translation: string; partOfSpeech: string; example: string }[];
-  grammarJson: { title: string; content: string }[];
-  content: string;
+  level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+  level_order?: number;
+  order?: number;
+  content: LessonContent;
+  quiz?: { question: string; options: string[]; correct: number; explanation?: string }[];
+  resources?: { type: string; url: string; title: string }[];
+  estimatedMinutes?: number;
 }
 
 // ============================================================
 // ACTIVE LESSONS DATA — All Levels A1–C2
 // ============================================================
 
-export const LESSONS_DATA: LessonData[] = [
-  ...A1_LESSONS,
-  ...A2_LESSONS,
-  ...B1_LESSONS,
-  ...B2_LESSONS,
-];
+export const LESSONS_DATA: LessonData[] = [];
+
+export const getLessonsByLevel = (level: string): LessonData[] => {
+  return LESSONS_DATA.filter((lesson) => lesson.level === level.toUpperCase());
+};
