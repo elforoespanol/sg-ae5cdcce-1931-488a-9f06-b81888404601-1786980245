@@ -22,6 +22,8 @@ import { LessonCard } from "@/components/LessonCard";
 import { StreakCalendar } from "@/components/dashboard/StreakCalendar";
 import { XPProgress } from "@/components/dashboard/XPProgress";
 
+export const dynamic = "force-dynamic";
+
 interface Stats {
   streak: number;
   lastActiveDate: string | null;

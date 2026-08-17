@@ -10,6 +10,8 @@ import { SessionComplete } from "@/components/flashcards/SessionComplete";
 import { EmptyDeck } from "@/components/flashcards/EmptyDeck";
 import { useRouter } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 interface Flashcard {
   id: string;
   spanishText: string;
