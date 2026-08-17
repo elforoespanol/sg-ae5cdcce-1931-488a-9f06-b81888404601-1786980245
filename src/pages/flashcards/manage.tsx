@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
-import { Plus, Trash2, Edit2, BookOpen } from "lucide-react";
+import { Plus, Trash2, Edit2, BookOpen, Search, Award, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 
 export const dynamic = "force-dynamic";

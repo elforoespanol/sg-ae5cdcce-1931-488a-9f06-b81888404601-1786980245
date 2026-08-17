@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
-import { Trophy, Star, Flame, Zap, Award, Lock } from "lucide-react";
+import { Trophy, Sparkles, Flame, Zap, Award, Lock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AchievementCard } from "@/components/achievements/AchievementCard";
