@@ -8,10 +8,10 @@ interface DialogueCardProps {
 }
 
 export function DialogueCard({ scenarios }: DialogueCardProps) {
-  const { currentMode } = useRegion();
+  const { region } = useRegion();
 
-  const filtered = scenarios.filter((s) => s.region === currentMode);
-  const otherScenarios = scenarios.filter((s) => s.region !== currentMode);
+  const filtered = scenarios.filter((s) => s.region === region);
+  const otherScenarios = scenarios.filter((s) => s.region !== region);
 
   return (
     <div className="space-y-6">
@@ -50,7 +50,7 @@ export function DialogueCard({ scenarios }: DialogueCardProps) {
         <div className="flex items-center gap-3 py-2">
           <div className="h-px flex-1 bg-border" />
           <span className="text-xs text-muted-foreground font-medium">
-            {currentMode === "SPAIN" ? "LATAM Variants" : "Spain Variants"}
+            {region === "SPAIN" ? "LATAM Variants" : "Spain Variants"}
           </span>
           <div className="h-px flex-1 bg-border" />
         </div>
