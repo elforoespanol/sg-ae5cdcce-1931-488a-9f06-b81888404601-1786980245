@@ -7,7 +7,9 @@ interface VocabularyComparisonTableProps {
 }
 
 export function VocabularyComparisonTable({ items }: VocabularyComparisonTableProps) {
-  const { currentMode, isSpain } = useRegion();
+  const { region } = useRegion();
+
+  const isSpain = region === "SPAIN";
 
   return (
     <div className="overflow-x-auto">
