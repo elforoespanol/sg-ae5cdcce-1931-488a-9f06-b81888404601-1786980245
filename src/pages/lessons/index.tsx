@@ -9,6 +9,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { LessonCard } from "@/components/LessonCard";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import type { Lesson } from "@/lib/lessons-data";
+import { BookOpen, Lock } from "lucide-react";
+import { RegionContext } from "@/contexts/RegionContext";
+import { RegionToggle } from "@/components/lessons/RegionToggle";
 
 export const dynamic = "force-dynamic";
 
