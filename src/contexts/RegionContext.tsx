@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode } from "react";
+import { createContext, useState, useContext, ReactNode } from "react";
 
 export type RegionMode = "SPAIN" | "LATAM";
 
