@@ -1,9 +1,15 @@
+import Head from "next/head";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
-import { Search, Trash2, Award, BookOpen, Filter } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Plus, Trash2, Edit2, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LoadingSkeleton } from "@/components/LoadingSkeleton";
+
+export const dynamic = "force-dynamic";
 
 interface Flashcard {
   id: string;
