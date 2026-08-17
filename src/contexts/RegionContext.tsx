@@ -2,6 +2,16 @@ import React, { createContext, useContext, useState, useCallback } from "react";
 
 export type RegionMode = "SPAIN" | "LATAM";
 
+export interface RegionContextType {
+  region: RegionMode;
+  setRegion: (region: RegionMode) => void;
+}
+
+export const RegionContext = createContext<RegionContextType>({
+  region: "SPAIN",
+  setRegion: () => {},
+});
+
 interface RegionContextValue {
   currentMode: RegionMode;
   setMode: (mode: RegionMode) => void;
@@ -9,8 +19,6 @@ interface RegionContextValue {
   isSpain: boolean;
   isLatam: boolean;
 }
-
-const RegionContext = createContext<RegionContextValue | undefined>(undefined);
 
 export function RegionProvider({ children }: { children: React.ReactNode }) {
   const [currentMode, setCurrentMode] = useState<RegionMode>("LATAM");
