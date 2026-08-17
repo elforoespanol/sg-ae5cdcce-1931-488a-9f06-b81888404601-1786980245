@@ -18,7 +18,6 @@ const LEVELS = ["A1", "A2", "B1", "B2"];
 
 export default function LessonsPage() {
   const router = useRouter();
-  const { authUser } = useAuth();
   const [selectedLevel, setSelectedLevel] = useState("A1");
   const [region, setRegion] = useState<"SPAIN" | "LATAM">("SPAIN");
   const [lessons, setLessons] = useState<LessonData[]>([]);
