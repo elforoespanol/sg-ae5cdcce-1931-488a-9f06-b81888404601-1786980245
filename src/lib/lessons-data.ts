@@ -1,7 +1,5 @@
-// ============================================================
-// REGION-AWARE SPANISH LESSON SCHEMA
-// CEFR Framework with Spain vs LATAM toggle support
-// ============================================================
+// Type definitions only - lesson data is fetched from /api/lessons endpoints at runtime
+// This prevents bundling 65KB of lesson data at build time and causing OOM on Vercel
 
 export type RegionMode = "SPAIN" | "LATAM";
 
