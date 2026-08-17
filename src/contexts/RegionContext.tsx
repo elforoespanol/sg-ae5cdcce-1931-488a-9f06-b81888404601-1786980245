@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useState, ReactNode } from "react";
 
 export type RegionMode = "SPAIN" | "LATAM";
 
@@ -12,33 +12,14 @@ export const RegionContext = createContext<RegionContextType>({
   setRegion: () => {},
 });
 
-interface RegionContextValue {
-  currentMode: RegionMode;
-  setMode: (mode: RegionMode) => void;
-  toggleMode: () => void;
-  isSpain: boolean;
-  isLatam: boolean;
-}
-
-export function RegionProvider({ children }: { children: React.ReactNode }) {
-  const [currentMode, setCurrentMode] = useState<RegionMode>("LATAM");
-
-  const setMode = useCallback((mode: RegionMode) => {
-    setCurrentMode(mode);
-  }, []);
-
-  const toggleMode = useCallback(() => {
-    setCurrentMode((prev) => (prev === "SPAIN" ? "LATAM" : "SPAIN"));
-  }, []);
+export function RegionProvider({ children }: { children: ReactNode }) {
+  const [region, setRegion] = useState<RegionMode>("SPAIN");
 
   return (
     <RegionContext.Provider
       value={{
-        currentMode,
-        setMode,
-        toggleMode,
-        isSpain: currentMode === "SPAIN",
-        isLatam: currentMode === "LATAM",
+        region,
+        setRegion,
       }}
     >
       {children}
@@ -47,7 +28,9 @@ export function RegionProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useRegion() {
-  const ctx = useContext(RegionContext);
-  if (!ctx) throw new Error("useRegion must be used within RegionProvider");
-  return ctx;
+  const context = React.useContext(RegionContext);
+  if (!context) {
+    throw new Error("useRegion must be used within RegionProvider");
+  }
+  return context;
 }
