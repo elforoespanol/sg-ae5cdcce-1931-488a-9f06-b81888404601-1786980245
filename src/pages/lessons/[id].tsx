@@ -27,6 +27,8 @@ import { RegionAwareFlashcard } from "@/components/lessons/RegionAwareFlashcard"
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 const difficultyColors: Record<string, string> = {
   BEGINNER: "bg-emerald-100 text-emerald-700",
   ELEMENTARY: "bg-blue-100 text-blue-700",
