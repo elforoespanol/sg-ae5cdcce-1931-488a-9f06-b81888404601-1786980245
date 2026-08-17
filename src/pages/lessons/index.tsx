@@ -17,7 +17,7 @@ export default function LessonsPage() {
   const router = useRouter();
   const [selectedLevel, setSelectedLevel] = useState("A1");
   const [region, setRegion] = useState<"SPAIN" | "LATAM">("SPAIN");
-  const [lessons, setLessons] = useState<LessonData[]>([]);
+  const [lessons, setLessons] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
