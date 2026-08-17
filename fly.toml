@@ -31,3 +31,4 @@ http_checks = [
 cpu_kind = "shared"
 cpus = 1
 memory_mb = 1024
+flyctl deploy
