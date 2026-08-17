@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { ProfileForm } from "@/components/settings/ProfileForm";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 
+export const dynamic = "force-dynamic";
+
 interface UserStats {
   createdAt: string;
   totalStudyMinutes: number;
