@@ -73,14 +73,65 @@ export interface LessonContent {
 
 export interface LessonData {
   id: string;
+  slug: string;
   title: string;
-  level: "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
-  level_order?: number;
-  order?: number;
-  content: LessonContent;
-  quiz?: { question: string; options: string[]; correct: number; explanation?: string }[];
-  resources?: { type: string; url: string; title: string }[];
-  estimatedMinutes?: number;
+  description: string;
+  level: "A1" | "A2" | "B1" | "B2";
+  difficulty: string;
+  order: number;
+  imageUrl: string | null;
+  durationMinutes: number;
+  isPublished: boolean;
+  vocabularyTable: Array<{
+    word: string;
+    spainVariant: string;
+    latamVariant: string;
+    phoneticSpain: string;
+    phoneticLatam: string;
+    english: string;
+    partOfSpeech: string;
+    exampleSentenceSpain: string;
+    exampleSentenceLatam: string;
+  }>;
+  grammarSection: Array<{
+    title: string;
+    spainContent: string;
+    latamContent: string;
+    note: string;
+  }>;
+  dialogues: Array<{
+    id: string;
+    title: string;
+    region: RegionMode;
+    setting: string;
+    lines: Array<{
+      speaker: string;
+      text: string;
+      region: RegionMode;
+      setting: string;
+    }>;
+  }>;
+  quiz: Array<{
+    questionId: string;
+    type: string;
+    questionText: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+  }>;
+  flashcards: Array<{
+    id: string;
+    frontSpain: string;
+    frontLatam: string;
+    backEnglish: string;
+    variantDifferenceNote: string;
+    exampleSentenceSpain: string;
+    exampleSentenceLatam: string;
+    partOfSpeech: string;
+  }>;
+  vocabularyJson: any[];
+  grammarJson: any[];
+  content: string;
 }
 
 // ============================================================
