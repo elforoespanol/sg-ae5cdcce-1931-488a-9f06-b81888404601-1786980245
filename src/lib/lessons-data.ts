@@ -15,8 +15,8 @@ export interface RegionalVocabItem {
   phoneticLatam: string;
   english: string;
   partOfSpeech: string;
-  exampleSentenceSpain?: string;
-  exampleSentenceLatam?: string;
+  exampleSentenceSpain: string;
+  exampleSentenceLatam: string;
 }
 
 export interface GrammarItem {
