@@ -157,7 +157,11 @@ export default function ChatSessionPage() {
                     timestamp={msg.timestamp.toISOString()}
                   />
                   {msg.correction && (
-                    <CorrectionDisplay correction={msg.correction} />
+                    <CorrectionDisplay
+                      original={msg.correction.original}
+                      corrected={msg.correction.corrected}
+                      explanation={msg.correction.explanation}
+                    />
                   )}
                 </div>
               ))
