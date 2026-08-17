@@ -262,7 +262,8 @@ function renderInline(text: string, vocabulary: VocabularyItem[]) {
 }
 
 function GrammarContent({ item }: { item: { spainContent: string; latamContent: string } }) {
-  const { isSpain } = useRegion();
+  const { region } = useRegion();
+  const isSpain = region === "SPAIN";
   const content = isSpain ? item.spainContent : item.latamContent;
   return <p className="text-sm text-muted-foreground leading-relaxed">{content}</p>;
 }
