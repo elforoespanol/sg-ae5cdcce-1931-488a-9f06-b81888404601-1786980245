@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -6,8 +8,6 @@ import { User, Mail, Shield, Calendar, Clock, Trash2, AlertTriangle } from "luci
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
-
-export const dynamic = "force-dynamic";
 
 interface UserStats {
   createdAt: string;
