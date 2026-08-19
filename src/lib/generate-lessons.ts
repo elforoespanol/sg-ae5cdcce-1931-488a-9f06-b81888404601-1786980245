@@ -1,7 +1,10 @@
 import type { LessonData, RegionalVocabItem, GrammarItem, DialogueScenario, QuizQuestion, FlashcardItem } from "./lessons-data";
+import { generateA1Lessons } from "./generate-lessons";
 import { generateA2Lessons } from "./generate-a2-lessons";
 import { generateB1Lessons } from "./generate-b1-lessons";
 import { generateB2Lessons } from "./generate-b2-lessons";
+import { generateC1Lessons } from "./generate-c1-lessons";
+import { generateC2Lessons } from "./generate-c2-lessons";
 
 const A1_LESSONS = {
   "a1-01-greetings": {
@@ -410,10 +413,11 @@ export function generateA1Lessons(): LessonData[] {
 }
 
 export function generateAllLessons(): LessonData[] {
-  // Return A1 + A2 lessons; B1, B2, C1, C2 will be added in subsequent batches
-  const a1Lessons = generateA1Lessons();
-  const a2Lessons = generateA2Lessons();
-  const b1Lessons = generateB1Lessons();
-  const b2Lessons = generateB2Lessons();
-  return [...a1Lessons, ...a2Lessons, ...b1Lessons, ...b2Lessons];
+  const a1 = generateA1Lessons();
+  const a2 = generateA2Lessons();
+  const b1 = generateB1Lessons();
+  const b2 = generateB2Lessons();
+  const c1 = generateC1Lessons();
+  const c2 = generateC2Lessons();
+  return [...a1, ...a2, ...b1, ...b2, ...c1, ...c2];
 }
