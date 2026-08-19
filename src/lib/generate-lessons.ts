@@ -1,4 +1,5 @@
 import type { LessonData, RegionalVocabItem, GrammarItem, DialogueScenario, QuizQuestion, FlashcardItem } from "./lessons-data";
+import { generateA2Lessons } from "./generate-a2-lessons";
 
 const A1_LESSONS = {
   "a1-01-greetings": {
