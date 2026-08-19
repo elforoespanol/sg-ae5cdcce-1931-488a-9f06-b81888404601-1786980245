@@ -443,8 +443,8 @@ export default function LessonPage() {
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Badge className={cn("font-medium", difficultyColors[lesson.difficulty])}>
-                  {lesson.difficulty.replace("_", " ")}
+                <Badge className={cn("font-medium", difficultyColors[lesson.difficulty || "ELEMENTARY"])}>
+                  {(lesson.difficulty || "ELEMENTARY").replace("_", " ")}
                 </Badge>
                 <span className="text-sm font-medium text-primary">{lesson.level}</span>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
