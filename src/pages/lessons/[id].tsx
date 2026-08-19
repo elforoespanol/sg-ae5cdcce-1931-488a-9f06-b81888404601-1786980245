@@ -76,6 +76,7 @@ interface Lesson {
 
 function renderContent(content: string, vocabulary: VocabularyItem[]) {
   // Simple markdown-like rendering
+  if (!content) return [];
   const lines = content.split("\n");
   const elements: React.ReactNode[] = [];
   let inTable = false;
