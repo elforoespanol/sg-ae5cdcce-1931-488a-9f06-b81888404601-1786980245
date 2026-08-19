@@ -13,7 +13,9 @@ import { Button } from "@/components/ui/button";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
+export async function getServerSideProps() {
+  return { props: {} };
+}
 
 export default function ProfilePage() {
   const { user: authUser, status } = useAuth();

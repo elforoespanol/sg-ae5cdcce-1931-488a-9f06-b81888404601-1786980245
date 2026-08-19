@@ -21,7 +21,9 @@ import { PasswordChange } from "@/components/settings/PasswordChange";
 import { DailyGoalSelector } from "@/components/settings/DailyGoalSelector";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 
-export const dynamic = "force-dynamic";
+export async function getServerSideProps() {
+  return { props: {} };
+}
 
 export default function SettingsPage() {
   const { user: authUser, status } = useAuth();
