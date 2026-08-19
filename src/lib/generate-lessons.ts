@@ -1,5 +1,4 @@
 import type { LessonData, RegionalVocabItem, GrammarItem, DialogueScenario, QuizQuestion, FlashcardItem } from "./lessons-data";
-import { generateA1Lessons } from "./generate-lessons";
 import { generateA2Lessons } from "./generate-a2-lessons";
 import { generateB1Lessons } from "./generate-b1-lessons";
 import { generateB2Lessons } from "./generate-b2-lessons";
