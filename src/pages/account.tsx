@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
@@ -7,6 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+
+export async function getServerSideProps() {
+  return { props: {} };
+}
 
 export default function AccountPage() {
   const { data: session, status } = useSession();
