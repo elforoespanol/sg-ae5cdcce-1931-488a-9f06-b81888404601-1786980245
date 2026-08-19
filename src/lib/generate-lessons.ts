@@ -407,7 +407,8 @@ export function generateA1Lessons(): LessonData[] {
 }
 
 export function generateAllLessons(): LessonData[] {
-  // For now, return only A1 lessons
-  // Will add A2, B1, B2, C1, C2 in subsequent batches
-  return generateA1Lessons();
+  // Return A1 + A2 lessons; B1, B2, C1, C2 will be added in subsequent batches
+  const a1Lessons = generateA1Lessons();
+  const a2Lessons = generateA2Lessons();
+  return [...a1Lessons, ...a2Lessons];
 }
