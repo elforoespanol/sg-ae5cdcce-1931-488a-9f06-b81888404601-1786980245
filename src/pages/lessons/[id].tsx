@@ -287,11 +287,12 @@ export default function LessonPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!id || status !== "authenticated") return;
+    if (!router.isReady || !id || status !== "authenticated") return;
 
     const fetchLesson = async () => {
       try {
         const res = await fetch(`/api/lessons/${id}`);
+        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
         const data = await res.json();
         setLesson(data);
       } catch (error) {
@@ -302,7 +303,7 @@ export default function LessonPage() {
     };
 
     fetchLesson();
-  }, [id, status]);
+  }, [id, status, router.isReady]);
 
   // Track time spent
   useEffect(() => {
