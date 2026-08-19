@@ -2,6 +2,10 @@ import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { motion } from "framer-motion";
+import { Search, BookOpen, Award, Filter, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export async function getServerSideProps() {
   return { props: {} };
