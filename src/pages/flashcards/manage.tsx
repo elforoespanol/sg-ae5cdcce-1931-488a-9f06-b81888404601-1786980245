@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState, useEffect } from "react";
@@ -11,8 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { LoadingSkeleton } from "@/components/LoadingSkeleton";
 import Link from "next/link";
-
-export const dynamic = "force-dynamic";
 
 interface Flashcard {
   id: string;
