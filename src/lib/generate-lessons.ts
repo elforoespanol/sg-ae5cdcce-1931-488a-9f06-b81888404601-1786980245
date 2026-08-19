@@ -1,5 +1,6 @@
 import type { LessonData, RegionalVocabItem, GrammarItem, DialogueScenario, QuizQuestion, FlashcardItem } from "./lessons-data";
 import { generateA2Lessons } from "./generate-a2-lessons";
+import { generateB1Lessons } from "./generate-b1-lessons";
 
 const A1_LESSONS = {
   "a1-01-greetings": {
@@ -411,5 +412,6 @@ export function generateAllLessons(): LessonData[] {
   // Return A1 + A2 lessons; B1, B2, C1, C2 will be added in subsequent batches
   const a1Lessons = generateA1Lessons();
   const a2Lessons = generateA2Lessons();
-  return [...a1Lessons, ...a2Lessons];
+  const b1Lessons = generateB1Lessons();
+  return [...a1Lessons, ...a2Lessons, ...b1Lessons];
 }
