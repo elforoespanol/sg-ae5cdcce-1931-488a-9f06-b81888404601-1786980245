@@ -75,7 +75,7 @@ const LESSON_STRUCTURE = {
   ],
 };
 
-const VOCABULARY_DATABASE: Record<string, RegionalVocabItem[]> = {
+const CORE_VOCABULARY: Record<string, RegionalVocabItem[]> = {
   "a1-01-greetings": [
     { word: "Hello", spainVariant: "Hola", latamVariant: "Hola", phoneticSpain: "[OH-lah]", phoneticLatam: "[OH-lah]", english: "Hello", partOfSpeech: "interjection", exampleSentenceSpain: "¡Hola! ¿Cómo te va?", exampleSentenceLatam: "¡Hola! ¿Qué onda?" },
     { word: "Good morning", spainVariant: "Buenos días", latamVariant: "Buenos días", phoneticSpain: "[BWEH-nos DEE-ahs]", phoneticLatam: "[BWEH-nos DEE-ahs]", english: "Good morning", partOfSpeech: "phrase", exampleSentenceSpain: "Buenos días, ¿qué tal el día?", exampleSentenceLatam: "Buenos días, ¿cómo amaneciste?" },
@@ -96,23 +96,11 @@ const VOCABULARY_DATABASE: Record<string, RegionalVocabItem[]> = {
 };
 
 function generateVocabulary(slug: string, count: number): RegionalVocabItem[] {
-  const cached = VOCABULARY_DATABASE[slug];
-  if (cached && cached.length > 0) {
-    return cached.slice(0, count).length >= count ? cached.slice(0, count) : [
-      ...cached,
-      ...Array(count - cached.length).fill(null).map((_, i) => ({
-        word: `Word ${cached.length + i + 1}`,
-        spainVariant: `Palabra ${cached.length + i + 1} (España)`,
-        latamVariant: `Palabra ${cached.length + i + 1} (México)`,
-        phoneticSpain: "[pal-AH-brah]",
-        phoneticLatam: "[pal-AH-brah]",
-        english: `Word ${cached.length + i + 1}`,
-        partOfSpeech: "noun",
-        exampleSentenceSpain: `Ejemplo en España`,
-        exampleSentenceLatam: `Ejemplo en México`,
-      })),
-    ];
+  const cached = CORE_VOCABULARY[slug];
+  if (cached) {
+    return cached;
   }
+  
   return Array(count).fill(null).map((_, i) => ({
     word: `Word ${i + 1}`,
     spainVariant: `Palabra ${i + 1} (España)`,
