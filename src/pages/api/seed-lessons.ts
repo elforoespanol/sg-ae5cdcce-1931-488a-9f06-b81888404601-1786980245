@@ -25,15 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             order: lesson.order,
             imageUrl: lesson.imageUrl,
             durationMinutes: lesson.durationMinutes,
-            isPublished: lesson.isPublished,
-            vocabularyJson: {
-              vocabulary: lesson.vocabularyTable,
-              grammar: lesson.grammarSection,
-              dialogues: lesson.dialogues,
-              quiz: lesson.quiz,
-              flashcards: lesson.flashcards,
-            },
-            grammarJson: lesson.grammarSection,
+            isPublished: true,
+            vocabularyJson: lesson.vocabularyJson || [],
+            grammarJson: lesson.grammarJson || [],
             content: lesson.content,
           },
           { onConflict: "id" }
