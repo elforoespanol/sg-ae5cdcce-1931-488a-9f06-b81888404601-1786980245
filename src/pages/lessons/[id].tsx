@@ -208,7 +208,8 @@ function renderContent(content: string, vocabulary: VocabularyItem[]) {
 }
 
 function renderInline(text: string, vocabulary: VocabularyItem[]) {
-  if (!vocabulary || vocabulary.length === 0) return text;
+  // Ensure vocabulary is an array
+  if (!vocabulary || !Array.isArray(vocabulary) || vocabulary.length === 0) return text;
 
   let result: React.ReactNode[] = [text];
 
@@ -425,8 +426,8 @@ export default function LessonPage() {
 
   const progress = lesson.userProgress?.[0];
   const isCompleted = progress?.isCompleted ?? false;
-  const vocabulary = lesson.vocabularyJson ?? [];
-  const grammar = lesson.grammarJson ?? [];
+  const vocabulary = Array.isArray(lesson.vocabularyJson) ? lesson.vocabularyJson : [];
+  const grammar = Array.isArray(lesson.grammarJson) ? lesson.grammarJson : [];
 
   return (
     <div className="min-h-screen bg-gradient-hero pb-20">
